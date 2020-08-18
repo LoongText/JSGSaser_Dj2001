@@ -1,0 +1,109 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+{% load static %}
+{% include 'common/header.html' %}
+<body>
+<div class="single-detail-div" style="">
+    <div class="single-detail-div-bottom">
+        <h5>项目名称：{{ data.bidding__name }}</h5>
+        <form method="post" enctype="multipart/form-data" class="form-horizontal">
+            <div class="row form-group">
+                <div class="col col-md-3"><label for="disabled-input" class=" form-control-label">课题招标名称</label>
+                </div>
+                <div class="col-12 col-md-9"><input type="text" value="{{ data.re_title }}" disabled=""
+                                                    class="form-control"></div>
+            </div>
+            <div class="row form-group">
+                <div class="col col-md-3"><label for="disabled-input"
+                                                 class=" form-control-label">申请经费/万元</label></div>
+                <div class="col-12 col-md-9"><input type="text" id="bid-funds"
+                                                    value="{{ data.funds }}" disabled="" class="form-control">
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col col-md-3"><label for="disabled-input"
+                                                 class=" form-control-label">投标方</label></div>
+                <div class="col-12 col-md-9"><input type="text" id="bid-bidder"
+                                                    value="{{ data.bidder }}" disabled="" class="form-control">
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col col-md-3"><label for="disabled-input"
+                                                 class=" form-control-label">投标时间</label></div>
+                <div class="col-12 col-md-9"><input type="text" id="bid-bidder_date"
+                                                    value="{{ data.bidder_date }}" disabled="" class="form-control">
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col col-md-3"><label for="disabled-input" class=" form-control-label">申报理由</label>
+                </div>
+                <div class="col-12 col-md-9"><textarea id="bid-brief" rows="9" disabled=""
+                                                       class="form-control">{{ data.brief }}</textarea>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col col-md-3"><label for="disabled-input"
+                                                 class=" form-control-label">课题联系人</label></div>
+                <div class="col-12 col-md-9"><input type="text" id="bid-contacts"
+                                                    value="{{ data.contacts }}" disabled="" class="form-control">
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col col-md-3"><label for="disabled-input"
+                                                 class=" form-control-label">联系人电话</label></div>
+                <div class="col-12 col-md-9"><input type="text" id="bid-con_phone"
+                                                    value="{{ data.con_phone }}" disabled="" class="form-control">
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col col-md-3"><label for="disabled-input"
+                                                 class=" form-control-label">课题负责人</label></div>
+                <div class="col-12 col-md-9"><input type="text" id="bid-leader"
+                                                    value="{{ data.leader }}" disabled="" class="form-control">
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col col-md-3"><label for="disabled-input"
+                                                 class=" form-control-label">负责人电话</label></div>
+                <div class="col-12 col-md-9"><input type="text" id="bid-lea_phone"
+                                                    value="{{ data.lea_phone }}" disabled="" class="form-control">
+                </div>
+            </div>
+            <!-- 招标状态注释
+            <div class="row form-group">
+                <div class="col col-md-3"><label for="disabled-input"
+                                                 class=" form-control-label">招标状态</label></div>
+                <div class="col-12 col-md-9"><input type="text" id="bid-bidder_status"
+                                                    value="" disabled="" class="form-control">
+                </div>
+            </div>
+            -->
+            {#        <div class="row form-group">#}
+            {#            <div class="col col-md-3"><label for="disabled-input"#}
+            {#                                             class=" form-control-label">申请者</label></div>#}
+            {#            <div class="col-12 col-md-9"><input type="text" id="bid-submitter"#}
+            {#                                                value="{{ data.submitter__username }}" disabled="" class="form-control">#}
+            {#            </div>#}
+            {#        </div>#}
+        </form>
+{#        <div class="single-detail-div-button">#}
+{#            <a onclick="jieti_more_agree([{{ data.id }}],1)">#}
+{#                <button type="button" class="btn btn-outline-primary btn-sm">#}
+{#                    同意#}
+{#                </button>#}
+{#            </a>#}
+{#            <a onclick="jieti_more_agree([{{ data.id }}],1)">#}
+{#                <button type="button" class="btn btn-outline-danger btn-sm">驳回#}
+{#                </button>#}
+{#            </a>#}
+{#        </div>#}
+    </div>
+</div>
+</body>
+<script src="{% static 'backstage/js/back.js' %}"></script>
+</html>

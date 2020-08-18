@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>daterangepicker组件Demo</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+ 	<link rel="stylesheet" href="../css/daterangepicker.css">
+ 
+	<script src="jquery-2.2.3.min.js"></script>
+	<script src="moment.js"></script>
+	<script src="daterangepicker.js"></script>
+ <script type="text/javascript">
+
+ $(function () {
+	 	//区间时间插件
+	     $("input[name='date2']").daterangepicker(
+	    		 {
+	    	        // autoApply: true,
+	    	        autoUpdateInput: false,
+	    	        // alwaysShowCalendars: true,
+	    	        ranges: {
+	    	            '今天': [moment(),moment()],
+	    	            '近7天': [moment().subtract(7, 'days'), moment()],
+	    	            '这个月': [moment().startOf('month'), moment().endOf('month')]
+	    	        },
+	    	        locale: {
+	    	            format: "YYYY/MM/DD",
+	    	            separator: " - ",
+	    	            applyLabel: "确认",
+	    	            cancelLabel: "清空",
+	    	            fromLabel: "开始时间",
+	    	            toLabel: "结束时间",
+	    	            customRangeLabel: "自定义",
+	    	            daysOfWeek: ["日","一","二","三","四","五","六"],
+	    	            monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
+	    	        }
+	    	     }
+	     ).on('cancel.daterangepicker', function(ev, picker) {
+	         $("#date2").val("请选择日期范围");
+             $("#startTime").val("");
+             $("#endTime").val("");
+	     }).on('apply.daterangepicker', function(ev, picker) {
+             $("#startTime").val(picker.startDate.format('YYYY-MM-DD'));
+             $("#endTime").val(picker.endDate.format('YYYY-MM-DD'));
+             $("#date2").val(picker.startDate.format('YYYY-MM-DD')+" 至 "+picker.endDate.format('YYYY-MM-DD'));
+	 });
+	 	
+ });
+ </script>
+</head>
+<body>
+         <div class="form-group">
+            <label>区间</label>
+            <div>
+            	<input type="text" name="date2" id="date2" class="form-control" style="width: 20%;">
+            	 <input type="hidden" id = "startTime" name="startTime" class="form-control" />
+            	 <input type="hidden" id = "endTime" name="endTime" class="form-control" />
+            </div>
+         </div>
+</body>
+</html>

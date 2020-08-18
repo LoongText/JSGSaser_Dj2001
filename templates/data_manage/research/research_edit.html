@@ -1,0 +1,232 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+{% load static %}
+<!--<![endif]-->
+
+{% include 'common/header.html' %}
+{% block header_add_css %}
+    {#    <link rel="stylesheet" href="{% static 'backstage/daterangepicker/css/bootstrap.min.css' %}">#}
+    <link rel="stylesheet" href="{% static 'backstage/daterangepicker/css/daterangepicker.css' %}">
+{% endblock %}
+<body>
+{% include 'common/left_panel.html' %}
+
+<!-- Right Panel -->
+
+<div id="right-panel" class="right-panel">
+
+    {% include 'common/right_panel_header.html' %}
+
+    <div class="breadcrumbs">
+        <div class="col-sm-4">
+            <div class="page-header float-left">
+                <div class="page-title">
+                    <div class="icon-container">
+                        <a href="{% url 'back:rm' %}"><span class="ti-back-right"></span><span class="icon-name"></span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div class="page-header float-right">
+                <div class="page-title">
+                    <ol class="breadcrumb text-right">
+                        {#                        <li><a href="#">仪表板</a></li>#}
+                        <li><a href="#">数据管理</a></li>
+                        <li class="active">招标信息</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content mt-3">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-lg-8" style="margin:0 auto;">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong>招标信息编辑</strong>
+                        </div>
+                        <div class="card-body card-block">
+                            <form enctype="multipart/form-data" class="form-horizontal" id="research-edit-form">
+                                {% csrf_token %}
+                                <input type="text" name="uuid" hidden value="{{ data.uuid }}">
+                                <input type="text" name="bt" hidden value="" id="research-edit-bt-value">
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="text-input"
+                                                                     class=" form-control-label"><i
+                                            style="color: red; margin-right: 5px">*</i>题名</label></div>
+                                    <div class="col-12 col-md-9"><input type="text" id="research-edit-re-name" name="name"
+                                                                        required="required"
+                                                                        value="{{ data.name }}" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="text-input"
+                                                                     class=" form-control-label"><i
+                                            style="color: red; margin-right: 5px">*</i>起止时间</label></div>
+                                    <div class="col-12 col-md-9"><input name="date2" id="research-edit-re-date" type="text"
+                                                                        readonly="readonly"
+                                                                        required="required"
+                                                                        placeholder="请选择起止时间"
+                                                                        value="{{ data.start_date }}至{{ data.end_date }}"
+                                                                        class="form-control">
+                                    </div>
+                                    <input type="hidden" id="startTime" name="start_date" class="form-control"
+                                           value="{{ data.start_date }}"/>
+                                    <input type="hidden" id="endTime" name="end_date" class="form-control"
+                                           value="{{ data.end_date }}"/>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="select" class=" form-control-label">分类</label>
+                                    </div>
+                                    <div class="col-12 col-md-9">
+                                        <select name="classify" id="select" class="form-control">
+                                            <option value="1">发展</option>
+                                            <option value="2">监管</option>
+                                            <option value="3">党建</option>
+                                            <option value="4">改革</option>
+                                            <option value="5">其他</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="text-input"
+                                                                     class=" form-control-label">经费/万元</label></div>
+                                    <div class="col-12 col-md-9"><input type="text" id="text-input" name="funds"
+                                                                        value="{{ data.funds }}"
+                                                                        class="form-control"
+                                                                        onblur="validationNumber(this)" o_value="">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="text-input"
+                                                                     class=" form-control-label">联系人</label></div>
+                                    <div class="col-12 col-md-9"><input type="text" id="text-input" name="contacts"
+                                                                        value="{{ data.contacts }}"
+                                                                        class="form-control" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="text-input"
+                                                                     class=" form-control-label">联系人电话</label></div>
+                                    <div class="col-12 col-md-9"><input type="text" id="text-input" name="phone"
+                                                                        value="{{ data.phone }}"
+                                                                        class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="textarea-input" class=" form-control-label">具体要求</label>
+                                    </div>
+                                    <div class="col-12 col-md-9"><textarea name="brief" id="textarea-input" rows="9"
+                                                                           placeholder="请输入具体要求"
+                                                                           class="form-control">{{ data.brief }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="file-input"
+                                                                     class=" form-control-label">申报指南</label></div>
+                                    <div class="col-12 col-md-9"><input type="file" id="file-input" name="guidelines"
+                                                                        class="form-control-file">{{ data.guidelines }}
+                                    </div>
+                                </div>
+                                <div style="margin-top:40px;margin-bottom:20px;">
+                                    <div style="width:200px;margin:0 auto;">
+                                        <button type="button" class="btn btn-primary btn-sm" style="width: 40%"
+                                                onclick="research_edit(0)">
+                                            <i class="fa fa-dot-circle-o"></i> 保存
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-sm"
+                                                style="width: 40%; float: right" onclick="research_edit(1)">
+                                            <i class="fa fa-check"></i> 提交
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- .animated -->
+    </div><!-- .content -->
+</div><!-- /#right-panel -->
+<!-- Right Panel -->
+
+{% include 'common/include_js.html' %}
+{% block add_js %}
+    <script src="{% static 'backstage/vendors/jquery-validation/dist/jquery.validate.min.js' %}"></script>
+    {#            <script src="{% static 'backstage/vendors/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js' %}"></script>#}
+{% endblock %}
+<script src="{% static 'backstage/vendors/jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'backstage/daterangepicker/js/jquery-2.2.3.min.js' %}"></script>
+<script src="{% static 'backstage/daterangepicker/js/moment.js' %}"></script>
+<script src="{% static 'backstage/daterangepicker/js/daterangepicker.js' %}"></script>
+<script src="{% static 'backstage/layer/layer.js' %}" charset="utf-8"></script>
+<script src="{% static 'backstage/js/back.js' %}" charset="utf-8"></script>
+
+<script>
+    {#选中自有类型#}
+    var str ={{ data.classify }};
+    $(window).load(function () {
+        $('#select option').each(function () {
+            if ($(this).attr('value') == str) {
+                $(this).attr("selected", "selected");
+            }
+        })
+    });
+
+    {#function validationNumber(ob) {#}
+    {#    if (!ob.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?|\.\d*?)?$/)) {#}
+    {#        ob.value = "";#}
+    {#        layer.alert("请输入正确的数字", {icon: 2}, function (index) {#}
+    {#            layer.close(index)#}
+    {#        })#}
+    {#    } else {#}
+    {#        if (ob.value.match(/^\.\d+$/)) ob.value = 0 + ob.value;#}
+    {#        if (ob.value.match(/^\.$/)) ob.value = 0;#}
+    {#    }#}
+    {# }#}
+
+    $(function () {
+        //区间时间插件
+        $("input[name='date2']").daterangepicker(
+            {
+                // autoApply: true,
+                autoUpdateInput: false,
+                // alwaysShowCalendars: true,
+                /*ranges: {
+                    '今天': [moment(), moment()],
+                    '近7天': [moment().subtract(7, 'days'), moment()],
+                    '这个月': [moment().startOf('month'), moment().endOf('month')]
+                },*/
+                locale: {
+                    format: "YYYY/MM/DD",
+                    separator: " - ",
+                    applyLabel: "确认",
+                    cancelLabel: "清空",
+                    fromLabel: "开始时间",
+                    toLabel: "结束时间",
+                    customRangeLabel: "自定义",
+                    {#daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],#}
+                    {#monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]#}
+                }
+            }
+        ).on('cancel.daterangepicker', function (ev, picker) {
+            $("#date2").val("{{ data.start_date }}至{{ data.end_date }}");
+            $("#startTime").val("");
+            $("#endTime").val("");
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $("#startTime").val(picker.startDate.format('YYYY-MM-DD'));
+            $("#endTime").val(picker.endDate.format('YYYY-MM-DD'));
+            $("#date2").val(picker.startDate.format('YYYY-MM-DD') + " 至 " + picker.endDate.format('YYYY-MM-DD'));
+        });
+
+    });
+</script>
+</body>
+</html>

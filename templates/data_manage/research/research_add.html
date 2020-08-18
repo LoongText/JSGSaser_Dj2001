@@ -1,0 +1,194 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+{% load static %}
+<!--<![endif]-->
+
+{% include 'common/header.html' %}
+{% block header_add_css %}
+    {#    <link rel="stylesheet" href="{% static 'backstage/daterangepicker/css/bootstrap.min.css' %}">#}
+    <link rel="stylesheet" href="{% static 'backstage/daterangepicker/css/daterangepicker.css' %}">
+{% endblock %}
+<body>
+{% include 'common/left_panel.html' %}
+
+<!-- Right Panel -->
+
+<div id="right-panel" class="right-panel">
+
+    {% include 'common/right_panel_header.html' %}
+
+    <div class="breadcrumbs">
+        <div class="col-sm-4">
+            <div class="page-header float-left">
+                <div class="page-title">
+                    <div class="icon-container">
+                        <a href="{% url 'back:rm' %}"><span class="ti-back-right"></span><span class="icon-name"></span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div class="page-header float-right">
+                <div class="page-title">
+                    <ol class="breadcrumb text-right">
+                        {#                        <li><a href="#">仪表板</a></li>#}
+                        <li><a href="#">数据管理</a></li>
+                        <li class="active">招标信息</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content mt-3">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-lg-8" style="margin:0 auto;">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong>招标信息添加</strong>
+                        </div>
+                        <div class="card-body card-block">
+                            <form enctype="multipart/form-data" class="form-horizontal" id="research-add-form">
+                                {% csrf_token %}
+                                <input type="text" name="bt" hidden value="" id="research-add-bt-value">
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="text-input"
+                                                                     class=" form-control-label"><i
+                                            style="color: red; margin-right: 5px">*</i>题名</label></div>
+                                    <div class="col-12 col-md-9"><input type="text" id="research-add-re-name"
+                                                                        name="name"
+                                                                        required="required" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="text-input"
+                                                                     class=" form-control-label"><i
+                                            style="color: red; margin-right: 5px">*</i>起止时间</label></div>
+                                    <div class="col-12 col-md-9"><input name="date2" id="research-add-re-date" type="text"
+                                                                        readonly="readonly"
+                                                                        required="required"
+                                                                        placeholder="请选择起止时间"
+                                                                        class="form-control">
+                                    </div>
+                                    <input type="hidden" id="startTime" name="start_date" class="form-control"/>
+                                    <input type="hidden" id="endTime" name="end_date" class="form-control"/>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="select" class=" form-control-label">分类</label>
+                                    </div>
+                                    <div class="col-12 col-md-9">
+                                        <select name="classify" id="select" class="form-control">
+                                            <option value="1">发展</option>
+                                            <option value="2">监管</option>
+                                            <option value="3">党建</option>
+                                            <option value="4">改革</option>
+                                            <option value="5">其他</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="text-input"
+                                                                     class=" form-control-label">经费/万元</label></div>
+                                    <div class="col-12 col-md-9"><input type="text" id="text-input" name="funds"
+                                                                        class="form-control" value="0"
+                                                                        onblur="validationNumber(this)" o_value="">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="text-input"
+                                                                     class=" form-control-label">联系人</label></div>
+                                    <div class="col-12 col-md-9"><input type="text" id="text-input" name="contacts"
+                                                                        class="form-control" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="text-input"
+                                                                     class=" form-control-label">联系人电话</label></div>
+                                    <div class="col-12 col-md-9"><input type="text" id="text-input" name="phone"
+                                                                        class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="textarea-input" class=" form-control-label">具体要求</label>
+                                    </div>
+                                    <div class="col-12 col-md-9"><textarea name="brief" id="textarea-input" rows="9"
+                                                                           placeholder="请输入具体要求"
+                                                                           class="form-control"></textarea>
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col col-md-3"><label for="file-input"
+                                                                     class=" form-control-label">申报指南</label></div>
+                                    <div class="col-12 col-md-9"><input type="file" id="file-input" name="guidelines"
+                                                                        class="form-control-file">
+                                    </div>
+                                </div>
+                                <div style="margin-top:40px;margin-bottom:20px;">
+                                    <div style="width:200px;margin:0 auto;">
+                                        <button type="button" class="btn btn-primary btn-sm" style="width: 40%"
+                                                onclick="research_add(0)">
+                                            <i class="fa fa-dot-circle-o"></i> 保存
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-sm"
+                                                style="width: 40%; float: right" onclick="research_add(1)">
+                                            <i class="fa fa-check"></i> 提交
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- .animated -->
+    </div><!-- .content -->
+</div><!-- /#right-panel -->
+<!-- Right Panel -->
+
+{% include 'common/include_js.html' %}
+{% block add_js %}
+    <script src="{% static 'backstage/vendors/jquery-validation/dist/jquery.validate.min.js' %}"></script>
+{% endblock %}
+<script src="{% static 'backstage/vendors/jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'backstage/daterangepicker/js/jquery-2.2.3.min.js' %}"></script>
+<script src="{% static 'backstage/daterangepicker/js/moment.js' %}"></script>
+<script src="{% static 'backstage/daterangepicker/js/daterangepicker.js' %}"></script>
+<script src="{% static 'backstage/layer/layer.js' %}" charset="utf-8"></script>
+<script src="{% static 'backstage/js/back.js' %}" charset="utf-8"></script>
+
+<script>
+
+    $(function () {
+        //区间时间插件
+        $("input[name='date2']").daterangepicker(
+            {
+                autoUpdateInput: false,
+                locale: {
+                    format: "YYYY/MM/DD",
+                    separator: " - ",
+                    applyLabel: "确认",
+                    cancelLabel: "清空",
+                    fromLabel: "开始时间",
+                    toLabel: "结束时间",
+                    customRangeLabel: "自定义"
+                }
+            }
+        ).on('cancel.daterangepicker', function (ev, picker) {
+            $("#research-add-re-date").val("{{ data.start_date }}至{{ data.end_date }}");
+            $("#startTime").val("");
+            $("#endTime").val("");
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $("#startTime").val(picker.startDate.format('YYYY-MM-DD'));
+            $("#endTime").val(picker.endDate.format('YYYY-MM-DD'));
+            $("#research-add-re-date").val(picker.startDate.format('YYYY-MM-DD') + " 至 " + picker.endDate.format('YYYY-MM-DD'));
+        });
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+{% load static %}
+{% include 'common/header.html' %}
+<body>
+{% include 'common/left_panel.html' %}
+
+<!-- Right Panel -->
+
+<div id="right-panel" class="right-panel">
+
+    {% include 'common/right_panel_header.html' %}
+
+    <div class="breadcrumbs">
+        <div class="col-sm-4">
+            <div class="page-header float-left">
+                <div class="page-title">
+                    <h1>仪表盘</h1>
+                </div>
+            </div>
+        </div>
+    </div><!--/.col-->
+    <div class="content mt-3">
+        <div class="col-lg-3 col-md-6">
+            <div class="card text-white bg-flat-color-1">
+                <div class="card-body">
+                    <div class="stat-widget-four">
+                        <div class="stat-icon dib">
+                            <i class="ti-server text-white"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="text-left dib">
+                                <div class="stat-heading">研究成果</div>
+                                <div class="stat-text">{{ data.pro_sum }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card text-white bg-flat-color-2">
+                <div class="card-body">
+                    <div class="stat-widget-four">
+                        <div class="stat-icon dib">
+                            <i class="ti-user text-white"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="text-left dib">
+                                <div class="stat-heading">研究人员</div>
+                                <div class="stat-text">{{ data.par_sum }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--/.col-->
+        <div class="col-lg-3 col-md-6">
+            <div class="card text-white bg-flat-color-3">
+                <div class="card-body">
+                    <div class="stat-widget-four">
+                        <div class="stat-icon dib">
+                            <i class="ti-stats-up text-white"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="text-left dib">
+                                <div class="stat-heading">课题招标</div>
+                                <div class="stat-text">{{ data.res_sum }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--/.col-->
+        <div class="col-lg-3 col-md-6">
+            <div class="card text-white bg-flat-color-4">
+                <div class="card-body">
+                    <div class="stat-widget-four">
+                        <div class="stat-icon dib">
+                            <i class="ti-pulse text-white"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="text-left dib">
+                                <div class="stat-heading">课题推进</div>
+                                <div class="stat-text">{{ data.res_ing_sum }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--/.col-->
+        <div class="col-lg-3 col-md-6">
+            <div class="card text-white bg-flat-color-5">
+                <div class="card-body">
+                    <div class="stat-widget-four">
+                        <div class="stat-icon dib">
+                            <i class="ti-lock text-white"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="text-left dib">
+                                <div class="stat-heading">课题结题</div>
+                                <div class="stat-text">{{ data.res_ed_sum }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--/.col-->
+{#        <div class="col-lg-6">#}
+{#            <div class="card">#}
+{#                <div class="card-body">#}
+{#                    <h4 class="mb-3">Pie Chart</h4>#}
+{#                    <div class="flot-container">#}
+{#                        <div id="flot-pie" class="flot-pie-container" style="padding: 0px; position: relative;">#}
+{#                            <canvas class="flot-base" width="705" height="275"#}
+{#                                    style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 705px; height: 275px;"></canvas>#}
+{#                            <canvas class="flot-overlay" width="705" height="275"#}
+{#                                    style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 705px; height: 275px;"></canvas>#}
+{#                            <div class="legend">#}
+{#                                <div style="position: absolute; width: 68px; height: 84px; top: 5px; right: 5px; background-color: rgb(255, 255, 255); opacity: 0.85;"></div>#}
+{#                                <table style="position:absolute;top:5px;right:5px;;font-size:smaller;color:#545454">#}
+{#                                    <tbody>#}
+{#                                    <tr>#}
+{#                                        <td class="legendColorBox">#}
+{#                                            <div style="border:1px solid #ccc;padding:1px">#}
+{#                                                <div style="width:4px;height:0;border:5px solid #8fc9fb;overflow:hidden"></div>#}
+{#                                            </div>#}
+{#                                        </td>#}
+{#                                        <td class="legendLabel">Primary</td>#}
+{#                                    </tr>#}
+{#                                    <tr>#}
+{#                                        <td class="legendColorBox">#}
+{#                                            <div style="border:1px solid #ccc;padding:1px">#}
+{#                                                <div style="width:4px;height:0;border:5px solid #007BFF;overflow:hidden"></div>#}
+{#                                            </div>#}
+{#                                        </td>#}
+{#                                        <td class="legendLabel">Success</td>#}
+{#                                    </tr>#}
+{#                                    <tr>#}
+{#                                        <td class="legendColorBox">#}
+{#                                            <div style="border:1px solid #ccc;padding:1px">#}
+{#                                                <div style="width:4px;height:0;border:5px solid #19A9D5;overflow:hidden"></div>#}
+{#                                            </div>#}
+{#                                        </td>#}
+{#                                        <td class="legendLabel">Danger</td>#}
+{#                                    </tr>#}
+{#                                    <tr>#}
+{#                                        <td class="legendColorBox">#}
+{#                                            <div style="border:1px solid #ccc;padding:1px">#}
+{#                                                <div style="width:4px;height:0;border:5px solid #DC3545;overflow:hidden"></div>#}
+{#                                            </div>#}
+{#                                        </td>#}
+{#                                        <td class="legendLabel">Warning</td>#}
+{#                                    </tr>#}
+{#                                    </tbody>#}
+{#                                </table>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div><!-- /# card -->#}
+{#        </div>#}
+    </div> <!-- .content -->
+</div><!-- /#right-panel -->
+
+<!-- Right Panel -->
+
+{% include 'common/include_js.html' %}
+{% block add_js %}
+{#    <script src="{% static 'backstage/vendors/chart.js/dist/Chart.bundle.min.js' %}"></script>#}
+{#    <script src="{% static 'backstage/assets/js/dashboard.js' %}"></script>#}
+{#    <script src="{% static 'backstage/assets/js/widgets.js' %}"></script>#}
+{#    <script src="{% static 'backstage/vendors/jqvmap/dist/jquery.vmap.min.js' %}"></script>#}
+{#    <script src="{% static 'backstage/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>#}
+{#    <script src="{% static 'backstage/vendors/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>#}
+
+{% endblock %}
+
+{#<script>#}
+{#    (function ($) {#}
+{#        "use strict";#}
+{##}
+{#        jQuery('#vmap').vectorMap({#}
+{#            map: 'world_en',#}
+{#            backgroundColor: null,#}
+{#            color: '#ffffff',#}
+{#            hoverOpacity: 0.7,#}
+{#            selectedColor: '#1de9b6',#}
+{#            enableZoom: true,#}
+{#            showTooltip: true,#}
+{#            values: sample_data,#}
+{#            scaleColors: ['#1de9b6', '#03a9f5'],#}
+{#            normalizeFunction: 'polynomial'#}
+{#        });#}
+{#    })(jQuery);#}
+{#</script>#}
+
+</body>
+
+</html>

@@ -1,0 +1,151 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+{% load static %}
+<!--<![endif]-->
+
+{% include 'common/header.html' %}
+
+<body class="bg-dark">
+
+
+<div class="sufee-login d-flex align-content-center flex-wrap">
+    <div class="container">
+        <div class="login-content">
+            <div class="login-logo">
+                <a>
+                    <img class="align-content" src="{% static 'backstage/images/logo.png' %}" alt="">
+                </a>
+            </div>
+            <div class="login-form">
+                <form>
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" class="form-control" placeholder="请输入用户名" required id="user_name">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" class="form-control" placeholder="请输入密码" required id="user_password">
+                    </div>
+                    {#                    <div class="checkbox">#}
+                    {#                        <label>#}
+                    {#                            <input type="checkbox"> Remember Me#}
+                    {#                        </label>#}
+                    {#                        <label class="pull-right">#}
+                    {#                            <a href="#">Forgotten Password?</a>#}
+                    {#                        </label>#}
+                    {##}
+                    {#                    </div>#}
+                    {#                    <button type="submit" class="btn btn-success btn-flat m-b-30 m-t-30" onclick="login()">登录#}
+                    <button type="button" class="btn btn-success btn-flat m-b-30 m-t-30" onclick="login()">登录
+                    </button>
+                    {#                    <div class="social-login-content">#}
+                    {#                        <div class="social-button">#}
+                    {#                            <button type="button" class="btn social facebook btn-flat btn-addon mb-3"><i#}
+                    {#                                    class="ti-facebook"></i>Sign in with facebook#}
+                    {#                            </button>#}
+                    {#                            <button type="button" class="btn social twitter btn-flat btn-addon mt-2"><i#}
+                    {#                                    class="ti-twitter"></i>Sign in with twitter#}
+                    {#                            </button>#}
+                    {#                        </div>#}
+                    {#                    </div>#}
+                    {#                    <div class="register-link m-t-15 text-center">#}
+                    {#                        <p>Don't have account ? <a href="#"> Sign Up Here</a></p>#}
+                    {#                    </div>#}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% include 'common/include_js.html' %}
+{% block add_js %}
+    <script src="{% static 'backstage/layer/layer.js' %}" charset="utf-8"></script>
+    <script type="text/javascript" src="{% static 'backstage/mask/js/jquery-1.8.0.min.js' %}"></script>
+
+{% endblock %}
+
+</body>
+<script>
+    //登录
+    function login(param) {
+        {#var uuid = $(obj).attr('data-uuid');#}
+        var name = $('#user_name').val();
+        var password = $('#user_password').val();
+        console.log(name);
+        console.log(password);
+        $.post("{% url 'back:login' %}", {'username': name, 'password': password}, function (res) {
+            console.log('111' + res);
+            if (res == 1) {
+                var url = '/back/';
+                console.log(url);
+                if (param === 'close') {
+                    window.close()
+                } else {
+                    window.open(url, '_self');
+                }
+            } else {
+                $('#user_name').val('');
+                $('#user_password').val('');
+                $('#user_name').focus();
+                layer.msg('用户名与密码不匹配!', {icon: 2}, function (index) {
+                    layer.close(index)
+                });
+            }
+        })
+        // })
+
+    }
+
+    {#$('.login-btn').click(function () {#}
+    {#    var name = $('#user_name').val();#}
+    {#    var password = $('#user_password').val();#}
+    {#    // console.log(name, password);#}
+    {#    $.ajax({#}
+    {#        url: '/users/login/',#}
+    {#        dataType: 'json',#}
+    {#        type: 'post',#}
+    {#        async: true,#}
+    {#        data: {#}
+    {#            'name': name,#}
+    {#            'password': password#}
+    {#        },#}
+    {#        success: function (res) {#}
+    {#            // console.log(res);#}
+    {#            if (res.msg === 'ok') {#}
+    {#                var url = '/index/';#}
+    {#                // $('.login-btn').attr('href',url);#}
+    {#                window.open(url, '_self')#}
+    {#            } else {#}
+    {#                alert('用户名与密码不匹配！');#}
+    {#                $('#user_name').val('');#}
+    {#                $('#user_password').val('');#}
+    {#                $('#user_name').focus();#}
+    {#            }#}
+    {#        },#}
+    {#        error: function (res) {#}
+    {#            console.log(res)#}
+    {#        }#}
+    {#    })#}
+    {# });#}
+
+    var thisURL = document.URL; // 获取当前页面网址
+    if (thisURL.indexOf('psd') > 0) {
+        // var thisURL="https://www.baidu.com/?id=admin&psd=admin1234";
+        var showval = thisURL.split("&")[0]; // 获取的是用=分割之后，数组中的第二个元素。split()方法用于把一个字符串分割成字符串数组
+        var user = showval.split('=')[1];
+        var psw = thisURL.split("&")[1].split('=')[1];
+        console.log(showval);
+        console.log("user===" + user);
+        console.log("psw===" + psw);
+        $('#user_name').val(user);
+        $('#user_password').val(psw);
+        {#$('.login-btn').trigger('click'); // trigger(eventObj)触发被选元素要触发的事件#}
+        login('close');
+    }
+</script>
+</html>

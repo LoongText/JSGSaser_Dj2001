@@ -67,6 +67,6 @@ urlpatterns = [
     # path('to_start_screen/', RedirectView.as_view(url='http://10.170.128.150/static/jsg-dist/index.html#/'), name='login_out_re'),
     # login.js也要修改
     # path('to_start_screen/', RedirectView.as_view(url='http://wlaq.cnki.net/vue-jsg/#/'), name='to_start_screen'),
-    path('to_start_screen/', RedirectView.as_view(url='http://wlaq.cnki.net/vue-jsg/#/'), name='to_start_screen'),
+    path('to_start_screen/', RedirectView.as_view(url='https://iser.cnki.net/'), name='to_start_screen'),
     # path('to_start_screen/', RedirectView.as_view(url='http://10.170.128.108:8088/static/dist/index.html#/'), name='to_start_screen'),
 ]

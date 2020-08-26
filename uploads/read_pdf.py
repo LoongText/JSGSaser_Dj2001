@@ -15,7 +15,7 @@ class pdf2txtmanager(object):
     @staticmethod
     def pdf2text(file_path):
         # 以二进制读模式打开
-        file = open(path, 'rb')
+        file = open(file_path, 'rb')
         # 用文件对象来创建一个pdf文档分析器
         praser = PDFParser(file)
         # 创建一个PDF文档对象存储文档结构,提供密码初始化，没有就不用传该参数

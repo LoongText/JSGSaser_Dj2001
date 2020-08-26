@@ -91,10 +91,11 @@ WSGI_APPLICATION = 'jsg.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        # 'NAME': 'cnki_2001_jsg_dev',
+        # 'NAME': 'cnki_2001_iser_pro',
         # 'USER': 'postgres',
-        # 'PASSWORD': 'postgres',
-        # 'HOST': '101.200.126.33',
+        # 'PASSWORD': 'cnki.P@$$w0rd',
+        # 'HOST': '10.90.64.229',
+        # 'PORT': '5432',
         'NAME': 'cnki_2001_jsg_pro',
         'USER': 'postgres',
         'PASSWORD': 'cnki5722902',

@@ -1281,7 +1281,6 @@ def bid_edit_do(request):
     :param request:
     :return:
     """
-    print(request.POST)
     param_dict = request.POST
 
     edit_id = param_dict.get('edit_id')
@@ -1836,7 +1835,15 @@ def user_edit(request, uuid):
             is_manage = 1
     if data:
         data = data[0]
-    return render(request, 'user_manage/user/user_edit.html', {"data": data, "is_manage": is_manage})
+    # --判断登录用户等级--
+    user = request.user
+    user_level = 0
+    if user.is_superuser:
+        user_level = 1
+    else:
+        if request.session.get('group_id') == 2:
+            user_level = 1
+    return render(request, 'user_manage/user/user_edit.html', {"data": data, "is_manage": is_manage, 'user_level': user_level})
 
 
 # @login_required(login_url='/back/login/')
@@ -2124,7 +2131,15 @@ def org_edit(request, uuid):
         data = models.Organization.objects.values('uuid', 'nature', 'is_a', 'is_b', 'brief', 'name', 'photo').filter(uuid=uuid)
         if data:
             data = data[0]
-        return render(request, 'user_manage/org/org_edit.html', {"data": data})
+        # --判断登录用户等级--
+        user = request.user
+        user_level = 0
+        if user.is_superuser:
+            user_level = 1
+        else:
+            if request.session.get('group_id') == 2:
+                user_level = 1
+        return render(request, 'user_manage/org/org_edit.html', {"data": data, "user_level": user_level})
     elif request.method == 'POST':
         print(request.POST)
         param_dict = request.POST

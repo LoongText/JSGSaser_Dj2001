@@ -14,7 +14,7 @@ function login_out() {
             },
             complete: function (jqXHR, textStatus) {
                 // window.open('http://wlaq.cnki.net/vue-jsg/#/', '_self')
-                window.open('http://wlaq.cnki.net/vue-jsg/#/', '_self')
+                window.open('https://iser.cnki.net/', '_self')
                 // window.open('http://10.170.128.108:8088/static/dist/index.html#/', '_self')
             },
         });

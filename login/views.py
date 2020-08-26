@@ -7,7 +7,7 @@ from functools import wraps
 from django.contrib.auth .models import Group
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.models import Token
-from tables.models import User, RunInfo
+from tables.models import User, RunInfo, UserBehavior
 from rest_framework.decorators import authentication_classes
 from login.auth import ExpiringTokenAuthentication
 from django.views.decorators.csrf import csrf_exempt
@@ -166,3 +166,14 @@ def set_run_info(level, address, keyword, user=None):
     :return:
     """
     RunInfo.objects.create(level=level, address=address, user=user, keyword=keyword)
+
+
+def add_user_behavior(keyword: str, search_con: str, user_obj=None):
+    """
+    添加行为记录
+    :param keyword: 关键词, 不为空
+    :param search_con: 内容，不为空
+    :param user_obj: 对象，为空时是游客
+    :return:
+    """
+    UserBehavior.objects.create(user=user_obj, keyword=keyword, search_con=search_con)

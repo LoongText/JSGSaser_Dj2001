@@ -14,6 +14,12 @@ class BaseCreateSerializer(serializers.ModelSerializer):
         fields = ['name', 'classify', 'start_date', 'end_date', 'status', 'guidelines', 'funds', 'brief', 'contacts', 'phone', 'user']
 
 
+class BaseUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Research
+        fields = ['name', 'classify', 'start_date', 'end_date', 'status', 'guidelines', 'funds', 'brief', 'contacts', 'phone', 'user']
+
+
 class ProListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projects

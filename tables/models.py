@@ -64,6 +64,8 @@ class Bid(models.Model):
     bidder = models.CharField(max_length=50, verbose_name='投标方', null=False)
     bidding = models.ForeignKey(Research, on_delete=models.CASCADE, verbose_name='课题招标id')
     bidder_date = models.DateField(verbose_name='投标时间', null=True)
+    # bidder_sp_date = models.DateField(verbose_name='投标审批时间', null=True)
+    # bidder_jt_date = models.DateField(verbose_name='投标结题审批时间', null=True)
     bidder_status = models.IntegerField(choices=BIDDER_STATUS_CHOICE, verbose_name='投标状态', default=0)
     conclusion_status = models.IntegerField(choices=CONCLUSION_STATUS_CHOICE, verbose_name='结题状态', default=0)
     funds = models.FloatField(verbose_name='申请经费/万元', null=True)

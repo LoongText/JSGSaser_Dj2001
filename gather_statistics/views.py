@@ -12,7 +12,7 @@ from collections import Counter
 from collections import OrderedDict
 
 
-# logger = log.getLogger('django')
+# logger = log.getLogger('djayngo')
 
 
 def get_org_roles_control(org_roles, choose_role, data):
@@ -47,9 +47,9 @@ class NumCountView(viewsets.ViewSet):
         # 课题招标总数
         res_sum = Research.objects.filter(status__in=[1, 2, 3]).count()
         # 成果浏览量
-        views_sum = Projects.objects.filter(status=1).aggregate(Sum('views'))['views__sum']
+        views_sum = Projects.objects.aggregate(Sum('views'))['views__sum']
         # 成果下载量
-        download_sum = Projects.objects.filter(status=1).aggregate(Sum('downloads'))['downloads__sum']
+        download_sum = Projects.objects.aggregate(Sum('downloads'))['downloads__sum']
         # 推进中的课题量(算小课题)
         res_ing_sum = Bid.objects.filter(bidder_status=2).count()
         # 课题结题量(算小课题)
@@ -76,7 +76,7 @@ def get_ab_org(request):
         roles = request.query_params.get('roles', 'org')  # 统计机构还是人员 org：机构，par:人员
         user_id = request.query_params.get('userid', 0)
         choose_role = request.query_params.get('choose_role')  # 甲方：a,乙方：b,其他：全部数据
-        tag = request.query_params.get('tag', 't')  # t代表图标统计（不统计成果数为0的机构或人员）
+        tag = request.query_params.get('tag')  # t代表图标统计（不统计成果数为0的机构或人员）
         data = Organization.objects.values('nature__id', 'nature__remarks').filter(is_show=True)
         print(request.query_params)
 
@@ -95,7 +95,7 @@ def get_ab_org(request):
         else:
             if tag == 't':
                 data = data.exclude(par_sum=0)
-            data = data.annotate(par_num=Sum('par_sum')).order_by('nature__id')
+            data = data.exclude(is_a=True).annotate(par_num=Sum('par_sum')).order_by('nature__id')
         return Response({"data": data}, status=status.HTTP_200_OK)
 
 
@@ -316,12 +316,16 @@ class ProjectsStatisticsView(viewsets.ViewSet):
         # 找出所有的成果id
         if org_id:
             # 按机构
-            pro_id_obj = ProRelations.objects.values('pro').filter(org=org_id, is_eft=True).distinct()
+            # pro_id_obj = ProRelations.objects.values('pro').filter(org=org_id, is_eft=True).distinct()
+            pro_id_obj = Projects.objects.values('id').filter(status=1).filter(Q(lead_org=org_id) | Q(research=org_id)).distinct()
+            # print(pro_id_obj.query)
+            pro_id_list = [i['id'] for i in pro_id_obj]
         else:
             # 按人员
             pro_id_obj = ProRelations.objects.values('pro').filter(par=par_id, is_eft=True).distinct()
+            pro_id_list = [i['pro'] for i in pro_id_obj]
         # print(pro_id_obj)
-        pro_id_list = [i['pro'] for i in pro_id_obj]
+        # pro_id_list = [i['pro'] for i in pro_id_obj]
 
         if column == 'y':
             # 根据指定类型，按年份分类统计
@@ -336,30 +340,40 @@ class ProjectsStatisticsView(viewsets.ViewSet):
         elif column == 'p':
             if org_id:
                 # 按学者发布成果量统计，发布量倒序排列
-                par_id_obj = ProRelations.objects.values('par').annotate(
+                par_id_obj = ProRelations.objects.values('par', 'par__name').annotate(
                     pro_sum=Count('pro')).filter(org=org_id, is_eft=True, par_id__isnull=False).order_by('-pro_sum')
-                for i in range(len(par_id_obj)):
-                    par_id_obj[i]['par'] = Participant.objects.values('name').get(pk=par_id_obj[i]['par'])['name']
+                # for i in range(len(par_id_obj)):
+                #     par_id_obj[i]['par'] = Participant.objects.values('name').get(pk=par_id_obj[i]['par'])['name']
                 res = {'res': par_id_obj}
             else:
                 # 合作学者,返回指定格式
-                par_id_obj = ProRelations.objects.values('par').filter(pro_id__in=pro_id_list,
-                                                                       par_id__isnull=False).distinct()
+                par_id_obj = ProRelations.objects.values('par', 'par__name').filter(pro_id__in=pro_id_list,
+                                                                                    par_id__isnull=False).distinct()
                 par_id_obj_list = list(filter(lambda x: x['par'] != par_id, par_id_obj))  # 删除本身
                 # print('22', par_id_obj_list)
                 par_name_cur = Participant.objects.get(pk=par_id).name
-                for i in range(len(par_id_obj_list)):
-                    par_id_obj_list[i]['par_name'] = \
-                        Participant.objects.values('name').get(pk=par_id_obj_list[i]['par'])['name']
+                # for i in range(len(par_id_obj_list)):
+                #     par_id_obj_list[i]['par_name'] = \
+                #         Participant.objects.values('name').get(pk=par_id_obj_list[i]['par'])['name']
                 res = {'name': par_name_cur, 'name_id': par_id, 'res': par_id_obj_list}
         elif column == 'co':
             # 合作机构成果量
-            co_obj = ProRelations.objects.values('org').annotate(pro_sum=Count('pro', distinct=True)).filter(
-                pro__in=pro_id_list, org_id__isnull=False, is_eft=True)
-            # print(data.query)
-            co_obj_list = list(filter(lambda x: x['org'] != org_id, co_obj))  # 删除本身
-            for i in range(len(co_obj_list)):
-                co_obj_list[i]['org'] = Organization.objects.get(pk=co_obj_list[i]['org']).name
+            # co_obj = ProRelations.objects.values('org').annotate(pro_sum=Count('pro', distinct=True)).filter(
+            #     pro__in=pro_id_list, org_id__isnull=False, is_eft=True)
+            co_org_obj = Projects.objects.values('lead_org', 'research').filter(status=1, id__in=pro_id_list)
+            # print(co_org_obj)
+            co_org_list = []
+            for co_org in co_org_obj:
+                if co_org['lead_org'] and co_org['lead_org'] not in co_org_list and co_org['lead_org'] != org_id:
+                    co_org_list.append(co_org['lead_org'])
+                if co_org['research'] and co_org['research'] not in co_org_list and co_org['research'] != org_id:
+                    co_org_list.append(co_org['research'])
+
+            # print(co_org_list)
+            co_obj_list = Organization.objects.values('name', 'pro_sum').filter(id__in=co_org_list)
+            # co_obj_list = list(filter(lambda x: x['org'] != org_id, co_obj))  # 删除本身
+            # for i in range(len(co_obj_list)):
+            #     co_obj_list[i]['org'] = Organization.objects.get(pk=co_obj_list[i]['org']).name
             res = {'res': co_obj_list}
         else:
             res = {'res': ['参数错误']}

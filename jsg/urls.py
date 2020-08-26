@@ -7,16 +7,22 @@ from login.views import *
 from gather_statistics.views import *
 from check.views import *
 from status_operation.views import *
+from django.urls import re_path
+from django.views.static import serve
 
 router = routers.DefaultRouter()
 # 成果检索
 router.register(r'query', ProjectsQueryView, basename='query')
+# 我的成果检索
+router.register(r'my_query', MyProjectsQueryView, basename='my_query')
 # 综合启动屏数据统计
 router.register(r'count', NumCountView, basename='count')
 # 招标信息检索
 router.register(r'search', ResearchQueryView, basename='search')
 # 我的投标信息
 router.register(r'my_bid', MyBidQueryView, basename='my_bid')
+# 获得审批的投标信息
+router.register(r'get_sp_bid', SPBidHistoryView, basename='get_sp_bid')
 # 招标检索
 router.register(r'bid', BidQueryView, basename='bid')
 # 首页第三屏统计表-机构统计
@@ -71,8 +77,12 @@ urlpatterns = [
     path(r'get_compare_status/', get_compare_status),
     # 设置成果状态--包括关系表
     path(r'set_pro_status/', set_pro_status),
+    # 设置招标状态
+    path(r'set_research_status/', set_research_status),
+    # 设置投标状态
+    path(r'set_bid_status/', set_bid_status),
     # 设置成果状态恢复--包括关系表
-    path(r'set_recovery_status/', set_recovery_status),
+    # path(r'set_recovery_status/', set_recovery_status),
     # 成果上传2-添加基本信息--修改
     path(r'pro_update_base_info/', pro_update_base_info),
     # 成果上传3-添加课题小组--修改
@@ -90,4 +100,5 @@ urlpatterns = [
     # 自定义后台
     path('back/', include('backstage.urls')),
     # path('admin/', xadmin.site.urls),
+    re_path(r'media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]

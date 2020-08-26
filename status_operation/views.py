@@ -1,12 +1,13 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from tables.models import Projects, Research, ProRelations, UserDownloadBehavior, User
+from tables.models import Projects, Research, ProRelations, UserDownloadBehavior, User, Bid
 import os
 from jsg import settings
 from django.http import StreamingHttpResponse
 from login.views import set_run_info
 import urllib.parse
+from login.views import add_user_behavior
 
 
 @api_view(['GET'])
@@ -92,18 +93,44 @@ def set_pro_status(request):
     # 成果状态设置
     if request.method == 'POST':
         try:
-            print(request.data)
+            print('set_pro_status', request.data)
             param_dict = request.data
             uuid = param_dict.get('uuid', '')
             pro_status = int(param_dict.get('status', 0))
-            print('set_pro_status', uuid, pro_status)
+            is_cut_num = int(param_dict.get('is_cut_num', 0))  # 主要区分成果是否发布
             data = Projects.objects.filter(uuid=uuid)
+            pro_obj_id = data[0].id
             if pro_status == 1:
                 data.update(status=pro_status)
-                ProRelations.objects.filter(pro=data[0].id).update(is_eft=True)
+                # 增加对应机构成果数
+                lead_org_obj = data[0].lead_org.all()
+                research_obj = data[0].research.all()
+                for i in lead_org_obj:
+                    i.pro_sum_add()
+                for j in research_obj:
+                    j.pro_sum_add()
+                # 将关系置为可用
+                par_pro_obj = ProRelations.objects.filter(pro=pro_obj_id)
+                par_pro_obj.update(is_eft=True)
+                # 对应人员成果数+1
+                for par_obj in par_pro_obj:
+                    par_obj.par.pro_sum_add()
             else:
                 data.update(status=pro_status)
-                ProRelations.objects.filter(pro=data[0].id).update(is_eft=False)
+                par_pro_obj = ProRelations.objects.filter(pro=pro_obj_id)
+                par_pro_obj.update(is_eft=False)
+                if is_cut_num:
+                    # 减少人员和机构的成果量
+                    for par_obj in par_pro_obj:
+                        par_obj.par.pro_sum_cut()
+                    # 减少各机构的成果总量
+                    lead_org_obj = data[0].lead_org.all()
+                    research_obj = data[0].research.all()
+                    for i in lead_org_obj:
+                        i.pro_sum_cut()
+                    for j in research_obj:
+                        j.pro_sum_cut()
+            add_user_behavior(keyword='', search_con='修改成果状态：{}'.format(uuid), user_obj=request.user)
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
             set_run_info(level='error', address='/status_operation/view.py/set_pro_status',
@@ -111,27 +138,27 @@ def set_pro_status(request):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['POST'])
-def set_recovery_status(request):
-    # 设置成果恢复删除状态
-    if request.method == 'POST':
-        try:
-            param_dict = request.data['data']
-            # print(param_dict)
-            uuid = param_dict.get('uuid', '')
-            table = param_dict.get('table', 'p')
-            # print(uuid, table)
-            if table == 'p':
-                data = Projects.objects.filter(uuid=uuid)
-                res = data.update(status=1)
-                ProRelations.objects.filter(pro=data[0].id).update(is_eft=True)
-            else:
-                res = Research.objects.filter(uuid=uuid).update(status=1)
-            return Response({"res": res}, status=status.HTTP_200_OK)
-        except Exception as e:
-            set_run_info(level='error', address='/status_operation/view.py/set_recovery_status',
-                         keyword='成果恢复删除状态失败：{}'.format(e))
-            return Response(status=status.HTTP_404_NOT_FOUND)
+# @api_view(['POST'])
+# def set_recovery_status(request):
+#     # 设置成果恢复删除状态
+#     if request.method == 'POST':
+#         try:
+#             param_dict = request.data['data']
+#             # print(param_dict)
+#             uuid = param_dict.get('uuid', '')
+#             table = param_dict.get('table', 'p')
+#             # print(uuid, table)
+#             if table == 'p':
+#                 data = Projects.objects.filter(uuid=uuid)
+#                 res = data.update(status=1)
+#                 ProRelations.objects.filter(pro=data[0].id).update(is_eft=True)
+#             else:
+#                 res = Research.objects.filter(uuid=uuid).update(status=1)
+#             return Response({"res": res}, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             set_run_info(level='error', address='/status_operation/view.py/set_recovery_status',
+#                          keyword='成果恢复删除状态失败：{}'.format(e))
+#             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -145,3 +172,46 @@ def file_list(request):
         path = os.path.join(settings.MEDIA_ROOT, 'attached')
         files = os.walk(path)  # home, dirs, files
         return Response({"files": files}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def set_research_status(request):
+    # 招标状态设置
+    if request.method == 'POST':
+        try:
+            print(request.data)
+            param_dict = request.data
+            uuid = param_dict.get('uuid', '')
+            re_status = int(param_dict.get('status', 0))
+            data = Research.objects.filter(uuid=uuid)
+            if re_status in [0, 1, 2, 3, 4]:
+                data.update(status=re_status)
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            set_run_info(level='error', address='/status_operation/view.py/set_research_status',
+                         keyword='修改招标状态失败：{}'.format(e))
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def set_bid_status(request):
+    # 投标状态设置
+    if request.method == 'POST':
+        try:
+            # print(request.data)
+            param_dict = request.data
+            id_list = param_dict.get('idlist', '')
+            bid_status = int(param_dict.get('status', 0))
+            tag = param_dict.get('tag', 'sq')  # sq：批量处理申请  jt：批量处理结题
+            data = Bid.objects.filter(id__in=id_list)
+            if tag == 'sq':
+                if bid_status in [0, 1, 2, 3, 4]:
+                    data.update(bidder_status=bid_status)
+            else:
+                if bid_status in [0, 1, 2, 3]:
+                    data.update(conclusion_status=bid_status)
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            set_run_info(level='error', address='/status_operation/view.py/set_bid_status',
+                         keyword='修改投标状态失败：{}'.format(e))
+            return Response(status=status.HTTP_404_NOT_FOUND)

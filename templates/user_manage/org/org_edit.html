@@ -63,7 +63,7 @@
                                                                         value="{{ data.name }}" class="form-control">
                                     </div>
                                 </div>
-                                <div class="row form-group">
+                                <div class="row form-group" id="org_org_is_a">
                                     <div class="col col-md-3"><label class=" form-control-label"><i
                                             style="color: red; margin-right: 5px">*</i>立项单位</label></div>
                                     <div class="col-12 col-md-9">
@@ -79,7 +79,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row form-group">
+                                <div class="row form-group" id="org_org_is_b">
                                     <div class="col col-md-3"><label class=" form-control-label"><i
                                             style="color: red; margin-right: 5px">*</i>研究单位</label></div>
                                     <div class="col-12 col-md-9">
@@ -95,7 +95,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row form-group">
+                                <div class="row form-group" id="org_org_nature">
                                     <div class="col col-md-3"><label for="text-input"
                                                                      class=" form-control-label"><i
                                             style="color: red; margin-right: 5px">*</i>机构性质</label></div>
@@ -157,7 +157,13 @@
     var is_a ='{{ data.is_a }}';
     var is_b ='{{ data.is_b }}';
     var nature ={{ data.nature }};
+    var user_level ={{ user_level }};
     $(window).load(function () {
+        if(Number(user_level)===0){
+            $('#org_org_nature').attr("hidden", "hidden");
+            $('#org_org_is_a').attr("hidden", "hidden");
+            $('#org_org_is_b').attr("hidden", "hidden");
+        }
         // 默认选中甲乙方
         $('#org_is_a label').each(function () {
             if ($(this).children('input').attr('value') == is_a) {

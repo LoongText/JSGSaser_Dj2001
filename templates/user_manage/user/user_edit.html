@@ -96,7 +96,8 @@
                                                                         class="form-control">
                                     </div>
                                 </div>
-                                <div class="row form-group">
+{#                                {% if is_manage == 1 %}#}
+                                <div class="row form-group" id="user_is_manage">
                                     <div class="col col-md-3"><label class=" form-control-label"><i
                                             style="color: red; margin-right: 5px">*</i>管理员</label></div>
                                     <div class="col col-md-9">
@@ -112,7 +113,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row form-group">
+                                <div class="row form-group" id="user_is_active">
                                     <div class="col col-md-3"><label for="text-input"
                                                                      class=" form-control-label">是否可用</label></div>
                                     <div class="col col-md-9">
@@ -128,6 +129,7 @@
                                         </div>
                                     </div>
                                 </div>
+{#                                {% endif %}#}
                                 <div style="margin-top:40px;margin-bottom:20px;">
                                     <button type="button" class="btn btn-primary btn-sm"
                                             style="width: 100px;display:block;margin:0 auto;" onclick="user_edit_bt()">
@@ -154,12 +156,19 @@
     // 默认选中性别
     var is_active = '{{ data.is_active }}';
     var is_manage = '{{ is_manage }}';
-    console.log('111---' + is_active);
+    var user_level = '{{ user_level }}';
+    {#console.log('111---' + is_active);#}
+    {#console.log('222---' + is_manage);#}
     $(window).load(function () {
+        if(Number(user_level)===0){
+            $('#user_is_manage').attr("hidden", "hidden");
+            $('#user_is_active').attr("hidden", "hidden");
+        }
         $('#is_active-inline-radio label').each(function () {
             if ($(this).children('input').attr('value') == is_active) {
                 $(this).children('input').attr("checked", "checked");
             }
+
         });
         $('#is_manage-inline-radio label').each(function () {
             if ($(this).children('input').attr('value') == is_manage) {

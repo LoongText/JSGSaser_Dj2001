@@ -6,16 +6,13 @@ from tables.models import HotWords, Bid
 from django.contrib.auth .models import Group
 from django.db.models import Sum, Count, Q
 import datetime
-# import logging as log
 from login.auth import ExpiringTokenAuthentication
 from query.split_page import SplitPages
-# import json
+from jsg import settings
 from jsg.settings import ORG_NATURE_LOWER_LEVEL, ORG_NATURE_HIGHER_LEVEL
 from jsg.settings import ORG_GROUP_LOWER_LEVEL, ORG_GROUP_MANAGER_LEVEL, ORG_GROUP_SUPERUSER_LEVEL
-from backstage.views import add_user_behavior
+from login.views import add_user_behavior
 from login.views import set_run_info
-
-# logger = log.getLogger('django')
 
 
 def get_user_org_level(user_id):
@@ -50,6 +47,35 @@ def get_user_org_level(user_id):
         return ORG_NATURE_LOWER_LEVEL
 
 
+# 分权限
+def get_user_permission(user):
+    """
+    区分管理员与普通人员
+    :param user: 登录对象
+    :return: user_permission-查看等级，1：所有数据可操作 0：只能看自己的数据
+    """
+    print(user, type(user))
+    if user.is_active:
+        group_id_obj = Group.objects.filter(user=user.id)
+        # 属于多个组的，取最小id（权限最大）
+        group_id_list = [i.id for i in group_id_obj]
+        if group_id_list:
+            user_group_id = min(group_id_list)
+        else:
+            user_group_id = 0
+        if user.is_superuser or user_group_id == 1 or user_group_id == 2:
+            user_permission = 1
+        else:
+            user_permission = 0
+        org_id = 0
+        if not user_permission:
+            org_id = user.org.id
+        print('org_id', org_id, 'user_group_id', user_group_id, 'user_permission', user_permission)
+        return {"user_permission": user_permission, "org_id": org_id}
+    else:
+        return {"user_permission": 0, "org_id": 0}
+
+
 class ProjectsQueryView(viewsets.ViewSet):
     """
     成果搜索
@@ -82,82 +108,79 @@ class ProjectsQueryView(viewsets.ViewSet):
         par_id = self.try_except(par_id, 0)  # 验证人员id
 
         data = Projects.objects.values('id', 'uuid', 'name', 'key_word', 'release_date', 'views').filter(status=1)
-        if org_id and not par_id:
-            # 指定机构查询
-            lead_org_data = data.filter(lead_org__id=org_id)
-            re_org_data = data.filter(research__id=org_id)
-            lead_org_data_list = []
-            re_org_data_list = []
-            if lead_org_data:
-                lead_org_data_list = [i['id'] for i in lead_org_data]
-            if re_org_data:
-                re_org_data_list = [i['id'] for i in re_org_data]
-            all_org_list_set = set(lead_org_data_list + re_org_data_list)
-            # data = data.filter(Q(research__id=org_id) | Q(lead_org__id=org_id))
-            data = data.filter(id__in=all_org_list_set)
-
-        elif par_id and not org_id:
-            # 指定人员查询
-            relation_data = ProRelations.objects.values('pro').filter(is_eft=1, par=par_id).distinct('pro')
-            # print('***', relation_data.query)
-            pro_id_list = [i['pro'] for i in relation_data]
-            data = data.filter(id__in=pro_id_list)
-
-        if s_date and s_date != 'NaN-NaN-NaN' and s_date != 'null':
-            # 判断日期
-            if e_date and e_date != 'NaN-NaN-NaN' and e_date != 'null':
-                data = data.filter(release_date__gte=s_date, release_date__lte=e_date)
-            else:
-                data = data.filter(release_date__gte=s_date)
-        else:
-            if e_date and e_date != 'NaN-NaN-NaN' and e_date != 'null':
-                data = data.filter(release_date__lte=e_date)
 
         if keyword:
-            keyword = str(keyword).replace(' ', '')
-            column_kd = '{}__contains'.format(column)
-            if cls_t == 100:
-                # cls_t不作为检索条件
-                data = data.filter(**{column_kd: keyword})
-                print('111', data.query)
-            else:
-                data = data.filter(classify=cls_t).filter(**{column_kd: keyword})
-                print('222', data.query)
+            data = self.filter_keyword(data, keyword, column, user_id)
+        #     keyword = str(keyword).replace(' ', '')
+        #     column_kd = '{}__contains'.format(column)
+        #     if cls_t == 100:
+        #         # cls_t不作为检索条件
+        #         data = data.filter(**{column_kd: keyword})
+        #         print('111', data.query)
+        #     else:
+        #         data = data.filter(classify=cls_t).filter(**{column_kd: keyword})
+        #         print('222', data.query)
+        #
+        #     # 添加行为记录
+        #     try:
+        #         if user_id and user_id != 'undefined' and user_id != 'null':
+        #             user_obj = User.objects.filter(pk=user_id)
+        #         else:
+        #             user_obj = None
+        #         if user_obj:
+        #             # -- 记录开始 --
+        #             add_user_behavior(
+        #                 keyword=keyword,
+        #                 search_con='查询成果信息({})'.format(str(data.query)),
+        #                 user_obj=user_obj[0])
+        #             # -- 记录结束 --
+        #         else:
+        #             add_user_behavior(keyword=keyword, search_con='查询成果信息({})'.format(str(data.query)))
+        #     except Exception as e:
+        #         add_user_behavior(keyword=keyword, search_con='查询成果信息({})'.format(str(data.query)))
+        #         # print('add user_behavior data', e)
+        #         set_run_info(level='error', address='/query/view.py/ProjectsQueryView-list',
+        #                      user=user_id, keyword='搜索成果-添加行为记录失败：{}'.format(e))
+        #         # logger.info('query 添加行为记录 --未获取到用户id：{}'.format(user_id))
+        if cls_t != 100:
+            data = data.filter(classify=cls_t)
 
-            # 添加行为记录
-            try:
-                if user_id and user_id != 'undefined' and user_id != 'null':
-                    user_obj = User.objects.filter(pk=user_id)
-                else:
-                    user_obj = None
-                if user_obj:
-                    # -- 记录开始 --
-                    add_user_behavior(
-                        keyword=keyword,
-                        search_con='查询成果信息({})'.format(str(data.query)),
-                        user_obj=user_obj[0])
-                    # -- 记录结束 --
-                else:
-                    add_user_behavior(keyword=keyword, search_con='查询成果信息({})'.format(str(data.query)))
-            except Exception as e:
-                add_user_behavior(keyword=keyword, search_con='查询成果信息({})'.format(str(data.query)))
-                # print('add user_behavior data', e)
-                set_run_info(level='error', address='/query/view.py/ProjectsQueryView-list',
-                             user=user_id, keyword='搜索成果-添加行为记录失败：{}'.format(e))
-                # logger.info('query 添加行为记录 --未获取到用户id：{}'.format(user_id))
-        else:
-            if cls_t != 100:
-                # cls_t不作为检索条件
-                data = data.filter(classify=cls_t)
-                print('333', data.query)
+        data = self.filter_date(data, s_date, e_date)
+        # if s_date and s_date != 'NaN-NaN-NaN' and s_date != 'null':
+        #     # 判断日期
+        #     if e_date and e_date != 'NaN-NaN-NaN' and e_date != 'null':
+        #         data = data.filter(release_date__gte=s_date, release_date__lte=e_date)
+        #     else:
+        #         data = data.filter(release_date__gte=s_date)
+        # else:
+        #     if e_date and e_date != 'NaN-NaN-NaN' and e_date != 'null':
+        #         data = data.filter(release_date__lte=e_date)
 
         org_obj = ''
         par_obj = ''
         if org_id and not par_id:
+            # 指定机构查询
+            data = self.designated_org_inquiry(data, org_id)
             # 机构研究人员姓名
             par_obj = Participant.objects.values('id', 'name').filter(unit__id=org_id, is_show=True)
+            # lead_org_data = data.filter(lead_org__id=org_id)
+            # re_org_data = data.filter(research__id=org_id)
+            # lead_org_data_list = []
+            # re_org_data_list = []
+            # if lead_org_data:
+            #     lead_org_data_list = [i['id'] for i in lead_org_data]
+            # if re_org_data:
+            #     re_org_data_list = [i['id'] for i in re_org_data]
+            # all_org_list_set = set(lead_org_data_list + re_org_data_list)
+            # # data = data.filter(Q(research__id=org_id) | Q(lead_org__id=org_id))
+            # data = data.filter(id__in=all_org_list_set)
         elif par_id and not org_id:
-            pass
+            # 指定人员查询
+            data = self.designated_par_inquiry(data, par_id)
+            # relation_data = ProRelations.objects.values('pro').filter(is_eft=1, par=par_id).distinct('pro')
+            # # print('***', relation_data.query)
+            # pro_id_list = [i['pro'] for i in relation_data]
+            # data = data.filter(id__in=pro_id_list)
         else:
             # 根据成果按机构统计数量
             org_obj = data.values('research', 'research__name').annotate(pro_sum=Count('id', distinct=True)).filter(
@@ -167,6 +190,7 @@ class ProjectsQueryView(viewsets.ViewSet):
         cls_dict = [{"classify": cls_t, "cls_num": data.count()}]
         if cls_t == 100:
             cls_dict = data.values('classify').annotate(cls_num=Count('classify'))
+
         if order == 't':
             # 按时间倒序排列
             data = data.order_by('-release_date')
@@ -182,7 +206,7 @@ class ProjectsQueryView(viewsets.ViewSet):
 
         org_level_list = [3, 4]
         org_level = get_user_org_level(user_id)
-        print('query_', org_level)
+        # print('query_', org_level)
         if org_level == 1:
             org_level_list = [1, 2, 3, 4]
 
@@ -229,7 +253,6 @@ class ProjectsQueryView(viewsets.ViewSet):
         research_org = Projects.objects.get(pk=pro_id).research.all()
         # print(research_org)
         if research_org:
-            # org_list = [i.name for i in research_org]
             # 判断添加研究机构
             for r_org in research_org:
                 if r_org.nature.level in org_level_list:
@@ -238,6 +261,168 @@ class ProjectsQueryView(viewsets.ViewSet):
         if org_list:
             org_str = ';'.join(org_list)
         return org_str
+
+    @staticmethod
+    def filter_date(data, s_date, e_date):
+        """
+        日期过滤
+        :param data:
+        :param s_date: 起始日期
+        :param e_date: 结束日期
+        :return:
+        """
+        if s_date and s_date != 'NaN-NaN-NaN' and s_date != 'null':
+            # 判断日期
+            if e_date and e_date != 'NaN-NaN-NaN' and e_date != 'null':
+                data = data.filter(release_date__gte=s_date, release_date__lte=e_date)
+            else:
+                data = data.filter(release_date__gte=s_date)
+        else:
+            if e_date and e_date != 'NaN-NaN-NaN' and e_date != 'null':
+                data = data.filter(release_date__lte=e_date)
+        return data
+
+    @staticmethod
+    def filter_keyword(data, keyword, column, user_id):
+        """
+        关键词过滤
+        :param data:
+        :param keyword: 关键词
+        :param column: 查询列
+        :param user_id: 用户id
+        :return:
+        """
+        keyword = str(keyword).replace(' ', '')
+        column_kd = '{}__contains'.format(column)
+        data = data.filter(**{column_kd: keyword})
+
+        # 添加行为记录
+        try:
+            if user_id and user_id != 'undefined' and user_id != 'null':
+                user_obj = User.objects.filter(pk=user_id)
+            else:
+                user_obj = None
+            if user_obj:
+                # -- 记录开始 --
+                add_user_behavior(
+                    keyword=keyword,
+                    search_con='查询成果信息({})'.format(str(data.query)),
+                    user_obj=user_obj[0])
+                # -- 记录结束 --
+            else:
+                add_user_behavior(keyword=keyword, search_con='查询成果信息({})'.format(str(data.query)))
+        except Exception as e:
+            add_user_behavior(keyword=keyword, search_con='查询成果信息({})'.format(str(data.query)))
+            set_run_info(level='error', address='/query/view.py/ProjectsQueryView-list',
+                         user=user_id, keyword='搜索成果-添加行为记录失败：{}'.format(e))
+
+        return data
+
+    @staticmethod
+    def designated_org_inquiry(data, org_id):
+        """
+        指定机构查询
+        :param data:
+        :param org_id: 机构id
+        :return:
+        """
+        lead_org_data = data.filter(lead_org__id=org_id)
+        re_org_data = data.filter(research__id=org_id)
+        lead_org_data_list = []
+        re_org_data_list = []
+        if lead_org_data:
+            lead_org_data_list = [i['id'] for i in lead_org_data]
+        if re_org_data:
+            re_org_data_list = [i['id'] for i in re_org_data]
+        all_org_list_set = set(lead_org_data_list + re_org_data_list)
+        data = data.filter(id__in=all_org_list_set)
+
+        return data
+
+    @staticmethod
+    def designated_par_inquiry(data, par_id):
+        """
+        指定人员查询
+        :param data:
+        :param par_id: 人员id
+        :return:
+        """
+        relation_data = ProRelations.objects.values('pro').filter(is_eft=1, par=par_id).distinct('pro')
+        pro_id_list = [i['pro'] for i in relation_data]
+        data = data.filter(id__in=pro_id_list)
+        return data
+
+
+class MyProjectsQueryView(viewsets.ViewSet):
+    """
+    我的成果信息
+    """
+    authentication_classes = (ExpiringTokenAuthentication,)
+
+    def list(self, request):
+        # 分类（1：发展，2：监管，3：党建，4：改革，5：其他，100：全部）
+        cls_t = request.query_params.get('cls', 100)
+        keyword = request.query_params.get('kw', '')  # 搜索关键字
+        pro_status = request.query_params.get('status', 0)
+        page = request.query_params.get('page', 1)
+        page_num = request.query_params.get('page_num', 30)
+
+        cls_t = self.try_except(cls_t, 100)  # 验证分类
+        pro_status = self.try_except(pro_status, 1)  # 验证状态
+        page = self.try_except(page, 1)  # 验证页码
+        page_num = self.try_except(page_num, 30)  # 验证每页的数量
+
+        # status=5 删除状态
+        data = Projects.objects.values('uuid', 'name', 'classify__cls_name', 'key_word',
+                                       'status').exclude(status=5).order_by('-id')
+        if keyword:
+            data = data.filter(Q(name__contains=keyword) | Q(key_word__contains=keyword))
+            # -- 记录开始 --
+            try:
+                add_user_behavior(keyword=keyword, search_con='搜索成果信息：{}'.format(str(data.query)), user_obj=request.user)
+            except Exception as e:
+                set_run_info(level='error', address='/query/view.py/MyProjectsQueryView',
+                             keyword='添加行为记录出错{}'.format(e))
+            # -- 记录结束 --
+
+        if cls_t != 100:
+            data = data.filter(classify=cls_t)
+
+        if pro_status:
+            data = data.filter(status=pro_status)
+
+        # -- 权限开始 --
+        user = request.user
+        user_permission_dict = get_user_permission(user)
+        if not user_permission_dict['user_permission']:
+            data = data.filter(user__org=user_permission_dict['org_id'])
+        # -- 权限结束 --
+
+        sp = SplitPages(data, page, page_num)
+        res = sp.split_page()
+
+        for i in range(len(res['res'])):
+            if res['res'][i]['status'] in [0, 2, 3, 4]:
+                res['res'][i]['edit'] = 1
+            else:
+                res['res'][i]['edit'] = 0
+
+            res['res'][i]['status'] = settings.PROJECTS_STATUS_CHOICE[res['res'][i]['status']]
+
+        return Response(res, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def try_except(param_key, param_default):
+        # 判断参数是否可以被是否是数字，不是的话，强转，强转不成功或者是负数，置为默认值
+        try:
+            param_key = int(param_key)
+            if param_key < 1:
+                param_key = param_default
+        except Exception as e:
+            param_key = param_default
+            set_run_info(level='error', address='/query/view.py/MyProjectsQueryView',
+                         keyword='强转参数出错{}'.format(e))
+        return param_key
 
 
 class ProDetailView(viewsets.ViewSet):
@@ -370,19 +555,21 @@ class ResearchQueryView(viewsets.ViewSet):
     """
     课题搜索（招标搜索）
     """
+    authentication_classes = (ExpiringTokenAuthentication,)
 
     def list(self, request):
         keyword = request.query_params.get('kw', '')
         page = request.query_params.get('page', 1)
         page_num = request.query_params.get('page_num', 8)
         column = request.query_params.get('column', 'name')
+        tag = request.query_params.get('tag', 'all')  # 区分公共查看(all)还是个人后台查看(personal)
         # print(request.query_params)
         page = self.try_except(page, 1)  # 验证页码
         page_num = self.try_except(page_num, 8)  # 验证每页数量
 
         data = Research.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'start_date', 'end_date',
-                                       'guidelines', 'user__org__name', 'contacts', 'phone'
-                                       ).filter(status__in=[1, 2, 3]).order_by('-start_date')
+                                       'guidelines', 'user__org__name', 'contacts', 'phone', 'status', 'funds'
+                                       ).filter(status__in=[0, 1, 2, 3])
 
         if keyword:
             keyword = str(keyword).replace(' ', '')
@@ -392,6 +579,39 @@ class ResearchQueryView(viewsets.ViewSet):
             cond = {'{}__contains'.format(column): keyword}
             data = data.filter(**cond)
             # print('1', data.query)
+
+        if tag == 'all':
+            # 前方页面不显示未发布状态的招标
+            data = data.exclude(status=0).order_by('-start_date')
+        elif tag == 'personal':
+            # -- 权限开始 --
+            user = request.user
+            user_permission_dict = get_user_permission(user)
+            if not user_permission_dict['user_permission']:
+                data = data.filter(user__org=user_permission_dict['org_id'])
+            # -- 权限结束 --
+            # 排序
+            data = data.order_by('-id')
+
+            for i in range(len(data)):
+                if data[i]['status'] == 0:
+                    data[i]['edit'] = 1
+                else:
+                    data[i]['edit'] = 0
+                # 统计投标数量
+                bid_count = Bid.objects.filter(bidder_status=1, bidding=data[i]['id']).count()
+                data[i]['bid_count'] = bid_count
+                # 统计已审批投标数量
+                bid_ed_count = Bid.objects.filter(bidder_status__in=[2, 3], bidding=data[i]['id']).count()
+                data[i]['bid_ed_count'] = bid_ed_count
+                # 统计申请结题数量
+                bid_conclusion = Bid.objects.filter(conclusion_status=1, bidding=data[i]['id']).count()
+                data[i]['bid_conclusion'] = bid_conclusion
+                # 统计已审批申请结题数量
+                bid_ed_conclusion = Bid.objects.filter(conclusion_status__in=[2, 3], bidding=data[i]['id']).count()
+                data[i]['bid_ed_conclusion'] = bid_ed_conclusion
+                # 将状态改为对应含义
+                data[i]['status'] = settings.RESEARCH_STATUS_CHOICE[data[i]['status']]
 
         sp = SplitPages(data, page, page_num)
         res = sp.split_page()
@@ -455,39 +675,72 @@ class ResearchDetailView(viewsets.ViewSet):
         contacts = param_dict.get('contacts', '')
         phone = param_dict.get('phone', '')
         brief = param_dict.get('brief', '')
-        # print('guuuuu', guidelines)
+        # print('guuuuu', param_dict)
         re_obj = Research.objects.filter(uuid=uuid)
-        try:
-            if guidelines:
-                re_obj.update(name=name, classify=classify, start_date=start_date, funds=funds, contacts=contacts,
-                              end_date=end_date, guidelines=guidelines, phone=phone, brief=brief, status=re_status)
-            else:
-                re_obj.update(name=name, classify=classify, start_date=start_date, funds=funds, contacts=contacts,
-                              end_date=end_date, phone=phone, brief=brief, status=re_status)
-            return Response(1, status=status.HTTP_200_OK)
-        except Exception as e:
+        if re_obj:
+            try:
+                if guidelines:
+                    re_obj.update(name=name, classify=classify, start_date=start_date, funds=funds, contacts=contacts,
+                                  end_date=end_date, guidelines=guidelines, phone=phone, brief=brief, status=re_status)
+                else:
+                    re_obj.update(name=name, classify=classify, start_date=start_date, funds=funds, contacts=contacts,
+                                  end_date=end_date, phone=phone, brief=brief, status=re_status)
+                return Response(1, status=status.HTTP_200_OK)
+            except Exception as e:
+                set_run_info(level='error', address='/query/view.py/ResearchDetailView-post',
+                             keyword='修改课题详情失败：{}'.format(e))
+                return Response(0, status=status.HTTP_200_OK)
+        else:
             set_run_info(level='error', address='/query/view.py/ResearchDetailView-post',
-                         keyword='修改课题详情失败：{}'.format(e))
+                         keyword='修改课题详情失败：未获取到记录')
             return Response(0, status=status.HTTP_200_OK)
 
 
-class MyBidQueryView(viewsets.ViewSet):
+class SPBidHistoryView(viewsets.ViewSet):
     """
-    我的投标信息--上传课题做关联用
+    审批投标/投标结题信息（未审批+已审批）
     """
     authentication_classes = (ExpiringTokenAuthentication,)
-    @staticmethod
-    def list(request):
-        # 分类（1：发展，2：监管，3：党建，4：改革，5：其他，100：全部）
+
+    def list(self, request):
         # 搜索关键字
-        user = request.user
-        print('my res', user)
-        if user.is_active:
-            data = Bid.objects.values('id', 're_title').filter(submitter=user.id, bidder_status=2).order_by('-id')
-        # print(data.query)
+        page = request.query_params.get('page', 1)
+        page_num = request.query_params.get('page_num', 1)
+        keyword = request.query_params.get('kd', '')
+        param = request.query_params.get('param', 'bid')  # bid：审批  jt：结题
+        tag = request.query_params.get('tag', 'td')  # td:未审批  ed:已审批
+        re_id = request.query_params.get('re_id')
+
+        page = self.try_except(page, 1)  # 验证页码
+        page_num = self.try_except(page_num, 8)  # 验证每页数量
+
+        data = Bid.objects.values('id', 're_title', 'bidder_date', 'bidder_status', 'bidder', 'leader', 'lea_phone',
+                                  'contacts', 'con_phone', 'bidding__name', 'conclusion_status').filter(bidding=re_id)
+        if keyword:
+            data = data.filter(
+                Q(re_title__contains=keyword) | Q(bidder_date__contains=keyword) | Q(
+                    bidding__name__contains=keyword))
+        if tag == 'td':
+            # 未审批
+            status_list = [1]
         else:
-            data = ''
-        return Response(data, status=status.HTTP_200_OK)
+            status_list = [2, 3]
+        if param == 'bid':
+            data = data.filter(bidder_status__in=status_list)
+        else:
+            data = data.filter(conclusion_status__in=status_list)
+        try:
+            # -- 记录开始 --
+            add_user_behavior(keyword=keyword, search_con='查看招标结题审批记录{}'.format(param), user_obj=request.user)
+            # -- 记录结束 --
+        except Exception as e:
+            set_run_info(level='error', address='/query/view.py/SPBidHistoryView',
+                         keyword='记录行为失败：{}'.format(e))
+
+        data = data.order_by('-id')
+        sp = SplitPages(data, page, page_num)
+        res = sp.split_page()
+        return Response(res, status=status.HTTP_200_OK)
 
     @staticmethod
     def try_except(param_key, param_default):
@@ -498,10 +751,42 @@ class MyBidQueryView(viewsets.ViewSet):
                 param_key = param_default
         except Exception as e:
             param_key = param_default
-            set_run_info(level='error', address='/query/view.py/MyBidQueryView-list',
+            set_run_info(level='error', address='/query/view.py/BidQueryView-list',
                          keyword='强转参数出错{}'.format(e))
             # logger.info('query_d --view.py --try_except --强转参数出错{}，--赋默认值'.format(e))
         return param_key
+
+
+class MyBidQueryView(viewsets.ViewSet):
+    """
+    我的投标信息--上传课题做关联用
+    """
+    authentication_classes = (ExpiringTokenAuthentication,)
+    @staticmethod
+    def list(request):
+        # 分类（1：发展，2：监管，3：党建，4：改革，5：其他，100：全部）
+        user = request.user
+        print('my res', user)
+        if user.is_active:
+            data = Bid.objects.values('id', 're_title').filter(submitter=user.id, bidder_status=2).order_by('-id')
+        # print(data.query)
+        else:
+            data = ''
+        return Response(data, status=status.HTTP_200_OK)
+
+    # @staticmethod
+    # def try_except(param_key, param_default):
+    #     # 判断参数是否可以被是否是数字，不是的话，强转，强转不成功或者是负数，置为默认值
+    #     try:
+    #         param_key = int(param_key)
+    #         if param_key < 1:
+    #             param_key = param_default
+    #     except Exception as e:
+    #         param_key = param_default
+    #         set_run_info(level='error', address='/query/view.py/MyBidQueryView-list',
+    #                      keyword='强转参数出错{}'.format(e))
+    #         # logger.info('query_d --view.py --try_except --强转参数出错{}，--赋默认值'.format(e))
+    #     return param_key
 
 
 class BidQueryView(viewsets.ViewSet):
@@ -523,9 +808,9 @@ class BidQueryView(viewsets.ViewSet):
                                   'bidder_date__year', 'leader', 'bidder_status', 'conclusion_status').order_by('-id')
 
         if tag == 'doing':
-            data = data.filter(bidder_status__in=[1, 2, 3])
+            data = data.filter(bidder_status__in=[1, 2])
         elif tag == 'done':
-            data = data.filter(conclusion_status__in=[1, 2, 3])
+            data = data.filter(conclusion_status__in=[1, 2])
 
         if keyword:
             keyword = str(keyword).replace(' ', '')

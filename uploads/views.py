@@ -4,6 +4,7 @@ from rest_framework import status
 from tables.models import Projects, Research, Participant, Organization, ProRelations, Bid
 from uploads.UploadsSerializer import BaseListSerializer as Bls
 from uploads.UploadsSerializer import BaseCreateSerializer as Cls
+from uploads.UploadsSerializer import BaseUpdateSerializer as Uls
 from uploads.UploadsSerializer import ProListSerializer as Pls
 from uploads.UploadsSerializer import ProRetrieveSerializer as Prs
 from uploads.UploadsSerializer import ProCreateSerializer as Pcs
@@ -21,7 +22,7 @@ from login.auth import ExpiringTokenAuthentication
 from login.views import set_run_info
 
 
-class ResearchUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin):
+class ResearchUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin):
     """
     课题上传(发布招标信息)
     """
@@ -33,11 +34,13 @@ class ResearchUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin):
             return Bls
         elif self.action == 'create':
             return Cls
+        elif self.action == 'update':
+            return Uls
         else:
             return Cls
 
     def create(self, request, *args, **kwargs):
-        # print(request.data)
+        print(request.data)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         obj = self.perform_create(serializer)
@@ -50,6 +53,20 @@ class ResearchUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin):
     def perform_create(self, serializer):
         obj = serializer.save()
         return obj
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
 
 
 class ProjectsUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin,
@@ -152,7 +169,7 @@ def pro_update_base_info(request):
     """
     # print(request.data)
     param_dict = request.data
-    print(param_dict)
+    # print(param_dict)
     re_id = param_dict.get('re_id', None),
     lead_org_list = eval(param_dict.get('lead_org'))
     research_list = eval(param_dict.get('research'))
@@ -160,9 +177,9 @@ def pro_update_base_info(request):
     key_word = param_dict.get('key_word')
     pro_status = param_dict.get('status')
     pro_id = param_dict.get('id', '')
-    print(lead_org_list, type(lead_org_list))
-    print(research_list, type(research_list))
-    print(re_id, type(re_id))
+    # print(lead_org_list, type(lead_org_list))
+    # print(research_list, type(research_list))
+    # print(re_id, type(re_id))
     # print(pro_id, type(pro_id))
     if re_id:
         re_id = re_id[0]

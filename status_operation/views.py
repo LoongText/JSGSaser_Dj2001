@@ -97,7 +97,7 @@ def set_pro_status(request):
             param_dict = request.data
             uuid = param_dict.get('uuid', '')
             pro_status = int(param_dict.get('status', 0))
-            is_cut_num = int(param_dict.get('is_cut_num', 0))  # 主要区分成果是否发布
+            is_cut_num = int(param_dict.get('is_cut_num', 0))  # 主要区分成果是否发布(目前管理员的删除和撤回都是发布状态，个人发布后不能删除)
             data = Projects.objects.filter(uuid=uuid)
             pro_obj_id = data[0].id
             if pro_status == 1:
@@ -200,7 +200,7 @@ def set_bid_status(request):
         try:
             # print(request.data)
             param_dict = request.data
-            id_list = param_dict.get('idlist', '')
+            id_list = param_dict.getlist('idlist', '')
             bid_status = int(param_dict.get('status', 0))
             tag = param_dict.get('tag', 'sq')  # sq：批量处理申请  jt：批量处理结题
             data = Bid.objects.filter(id__in=id_list)

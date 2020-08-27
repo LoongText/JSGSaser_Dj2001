@@ -53,7 +53,7 @@ class ProUpdateSerializer(serializers.ModelSerializer):
 class BidderListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bid
-        fields = ['id', 'bidder']
+        fields = ['id', 're_title']
 
 
 class BidderCreateSerializer(serializers.ModelSerializer):
@@ -61,3 +61,19 @@ class BidderCreateSerializer(serializers.ModelSerializer):
         model = Bid
         fields = ['bidder', 'bidding', 'funds', 'contacts', 'con_phone', 'bidder_date',
                   'brief', 'submitter', 'leader', 'lea_phone', 're_title', 'bidder_status']
+
+
+class BidderUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bid
+        fields = ['funds', 'contacts', 'con_phone', 'bidder_date',
+                  'brief', 'leader', 'lea_phone', 're_title', 'bidder_status']
+
+
+class BidderRetirveSerializer(serializers.ModelSerializer):
+    bidding_name = serializers.ReadOnlyField(source='bidding.name')
+    submitter_name = serializers.ReadOnlyField(source='submitter.username')
+
+    class Meta:
+        model = Bid
+        fields = "__all__"

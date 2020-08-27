@@ -394,7 +394,9 @@ class MyProjectsQueryView(viewsets.ViewSet):
         # -- 权限开始 --
         user = request.user
         user_permission_dict = get_user_permission(user)
-        if not user_permission_dict['user_permission']:
+        if user_permission_dict['user_permission']:
+            data = data.filter(status=1)
+        else:
             data = data.filter(user__org=user_permission_dict['org_id'])
         # -- 权限结束 --
 
@@ -423,6 +425,94 @@ class MyProjectsQueryView(viewsets.ViewSet):
             set_run_info(level='error', address='/query/view.py/MyProjectsQueryView',
                          keyword='强转参数出错{}'.format(e))
         return param_key
+
+
+class SPProjectsQueryView(viewsets.ViewSet):
+    """
+    审批成果信息以及历史
+    """
+    authentication_classes = (ExpiringTokenAuthentication,)
+
+    def list(self, request):
+        # 分类（1：发展，2：监管，3：党建，4：改革，5：其他，100：全部）
+        cls_t = request.query_params.get('cls', 100)
+        keyword = request.query_params.get('kw', '')  # 搜索关键字
+        page = request.query_params.get('page', 1)
+        page_num = request.query_params.get('page_num', 30)
+        tag = request.query_params.get('tag', 'td')  # td:待审批 his:历史
+
+        cls_t = self.try_except(cls_t, 100)  # 验证分类
+        page = self.try_except(page, 1)  # 验证页码
+        page_num = self.try_except(page_num, 30)  # 验证每页的数量
+
+        # status=5 删除状态
+        if tag == 'td':
+            data = Projects.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'status'
+                                           ).filter(status=3).order_by('-id')
+        else:
+            data = Projects.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'status'
+                                           ).filter(status__in=[1, 4]).order_by('-id')
+        if keyword:
+            data = data.filter(Q(name__contains=keyword) | Q(lead_org__name__contains=keyword) | Q(research__name__contains=keyword))
+            # -- 记录开始 --
+            try:
+                add_user_behavior(keyword=keyword, search_con='审批成果信息以及历史{}'.format(tag), user_obj=request.user)
+            except Exception as e:
+                set_run_info(level='error', address='/query/view.py/SPProjectsQueryView',
+                             keyword='审批成果信息以及历史出错{}'.format(e))
+            # -- 记录结束 --
+
+        if cls_t != 100:
+            data = data.filter(classify=cls_t)
+
+        sp = SplitPages(data, page, page_num)
+        res = sp.split_page()
+
+        for i in range(len(res['res'])):
+            res['res'][i]['status'] = settings.PROJECTS_STATUS_CHOICE[res['res'][i]['status']]
+            res['res'][i]['lead_org'] = self.get_lead_org_str(res['res'][i]['id'])
+            res['res'][i]['research'] = self.get_search_str(res['res'][i]['id'])
+
+        return Response(res, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def try_except(param_key, param_default):
+        # 判断参数是否可以被是否是数字，不是的话，强转，强转不成功或者是负数，置为默认值
+        try:
+            param_key = int(param_key)
+            if param_key < 1:
+                param_key = param_default
+        except Exception as e:
+            param_key = param_default
+            set_run_info(level='error', address='/query/view.py/MyProjectsQueryView',
+                         keyword='强转参数出错{}'.format(e))
+        return param_key
+
+    @staticmethod
+    def get_lead_org_str(pro_id: int):
+        # 获得多对多字段牵头机构名称
+        lead_org = Projects.objects.get(pk=pro_id).lead_org.all()
+        # print(lead_org)
+        org_list = ''
+        if lead_org:
+            org_list = [i.name for i in lead_org]
+        org_str = ''
+        if org_list:
+            org_str = ';'.join(org_list)
+        return org_str
+
+    @staticmethod
+    def get_search_str(pro_id: int):
+        # 获得多对多字段研究机构名称
+        org_list = []
+        research_org = Projects.objects.get(pk=pro_id).research.all()
+        # print(research_org)
+        if research_org:
+            org_list = [i.name for i in research_org]
+        org_str = ''
+        if org_list:
+            org_str = ';'.join(org_list)
+        return org_str
 
 
 class ProDetailView(viewsets.ViewSet):
@@ -851,7 +941,7 @@ class BidQueryView(viewsets.ViewSet):
         return param_key
 
 
-class PaticipantsQueryView(viewsets.ViewSet):
+class ParticipantsQueryView(viewsets.ViewSet):
     """
     研究人员搜索
     """

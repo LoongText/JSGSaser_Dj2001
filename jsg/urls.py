@@ -15,6 +15,8 @@ router = routers.DefaultRouter()
 router.register(r'query', ProjectsQueryView, basename='query')
 # 我的成果检索
 router.register(r'my_query', MyProjectsQueryView, basename='my_query')
+# 我的成果检索
+router.register(r'sp_query', SPProjectsQueryView, basename='sp_query')
 # 综合启动屏数据统计
 router.register(r'count', NumCountView, basename='count')
 # 招标信息检索
@@ -36,7 +38,7 @@ router.register(r'pro_uploads', ProjectsUploadView, basename='pro_uploads')
 # 成果详情
 router.register(r'detail', ProDetailView, basename='detail')
 # 专家检索
-router.register(r'researcher', PaticipantsQueryView, basename='researcher')
+router.register(r'researcher', ParticipantsQueryView, basename='researcher')
 # 推荐专家
 router.register(r'rcd_researcher', ParticipantsRcdView, basename='rcd_researcher')
 # 机构检索

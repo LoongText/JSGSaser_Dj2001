@@ -101,16 +101,19 @@
                                             style="color: red; margin-right: 5px">*</i>机构性质</label></div>
                                     <div class="col-12 col-md-9">
                                         <select name="nature" id="org_nature" class="form-control">
-                                            <option value="1">国资委</option>
+                                            <option value="1">中央企业集团</option>
                                             <option value="2">地方国资委</option>
-                                            <option value="3">其他政府单位</option>
-                                            <option value="4">央企集团</option>
-                                            <option value="5">央企下属单位</option>
-                                            <option value="6">行业协会</option>
-                                            <option value="7">地方国企</option>
-                                            <option value="8">大专院校</option>
-                                            <option value="9">研究机构</option>
-                                            <option value="10">其他</option>
+                                            <option value="3">国资委所属单位</option>
+                                            <option value="4">地方国有企业</option>
+                                            <option value="5">国资委所属研究机构</option>
+                                            <option value="6">社科院所属研究机构</option>
+                                            <option value="7">高校所属研究机构</option>
+                                            <option value="8">中央企业所属研究机构</option>
+                                            <option value="9">地方国资委所属研究机构</option>
+                                            <option value="10">地方国企所属研究机构</option>
+                                            <option value="11">行业协会所属研究机构</option>
+                                            <option value="11">社会研究机构</option>
+                                            <option value="11">其他</option>
                                         </select>
                                     </div>
                                 </div>
@@ -128,7 +131,7 @@
                                                                      class=" form-control-label">缩略图</label></div>
                                     <div class="col-12 col-md-9"><input type="file" id="file-input" name="photo"
                                                                         class="form-control-file">
-                                        <img src="/static/{{ data.photo }}" alt="还没有图片哦~" width="195px" height="237px">
+                                        <img src="/media/{{ data.photo }}" alt="还没有图片哦~" width="195px" height="237px">
                                     </div>
                                 </div>
                                 <div style="margin-top:40px;margin-bottom:20px;">

@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
-from tables.models import Projects, Research, Participant, ProRelations, Organization, Bid
+from tables.models import Projects, Research, Participant, ProRelations, Organization, Bid, OrgNature
 from tables.models import UserDownloadBehavior, UserClickBehavior
 from django.db.models import Sum, Count, Q
 # import logging as log
@@ -73,13 +73,18 @@ def get_ab_org(request):
     """
     # 用户所属组
     if request.method == 'GET':
-        roles = request.query_params.get('roles', 'org')  # 统计机构还是人员 org：机构，par:人员
+        roles = request.query_params.get('roles', 'org')  # 统计机构还是人员 org：机构，par:人员, more:获取所有
+
+        if roles == 'more':
+            #  获取所有机构性质
+            data = OrgNature.objects.values('id', 'remarks')
+            return Response({"data": data}, status=status.HTTP_200_OK)
+
         user_id = request.query_params.get('userid', 0)
         choose_role = request.query_params.get('choose_role')  # 甲方：a,乙方：b,其他：全部数据
         tag = request.query_params.get('tag')  # t代表图标统计（不统计成果数为0的机构或人员）
         data = Organization.objects.values('nature__id', 'nature__remarks').filter(is_show=True)
         print(request.query_params)
-
         # ---权限控制开始---
         # org_level = get_user_org_level(user_id)
         # data = data.filter(nature__level__in=[3, 4]).exclude(nature__level__lt=org_level)
@@ -176,7 +181,6 @@ class ProOrgCountView(viewsets.ViewSet):
             #         print(i)
             data = sorted(data_obj_list, key=lambda x: x['view_sum'], reverse=True)
             data_sum = len(data)
-
         else:
             # 根据学者量排序
             data = data.order_by('-par_sum')

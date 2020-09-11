@@ -36,12 +36,14 @@ select setval('tables_sensitivewords_id_seq',(SELECT max(id) FROM "tables_sensit
 # 2.更新机构表中的成果总数
 truncate ttt;
 insert into ttt(org_id, pro_sum)
--- select organization_id, count(projects_id) from tables_projects_lead_org group by organization_id;
-select organization_id, count(projects_id) from tables_projects_research group by organization_id;
+-- select organization_id, count(projects_id) from tables_projects_lead_org,tables_projects where tables_projects_lead_org.projects_id=tables_projects.id and tables_projects.status=1
+-- group by organization_id;
+select organization_id, count(projects_id) from tables_projects_research,tables_projects  where tables_projects_research.projects_id=tables_projects.id and tables_projects.status=1
+group by organization_id;
 -- update tables_organization set pro_sum=0;
 update tables_organization set pro_sum=ttt.pro_sum from ttt where ttt.org_id=tables_organization.id
 -- 重复项处理
-select organization_id from tables_projects_research where organization_id in (select organization_id from tables_projects_lead_org)
+select distinct(organization_id) from tables_projects_research where organization_id in (select organization_id from tables_projects_lead_org)
 # 3.更新机构表中的研究人员总数
 truncate ttt;
 insert into ttt(org_id,pro_sum)

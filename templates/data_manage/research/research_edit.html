@@ -132,7 +132,10 @@
                                     <div class="col col-md-3"><label for="file-input"
                                                                      class=" form-control-label">申报指南</label></div>
                                     <div class="col-12 col-md-9"><input type="file" id="file-input" name="guidelines"
-                                                                        class="form-control-file">{{ data.guidelines }}
+                                                                        class="form-control-file">
+                                        {% if data.guidelines %}
+                                            <a href="/media/{{ data.guidelines }}" target="_blank">点击查看附件</a>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <div style="margin-top:40px;margin-bottom:20px;">

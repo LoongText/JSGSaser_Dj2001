@@ -39,12 +39,16 @@ router.register(r'pro_uploads', ProjectsUploadView, basename='pro_uploads')
 router.register(r'detail', ProDetailView, basename='detail')
 # 专家检索
 router.register(r'researcher', ParticipantsQueryView, basename='researcher')
-# 推荐专家
-router.register(r'rcd_researcher', ParticipantsRcdView, basename='rcd_researcher')
+# 我的专家
+router.register(r'my_par', MyParView, basename='my_par')
+# 我的专家-增删改
+router.register(r'par_manage', ParManageView, basename='par_manage')
 # 机构检索
 router.register(r'org', OrgQueryView, basename='org')
-# 推荐机构
-router.register(r'rcd_org', OrgRcdView, basename='rcd_org')
+# 我的机构
+router.register(r'my_org', MyOrgView, basename='my_org')
+# 我的机构管理-增删改
+router.register(r'org_manage', OrgManageView, basename='org_manage')
 # 登录
 router.register(r'login', LoginView, basename='login')
 # 退出登录
@@ -83,8 +87,12 @@ urlpatterns = [
     path(r'set_research_status/', set_research_status),
     # 设置投标状态
     path(r'set_bid_status/', set_bid_status),
-    # 设置成果状态恢复--包括关系表
-    # path(r'set_recovery_status/', set_recovery_status),
+    # 设置机构状态
+    path(r'set_org_status/', set_org_status),
+    # 设置专家状态
+    path(r'set_par_status/', set_par_status),
+    # 获得所有机构名称
+    path(r'get_org_name/', get_org_name),
     # 成果上传2-添加基本信息--修改
     path(r'pro_update_base_info/', pro_update_base_info),
     # 成果上传3-添加课题小组--修改

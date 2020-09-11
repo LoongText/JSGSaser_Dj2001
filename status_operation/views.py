@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from tables.models import Projects, Research, ProRelations, UserDownloadBehavior, User, Bid
+from tables.models import Projects, Research, ProRelations, UserDownloadBehavior, User, Bid, Organization, Participant
 import os
 from jsg import settings
 from django.http import StreamingHttpResponse
@@ -214,4 +214,52 @@ def set_bid_status(request):
         except Exception as e:
             set_run_info(level='error', address='/status_operation/view.py/set_bid_status',
                          keyword='修改投标状态失败：{}'.format(e))
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def set_org_status(request):
+    # 机构状态设置
+    if request.method == 'POST':
+        try:
+            # print(request.data)
+            param_dict = request.data
+            uuid_list = param_dict.getlist('uuidlist', '')
+            org_status = int(param_dict.get('status', 0))
+            Organization.objects.filter(uuid__in=uuid_list).update(is_show=org_status)
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            set_run_info(level='error', address='/status_operation/view.py/set_org_status',
+                         keyword='修改机构状态失败：{}'.format(e))
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def get_org_name(request):
+    # 获得所有机构名称和id
+    if request.method == 'GET':
+        try:
+            data = Organization.objects.values('id', 'name')
+            # data_list = [i['name'] for i in data]
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            set_run_info(level='error', address='/status_operation/view.py/get_org_name',
+                         keyword='获取机构名称失败：{}'.format(e))
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def set_par_status(request):
+    # 人员状态设置
+    if request.method == 'POST':
+        try:
+            # print(request.data)
+            param_dict = request.data
+            uuid_list = param_dict.getlist('uuidlist', '')
+            par_status = int(param_dict.get('status', 0))
+            Participant.objects.filter(uuid__in=uuid_list).update(is_show=par_status)
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            set_run_info(level='error', address='/status_operation/view.py/set_par_status',
+                         keyword='修改人员状态失败：{}'.format(e))
             return Response(status=status.HTTP_404_NOT_FOUND)

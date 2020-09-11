@@ -166,6 +166,7 @@ class Projects(models.Model):
     text_part = models.TextField(null=True, verbose_name='正文')
     release_date = models.DateField(null=True, verbose_name='发布时间')
     update_date = models.DateField(auto_now_add=True, verbose_name='上传时间')
+    release_time = models.DateTimeField(auto_now_add=True, verbose_name='变动时间', null=True)
     # （0：不显示，1:合格，2:待完善，3:检测中，4:不合格， 5:删除）
     status = models.IntegerField(choices=STATUS_CHOICE, default=1, verbose_name='状态')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="提交用户", null=True)

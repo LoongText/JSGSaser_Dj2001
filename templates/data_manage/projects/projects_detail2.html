@@ -15,7 +15,12 @@
             <!--状态印章-->
             <p class="txt" id="stamp_box_status">{{ data.status }}</p>
         </div>
-        <h5>成果名称：{{ data.name }}</h5>
+        <h5>
+            {#            {% if data.attached %}#}
+            {#                <a style="float: left" href="/media/{{ data.attached }}" target="_blank">>>点击查看原文</a>#}
+            {#            {% endif %}#}
+            <a style="color: black" href="/media/{{ data.attached }}" target="_blank">成果名称：{{ data.name }}</a>
+        </h5>
         <form method="post" enctype="multipart/form-data" class="form-horizontal">
             <div class="row form-group">
                 <div class="col col-md-3"><label for="disabled-input" class=" form-control-label">牵头厅局</label>

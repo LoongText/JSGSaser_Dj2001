@@ -193,7 +193,8 @@ class ProjectsQueryView(viewsets.ViewSet):
 
         if order == 't':
             # 按时间倒序排列
-            data = data.order_by('-release_date')
+            # data = data.order_by('-release_date')
+            data = data.order_by('-release_time')
         elif order == 'v':
             # 按浏览量倒序排列
             data = data.order_by('-views')
@@ -360,6 +361,7 @@ class MyProjectsQueryView(viewsets.ViewSet):
     authentication_classes = (ExpiringTokenAuthentication,)
 
     def list(self, request):
+        print(request.query_params)
         # 分类（1：发展，2：监管，3：党建，4：改革，5：其他，100：全部）
         cls_t = request.query_params.get('cls', 100)
         keyword = request.query_params.get('kw', '')  # 搜索关键字
@@ -368,21 +370,19 @@ class MyProjectsQueryView(viewsets.ViewSet):
         page_num = request.query_params.get('page_num', 30)
 
         cls_t = self.try_except(cls_t, 100)  # 验证分类
-        pro_status = self.try_except(pro_status, 1)  # 验证状态
         page = self.try_except(page, 1)  # 验证页码
         page_num = self.try_except(page_num, 30)  # 验证每页的数量
 
-        # status=5 删除状态
+        # status=5 删除状态 0:不显示
         data = Projects.objects.values('uuid', 'name', 'classify__cls_name', 'key_word',
-                                       'status').exclude(status=5).order_by('-id')
+                                       'status').exclude(status__in=[0, 5]).order_by('-id')
         if keyword:
             data = data.filter(Q(name__contains=keyword) | Q(key_word__contains=keyword))
             # -- 记录开始 --
-            try:
-                add_user_behavior(keyword=keyword, search_con='搜索成果信息：{}'.format(str(data.query)), user_obj=request.user)
-            except Exception as e:
-                set_run_info(level='error', address='/query/view.py/MyProjectsQueryView',
-                             keyword='添加行为记录出错{}'.format(e))
+
+            add_user_behavior(keyword=keyword, search_con='搜索成果信息：{}'.format(str(data.query)),
+                            user_obj=request.user)
+
             # -- 记录结束 --
 
         if cls_t != 100:
@@ -447,19 +447,16 @@ class SPProjectsQueryView(viewsets.ViewSet):
 
         # status=5 删除状态
         if tag == 'td':
-            data = Projects.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'status'
+            data = Projects.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'status', 'attached'
                                            ).filter(status=3).order_by('-id')
         else:
             data = Projects.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'status'
                                            ).filter(status__in=[1, 4]).order_by('-id')
         if keyword:
-            data = data.filter(Q(name__contains=keyword) | Q(lead_org__name__contains=keyword) | Q(research__name__contains=keyword))
+            data = data.filter(Q(name__contains=keyword) | Q(lead_org__name__contains=keyword) |
+                               Q(research__name__contains=keyword))
             # -- 记录开始 --
-            try:
-                add_user_behavior(keyword=keyword, search_con='审批成果信息以及历史{}'.format(tag), user_obj=request.user)
-            except Exception as e:
-                set_run_info(level='error', address='/query/view.py/SPProjectsQueryView',
-                             keyword='审批成果信息以及历史出错{}'.format(e))
+            add_user_behavior(keyword=keyword, search_con='审批成果信息以及历史{}'.format(tag), user_obj=request.user)
             # -- 记录结束 --
 
         if cls_t != 100:
@@ -524,13 +521,16 @@ class ProDetailView(viewsets.ViewSet):
     def list(self, request):
         uuid = request.query_params.get('uuid', '')
         user_id = request.query_params.get('userid', '')
-        print('-----', user_id)
+        tag = request.query_params.get('tag', 'web')  # 前端看：web，后端看：back
+        # print('-----', user_id)
         # user = request.user
 
         user_obj = self.get_user_obj(user_id)  # 获取用户对象
-        org_level = get_user_org_level(user_id)  # 获取机构等级
-        print('pro detail', org_level)
-        # print(uuid)
+        if tag == 'web':
+            org_level = get_user_org_level(user_id)  # 获取机构等级
+        else:
+            org_level = ORG_NATURE_HIGHER_LEVEL
+
         try:
             obj_list = Projects.objects.filter(uuid=uuid)
             if obj_list:
@@ -541,70 +541,43 @@ class ProDetailView(viewsets.ViewSet):
             # print(obj)
             lead_org_obj = obj.lead_org.all()
             research_org_obj = obj.research.all()
-            # print(lead_org_obj)
-            # print(research_org_obj)
-            lead_org_list = []
-            research_org_list = []
+
+            par_id_obj = ProRelations.objects.values(
+                'id', 'par__name', 'roles', 'speciality', 'job', 'task', 'org__name').filter(
+                pro=obj.id, par__id__isnull=False).order_by('roles')
+
             if org_level == ORG_NATURE_HIGHER_LEVEL:
-                par_id_obj = ProRelations.objects.values(
-                    'id', 'par__name', 'roles', 'speciality', 'job', 'task', 'org__name').filter(
-                    pro=obj.id, par__id__isnull=False).order_by('roles')
-                if lead_org_obj:
-                    # 判断添加牵头机构
-                    for l_org in lead_org_obj:
-                        # print(l_org, type(l_org))
-                        lead_org_list.append(l_org.name)
-                if research_org_obj:
-                    # 判断添加研究机构
-                    for r_org in research_org_obj:
-                        # print(r_org, type(r_org))
-                        research_org_list.append(r_org.name)
+                lead_org_str = self.filter_show_org(lead_org_obj, [])
+                research_org_str = self.filter_show_org(research_org_obj, [])
                 UserClickBehavior.objects.create(user=user_obj, pro=obj)  # 创建点击记录
             else:
-                print(2222)
-                par_id_obj = ProRelations.objects.values(
-                    'par__name', 'roles', 'speciality', 'job', 'task', 'org__name').filter(
-                    pro=obj.id, par__id__isnull=False, org__nature__level__in=[4]).order_by('roles')
-                if lead_org_obj:
-                    # 判断添加牵头机构
-                    for l_org in lead_org_obj:
-                        print('222-1', l_org, l_org.nature.level)
-                        if l_org.nature.level not in [1, 2, 3]:
-                            lead_org_list.append(l_org.name)
-                if research_org_obj:
-                    # 判断添加研究机构
-                    for r_org in research_org_obj:
-                        print('222-2', r_org, r_org.nature.level)
-                        if r_org.nature.level not in [1, 2, 3]:
-                            research_org_list.append(r_org.name)
+                par_id_obj = par_id_obj.filter(org__nature__level__in=[4])
+                lead_org_str = self.filter_show_org(lead_org_obj, [1, 2, 3])
+                research_org_str = self.filter_show_org(research_org_obj, [1, 2, 3])
                 UserClickBehavior.objects.create(pro=obj)  # 创建点击记录
 
-            # if par_id_obj:
-            #     for i in range(len(par_id_obj)):
-            #         print(par_id_obj[i]['id'], par_id_obj[i]['par'])
-            #         par_obj = Participant.objects.get(pk=par_id_obj[i]['par'])
-            #         print('par_obj:', par_obj.name)
-            #         par_id_obj[i]['par'] = par_obj.name
-            #         if par_obj.unit:
-            #             par_id_obj[i]['unit'] = par_obj.unit.name
-            #         else:
-            #             par_id_obj[i]['unit'] = None
             cls_t = ''
             if obj.classify:
                 cls_t = obj.classify.cls_id
 
             obj.views_num_update()  # 浏览量+1
 
-            research_org_str = ';'.join(research_org_list)
-            lead_org_str = ';'.join(lead_org_list)
             obj_dict = {"lead_org": lead_org_str, "research": research_org_str, "key_word": obj.key_word,
                         "release_date": obj.release_date, "abstract": obj.abstract,
                         "attached": str(obj.attached), "classify": cls_t,
                         "reference": str(obj.reference).split(';'), "par": par_id_obj, 'name': obj.name
                         }
             # print(obj_dict)
-            # 将类型id转化为类型具体名称
-            # 将参考文献分成列表
+            if tag == 'back':
+                bid_re_title = obj.bid
+                if bid_re_title:
+                    bid_re_title = bid_re_title.re_title
+                back_append_dict = {'status': settings.PROJECTS_STATUS_CHOICE[obj.status],
+                                    'bid_re_title': bid_re_title,
+                                    'downloads': obj.downloads, 'views': obj.views,
+                                    }
+                obj_dict.update(back_append_dict)
+
             res = {'res': obj_dict}
 
             add_user_behavior(keyword='', search_con='查看成果详情({})'.format(uuid), user_obj=user_obj)
@@ -639,6 +612,26 @@ class ProDetailView(viewsets.ViewSet):
             user_obj = None
 
         return user_obj
+
+    @staticmethod
+    def filter_show_org(org_obj, level_list: list):
+        """
+        过滤要展示的研究机构和立项机构
+        :org_obj:带过滤的机构
+        :level_list:可以展示的机构等级
+        :return:
+        """
+        org_list = []
+        if org_obj:
+            if level_list:
+                for l_org in org_obj:
+                    if l_org.nature.level not in [1, 2, 3]:
+                        org_list.append(l_org.name)
+            else:
+                for l_org in org_obj:
+                    org_list.append(l_org.name)
+        org_str = ';'.join(org_list)
+        return org_str
 
 
 class ResearchQueryView(viewsets.ViewSet):
@@ -677,7 +670,9 @@ class ResearchQueryView(viewsets.ViewSet):
             # -- 权限开始 --
             user = request.user
             user_permission_dict = get_user_permission(user)
-            if not user_permission_dict['user_permission']:
+            if user_permission_dict['user_permission']:
+                data = data.exclude(status=0)
+            else:
                 data = data.filter(user__org=user_permission_dict['org_id'])
             # -- 权限结束 --
             # 排序
@@ -819,13 +814,9 @@ class SPBidHistoryView(viewsets.ViewSet):
             data = data.filter(bidder_status__in=status_list)
         else:
             data = data.filter(conclusion_status__in=status_list)
-        try:
-            # -- 记录开始 --
-            add_user_behavior(keyword=keyword, search_con='查看招标结题审批记录{}'.format(param), user_obj=request.user)
-            # -- 记录结束 --
-        except Exception as e:
-            set_run_info(level='error', address='/query/view.py/SPBidHistoryView',
-                         keyword='记录行为失败：{}'.format(e))
+        # -- 记录开始 --
+        add_user_behavior(keyword=keyword, search_con='查看招标结题审批记录{}'.format(param), user_obj=request.user)
+        # -- 记录结束 --
 
         data = data.order_by('-id')
         sp = SplitPages(data, page, page_num)
@@ -849,34 +840,83 @@ class SPBidHistoryView(viewsets.ViewSet):
 
 class MyBidQueryView(viewsets.ViewSet):
     """
-    我的投标信息--上传课题做关联用
+    我的投标信息
     """
     authentication_classes = (ExpiringTokenAuthentication,)
-    @staticmethod
-    def list(request):
-        # 分类（1：发展，2：监管，3：党建，4：改革，5：其他，100：全部）
-        user = request.user
-        print('my res', user)
-        if user.is_active:
-            data = Bid.objects.values('id', 're_title').filter(submitter=user.id, bidder_status=2).order_by('-id')
-        # print(data.query)
-        else:
-            data = ''
-        return Response(data, status=status.HTTP_200_OK)
 
-    # @staticmethod
-    # def try_except(param_key, param_default):
-    #     # 判断参数是否可以被是否是数字，不是的话，强转，强转不成功或者是负数，置为默认值
-    #     try:
-    #         param_key = int(param_key)
-    #         if param_key < 1:
-    #             param_key = param_default
-    #     except Exception as e:
-    #         param_key = param_default
-    #         set_run_info(level='error', address='/query/view.py/MyBidQueryView-list',
-    #                      keyword='强转参数出错{}'.format(e))
-    #         # logger.info('query_d --view.py --try_except --强转参数出错{}，--赋默认值'.format(e))
-    #     return param_key
+    def list(self, request):
+        page = request.query_params.get('page', 1)
+        page_num = request.query_params.get('page_num', 10)
+        keyword = request.query_params.get('kd', '')
+        tag = request.query_params.get('tag', 'vue')  # vue:前端  back：后台列表
+        bid_status = request.query_params.get('status', 100)  # 100代表未输入
+        user = request.user
+
+        page = self.try_except(page, 1)  # 验证页码
+        page_num = self.try_except(page_num, 30)  # 验证每页的数量
+        bid_status = self.try_except(bid_status, 100)  # 验证状态
+
+        if tag == 'vue':
+            # 上传课题做关联用
+            if user.is_active:
+                data = Bid.objects.values('id', 're_title').filter(submitter=user.id, bidder_status=2).order_by('-id')
+            else:
+                data = ''
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            data = Bid.objects.values(
+                'id', 'bidding__name', 're_title', 'bidder_date', 'bidder_status',
+                'funds', 'contacts', 'con_phone', 'conclusion_status').exclude(bidder_status=4).order_by('-id')
+
+            if keyword:
+                data = data.filter(Q(bidding__name__contains=keyword) | Q(re_title__contains=keyword) |
+                                   Q(bidder_date__contains=keyword) | Q(funds__contains=keyword) |
+                                   Q(contacts__contains=keyword) | Q(con_phone__contains=keyword))
+
+                # -- 记录开始 --
+                add_user_behavior(keyword=keyword, search_con='搜索投标信息', user_obj=user)
+                # -- 记录结束 --
+
+            if bid_status != 100:
+                data = data.filter(bidder_status=bid_status)
+
+            # -- 权限开始 --
+            # user = request.user
+            user_permission_dict = get_user_permission(user)
+            if user_permission_dict['user_permission']:
+                data = data.filter(bidder_status__in=[2, 3])
+            else:
+                data = data.filter(submitter__org=user_permission_dict['org_id'])
+            # -- 权限结束 --
+
+            # for i in range(len(data)):
+            #     data[i]['conclusion'] = 0
+            #     data[i]['edit'] = 0
+            #     if data[i]['bidder_status'] == 0 or data[i]['bidder_status'] == 3:
+            #         data[i]['edit'] = 1
+            #     elif data[i]['bidder_status'] == 2:
+            #         if data[i]['conclusion_status'] == 0:
+            #             data[i]['conclusion'] = 1
+            #     data[i]['bidder_status'] = settings.BIDDER_STATUS_CHOICE[data[i]['bidder_status']]
+            #     data[i]['conclusion_status'] = settings.BIDDER_CONCLUSION_STATUS[data[i]['conclusion_status']]
+            print(data.count())
+            sp = SplitPages(data, page, page_num)
+            res = sp.split_page()
+            print(res['res'])
+            return Response(res, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def try_except(param_key, param_default):
+        # 判断参数是否可以被是否是数字，不是的话，强转，强转不成功或者是负数，置为默认值
+        try:
+            param_key = int(param_key)
+            if param_key < 1:
+                param_key = param_default
+        except Exception as e:
+            param_key = param_default
+            set_run_info(level='error', address='/query/view.py/MyBidQueryView-list',
+                         keyword='强转参数出错{}'.format(e))
+        return param_key
 
 
 class BidQueryView(viewsets.ViewSet):
@@ -1009,31 +1049,40 @@ class ParticipantsQueryView(viewsets.ViewSet):
         return param_key
 
 
-class ParticipantsRcdView(viewsets.ViewSet):
+class MyParView(viewsets.ViewSet):
     """
-    研究人员按成果分类分值推荐
+    后台-专家检索
     """
+    authentication_classes = (ExpiringTokenAuthentication,)
 
     def list(self, request):
-        num = request.query_params.get('num', 3)
-        cls_t = self.request.query_params.get('cls', 100)
+        page = request.query_params.get('page', 1)
+        page_num = request.query_params.get('page_num', 10)
+        keyword = request.query_params.get('kw', '')
 
-        cls_t = self.try_except(cls_t, 100)  # 验证类型
-        num = self.try_except(num, 3)  # 验证返回数量
+        page = self.try_except(page, 1)  # 验证类型
+        page_num = self.try_except(page_num, 10)  # 验证返回数量
 
-        if cls_t == 100:
-            pro_id_queryset = Projects.objects.values('id').filter(status=1)
-        else:
-            pro_id_queryset = Projects.objects.values('id').filter(classify=cls_t, status=1)
-        pro_id_list = [i['id'] for i in pro_id_queryset]
-        # data = Relations.objects.values('pro','par', 'roles').filter(pro__in=pro_id_list)
-        data = ProRelations.objects.values('par').annotate(score=Sum('score')).filter(pro__in=pro_id_list).order_by(
-            '-score')[:num]
-        # 根据人员id取人员名称
-        res_id = [i['par'] for i in data]
-        res = Participant.objects.values('name').filter(id__in=res_id)
-        # print(data)
+        data = Participant.objects.values('uuid', 'name', 'unit__name', 'job', 'email'
+                                          ).exclude(is_show=0).order_by('-id')
 
+        # -- 权限开始 --
+        user = request.user
+        user_permission_dict = get_user_permission(user)
+        if not user_permission_dict['user_permission']:
+            data = data.filter(unit=user_permission_dict['org_id'])
+        # -- 权限结束 --
+
+        if keyword:
+            data = data.filter(Q(name__contains=keyword) | Q(unit__name__contains=keyword) |
+                               Q(job__contains=keyword) | Q(email__contains=keyword))
+
+            # -- 记录开始 --
+            add_user_behavior(keyword=keyword, search_con='后台-搜索人员信息', user_obj=request.user)
+            # -- 记录结束 --
+
+        sp = SplitPages(data, page, page_num)
+        res = sp.split_page()
         return Response(res, status=status.HTTP_200_OK)
 
     @staticmethod
@@ -1044,11 +1093,9 @@ class ParticipantsRcdView(viewsets.ViewSet):
             if param_key < 1:
                 param_key = param_default
         except Exception as e:
-            set_run_info(level='error', address='/query/view.py/ParticipantsRcdView-list',
+            set_run_info(level='error', address='/query/view.py/MyParView-list',
                          keyword='强转参数出错{}'.format(e))
-            # logger.info('rcd_researcher --view.py --try_except --强转参数出错{}，--赋默认值'.format(e))
             param_key = param_default
-        # print(param_key)
         return param_key
 
 
@@ -1120,31 +1167,39 @@ class OrgQueryView(viewsets.ViewSet):
         return param_key
 
 
-class OrgRcdView(viewsets.ViewSet):
+class MyOrgView(viewsets.ViewSet):
     """
-    研究机构按成果分类分值推荐
+    后台-机构检索
     """
+    authentication_classes = (ExpiringTokenAuthentication,)
 
     def list(self, request):
-        num = request.query_params.get('num', 3)
-        cls_t = self.request.query_params.get('cls', 100)
+        page = request.query_params.get('page', 1)
+        page_num = request.query_params.get('page_num', 10)
+        keyword = request.query_params.get('kw', '')
 
-        cls_t = self.try_except(cls_t, 100)  # 验证类型
-        num = self.try_except(num, 3)  # 验证返回数量
+        page = self.try_except(page, 1)  # 验证类型
+        page_num = self.try_except(page_num, 10)  # 验证返回数量
 
-        if cls_t == 100:
-            pro_id_queryset = Projects.objects.values('id').filter(status=1)
-        else:
-            pro_id_queryset = Projects.objects.values('id').filter(classify=cls_t, status=1)
-        pro_id_list = [i['id'] for i in pro_id_queryset]
-        data = ProRelations.objects.values('org').annotate(score=Sum('score')).filter(pro__in=pro_id_list,
-                                                                                      org_id__isnull=False).order_by(
-            '-score')[:num]
-        # print(data)
-        # 根据机构id取机构名称
-        res_id = [i['org'] for i in data]
-        res = Organization.objects.values('name').filter(id__in=res_id)
-        # print(data)
+        data = Organization.objects.values('id', 'uuid', 'name', 'is_a', 'is_b', 'nature__remarks').filter(
+            is_show=True).order_by('-id')
+
+        # -- 权限开始 --
+        user = request.user
+        user_permission_dict = get_user_permission(user)
+        if not user_permission_dict['user_permission']:
+            data = data.filter(id=user_permission_dict['org_id'])
+        # -- 权限结束 --
+
+        if keyword:
+            data = data.filter(Q(name__contains=keyword) | Q(nature__remarks__contains=keyword))
+
+            # -- 记录开始 --
+            add_user_behavior(keyword=keyword, search_con='后台-搜索机构信息', user_obj=request.user)
+            # -- 记录结束 --
+
+        sp = SplitPages(data, page, page_num)
+        res = sp.split_page()
         return Response(res, status=status.HTTP_200_OK)
 
     @staticmethod
@@ -1155,11 +1210,9 @@ class OrgRcdView(viewsets.ViewSet):
             if param_key < 1:
                 param_key = param_default
         except Exception as e:
-            set_run_info(level='error', address='/query/view.py/OrgRcdView-list',
+            set_run_info(level='error', address='/query/view.py/MyOrgView-list',
                          keyword='强转参数出错{}'.format(e))
-            # logger.info('rcd_org --view.py --try_except --强转参数出错{}，--赋默认值'.format(e))
             param_key = param_default
-        # print(param_key)
         return param_key
 
 

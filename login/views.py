@@ -176,4 +176,8 @@ def add_user_behavior(keyword: str, search_con: str, user_obj=None):
     :param user_obj: 对象，为空时是游客
     :return:
     """
-    UserBehavior.objects.create(user=user_obj, keyword=keyword, search_con=search_con)
+    try:
+        UserBehavior.objects.create(user=user_obj, keyword=keyword, search_con=search_con)
+    except Exception as e:
+        set_run_info(level='error', address='/login/view.py/add_user_behavior',
+                     keyword='添加行为记录出错{}'.format(e))

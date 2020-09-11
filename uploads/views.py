@@ -1,5 +1,6 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from rest_framework import status
 from tables.models import Projects, Research, Participant, Organization, ProRelations, Bid
 from uploads.UploadsSerializer import BaseListSerializer as Bls
@@ -13,16 +14,23 @@ from uploads.UploadsSerializer import BidderListSerializer as Bdls
 from uploads.UploadsSerializer import BidderCreateSerializer as Bdcs
 from uploads.UploadsSerializer import BidderUpdateSerializer as Bdus
 from uploads.UploadsSerializer import BidderRetirveSerializer as Bdrs
-from uploads.read_pdf import pdf2txtmanager
-from jsg.settings import MEDIA_ROOT
-import json
-from rest_framework.decorators import api_view
-from django.views.decorators.csrf import csrf_exempt
-import time
-from backstage.views import add_user_behavior
+from uploads.UploadsSerializer import OrgListSerializer as Ols
+from uploads.UploadsSerializer import OrgCreateSerializer as Ocs
+from uploads.UploadsSerializer import OrgRetriveSerializer as Ors
+from uploads.UploadsSerializer import OrgUpdateSerializer as Ous
+from uploads.UploadsSerializer import ParListSerializer as Par_ls
+from uploads.UploadsSerializer import ParCreateSerializer as Par_cs
+from uploads.UploadsSerializer import ParRetriveSerializer as Par_rs
+from uploads.UploadsSerializer import ParUpdateSerializer as Par_us
 # from rest_framework.decorators import authentication_classes
+from django.views.decorators.csrf import csrf_exempt
 from login.auth import ExpiringTokenAuthentication
+from backstage.views import add_user_behavior
+from uploads.read_pdf import pdf2txtmanager
 from login.views import set_run_info
+from jsg.settings import MEDIA_ROOT
+import time
+import json
 
 
 class ResearchUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin):
@@ -340,6 +348,103 @@ class BidderUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         print('bid_update', request.data)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+
+class OrgManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin,
+                    mixins.RetrieveModelMixin):
+    """
+    机构管理
+    """
+    queryset = Organization.objects.all()
+
+    authentication_classes = (ExpiringTokenAuthentication,)
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return Ocs
+        elif self.action == 'update':
+            return Ous
+        else:
+            return Ors
+
+    def create(self, request, *args, **kwargs):
+        # print(request.data)
+        # print('--------------------- ')
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        obj = self.perform_create(serializer)
+        # print(serializer.data)
+        headers = self.get_success_headers(serializer.data)
+        # -- 记录开始 --
+        add_user_behavior(keyword='', search_con='创建机构：{}'.format(obj.id), user_obj=request.user)
+        # -- 记录结束 --
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        obj = serializer.save()
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+
+class ParManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin,
+                    mixins.RetrieveModelMixin):
+    """
+    人员管理
+    """
+    queryset = Participant.objects.all()
+
+    authentication_classes = (ExpiringTokenAuthentication,)
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return Par_cs
+        elif self.action == 'update':
+            return Par_us
+        # elif self.action == 'list':
+        #     return Par_ls
+        else:
+            return Par_rs
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        obj = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        # -- 记录开始 --
+        add_user_behavior(keyword='', search_con='创建人员：{}'.format(obj.id), user_obj=request.user)
+        # -- 记录结束 --
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        obj = serializer.save()
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)

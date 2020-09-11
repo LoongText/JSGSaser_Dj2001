@@ -9,6 +9,7 @@ from jsg import settings
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
 from backstage.split_pages import split_page
+from uploads.read_pdf import pdf2txtmanager
 import datetime
 import os
 import time
@@ -316,6 +317,8 @@ def pro_add(request):
                     for content in attached.chunks():
                         f.write(content)
 
+                content = read_con(save_path)
+
                 pro_obj = models.Projects.objects.create(
                     name=name,
                     classify=models.Classify.objects.get(pk=classify),
@@ -326,6 +329,7 @@ def pro_add(request):
                     release_date=release_date,
                     user=request.user,
                     bid=bid_obj,
+                    text_part=content,
                     attached="attached/{}/{}/{}".format(current_year, current_month, attached_name_fin)
                 )
             else:
@@ -371,6 +375,21 @@ def pro_add(request):
             set_run_info(level='error', address='/backstage/view.py/pro_add',
                          user=request.user.id, keyword='添加成果失败：{}'.format(e))
             return HttpResponse(400)
+
+
+def read_con(path):
+    """
+    读取pdf文件
+    :param path:
+    :return:
+    """
+    content = ''
+    try:
+        content = pdf2txtmanager.pdf2text(path)
+    except Exception as e:
+        set_run_info(level='error', address='/uploads/view.py/ProjectsUploadView-read_con',
+                     keyword='读取pdf文件失败：{}'.format(e))
+    return content
 
 
 # @login_required(login_url='/back/login/')
@@ -530,7 +549,7 @@ def project_detail(request):
                               user_obj=request.user)
             # -- 记录结束 --
 
-            obj = data.values('id', 'uuid', 'name', 'classify__cls_name', 'key_word', 'bid__re_title',
+            obj = data.values('id', 'uuid', 'name', 'classify__cls_name', 'key_word', 'bid__re_title', 'attached',
                               'downloads', 'views', 'user__username', 'release_date', 'status', 'update_date')
             obj = obj[0]
             obj['lead_org'] = get_org_str(uuid, 'lead_org')[0]
@@ -545,6 +564,7 @@ def project_detail(request):
             for i in range(len(par_id_obj)):
                 par_id_obj[i]['roles'] = settings.PRO_RELATIONS_ROLES[par_id_obj[i]['roles']]
             # return JsonResponse({"data": obj, "par_org": list(par_id_obj), "code": 200})
+            print(obj)
             return render(request, 'data_manage/projects/projects_detail2.html',
                           {"data": obj, "par_org": list(par_id_obj), "code": 200})
         else:
@@ -605,10 +625,12 @@ def project_withdraw(request):
         # 减少各机构的成果总量
         lead_org_obj = pro_obj[0].lead_org.all()
         research_obj = pro_obj[0].research.all()
-        for i in lead_org_obj:
+        queryset_list = []
+        queryset_list.extend(lead_org_obj)
+        queryset_list.extend(research_obj)
+        queryset_list = list(set(queryset_list))
+        for i in queryset_list:
             i.pro_sum_cut()
-        for j in research_obj:
-            j.pro_sum_cut()
 
         # 直接写路由
         # return redirect('/back/pm')
@@ -701,11 +723,12 @@ def project_sp(request):
                 data[i]['research'] = get_org_str(data[i]['uuid'], 'research')[0]
             # -- 分页开始 --
             data = split_page(page, 7, data, 10)
-            print(data)
+            # print(data)
             # -- 分页结束 --
             return render(request, 'data_manage/projects/projects_sp.html', {'data': data, 'keyword': keyword})
 
     elif request.method == 'POST':
+        print(request.POST)
         uuid = request.POST.get('uuid')
         status = request.POST.get('status')  # 同意1还是驳回4
         try:
@@ -715,10 +738,12 @@ def project_sp(request):
             if status == 1:
                 lead_org_obj = pro_obj[0].lead_org.all()
                 research_obj = pro_obj[0].research.all()
-                for i in lead_org_obj:
+                queryset_list = []
+                queryset_list.extend(lead_org_obj)
+                queryset_list.extend(research_obj)
+                queryset_list = list(set(queryset_list))
+                for i in queryset_list:
                     i.pro_sum_add()
-                for j in research_obj:
-                    j.pro_sum_add()
                 par_pro_obj = models.ProRelations.objects.filter(pro=pro_obj[0])
                 par_pro_obj.update(is_eft=True)
                 for par_obj in par_pro_obj:
@@ -1134,7 +1159,8 @@ def research_bid_jt_manage(request):
             result = bid_obj.update(conclusion_status=2)
             for i_obj in bid_obj:
                 print(i_obj.bidding.id)
-                con_dict = models.Bid.objects.values('conclusion_status').filter(bidding_id=i_obj.bidding.id, bidder_status=2)
+                con_dict = models.Bid.objects.values('conclusion_status').filter(bidding_id=i_obj.bidding.id,
+                                                                                 bidder_status=2)
                 con_list = [i['conclusion_status'] for i in con_dict]
                 if len(set(con_list)) == 1:
                     models.Research.objects.filter(id=i_obj.bidding.id).update(status=3)
@@ -1843,7 +1869,8 @@ def user_edit(request, uuid):
     else:
         if request.session.get('group_id') == 2:
             user_level = 1
-    return render(request, 'user_manage/user/user_edit.html', {"data": data, "is_manage": is_manage, 'user_level': user_level})
+    return render(request, 'user_manage/user/user_edit.html',
+                  {"data": data, "is_manage": is_manage, 'user_level': user_level})
 
 
 # @login_required(login_url='/back/login/')
@@ -2128,7 +2155,8 @@ def org_edit(request, uuid):
     :return:
     """
     if request.method == 'GET':
-        data = models.Organization.objects.values('uuid', 'nature', 'is_a', 'is_b', 'brief', 'name', 'photo').filter(uuid=uuid)
+        data = models.Organization.objects.values('uuid', 'nature', 'is_a', 'is_b', 'brief', 'name', 'photo').filter(
+            uuid=uuid)
         if data:
             data = data[0]
         # --判断登录用户等级--

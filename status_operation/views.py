@@ -1,17 +1,20 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from tables.models import Projects, Research, ProRelations, UserDownloadBehavior, User, Bid, Organization, Participant
+from tables.models import Projects, Research, ProRelations, UserDownloadBehavior
+from tables.models import User, Bid, Organization, Participant, UserBehavior
 import os
 from jsg import settings
 from django.http import StreamingHttpResponse
 from login.views import set_run_info
 import urllib.parse
 from login.views import add_user_behavior
+from rest_framework.decorators import authentication_classes
+from login.auth import ExpiringTokenAuthentication
+import time
 
 
 @api_view(['GET'])
-# @authentication_classes([ExpiringTokenAuthentication])
 def projects_download(request):
     """
     课题下载次数记录
@@ -89,6 +92,7 @@ def get_compare_status(request):
 
 
 @api_view(['POST'])
+@authentication_classes([ExpiringTokenAuthentication])
 def set_pro_status(request):
     # 成果状态设置
     if request.method == 'POST':
@@ -105,10 +109,12 @@ def set_pro_status(request):
                 # 增加对应机构成果数
                 lead_org_obj = data[0].lead_org.all()
                 research_obj = data[0].research.all()
-                for i in lead_org_obj:
+                queryset_list = []
+                queryset_list.extend(lead_org_obj)
+                queryset_list.extend(research_obj)
+                queryset_list = list(set(queryset_list))
+                for i in queryset_list:
                     i.pro_sum_add()
-                for j in research_obj:
-                    j.pro_sum_add()
                 # 将关系置为可用
                 par_pro_obj = ProRelations.objects.filter(pro=pro_obj_id)
                 par_pro_obj.update(is_eft=True)
@@ -126,39 +132,22 @@ def set_pro_status(request):
                     # 减少各机构的成果总量
                     lead_org_obj = data[0].lead_org.all()
                     research_obj = data[0].research.all()
-                    for i in lead_org_obj:
+                    queryset_list = []
+                    queryset_list.extend(lead_org_obj)
+                    queryset_list.extend(research_obj)
+                    queryset_list = list(set(queryset_list))
+                    for i in queryset_list:
                         i.pro_sum_cut()
-                    for j in research_obj:
-                        j.pro_sum_cut()
+                    # for i in lead_org_obj:
+                    #     i.pro_sum_cut()
+                    # for j in research_obj:
+                    #     j.pro_sum_cut()
             add_user_behavior(keyword='', search_con='修改成果状态：{}'.format(uuid), user_obj=request.user)
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
             set_run_info(level='error', address='/status_operation/view.py/set_pro_status',
                          keyword='修改成果状态失败：{}'.format(e))
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-# @api_view(['POST'])
-# def set_recovery_status(request):
-#     # 设置成果恢复删除状态
-#     if request.method == 'POST':
-#         try:
-#             param_dict = request.data['data']
-#             # print(param_dict)
-#             uuid = param_dict.get('uuid', '')
-#             table = param_dict.get('table', 'p')
-#             # print(uuid, table)
-#             if table == 'p':
-#                 data = Projects.objects.filter(uuid=uuid)
-#                 res = data.update(status=1)
-#                 ProRelations.objects.filter(pro=data[0].id).update(is_eft=True)
-#             else:
-#                 res = Research.objects.filter(uuid=uuid).update(status=1)
-#             return Response({"res": res}, status=status.HTTP_200_OK)
-#         except Exception as e:
-#             set_run_info(level='error', address='/status_operation/view.py/set_recovery_status',
-#                          keyword='成果恢复删除状态失败：{}'.format(e))
-#             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -262,4 +251,62 @@ def set_par_status(request):
         except Exception as e:
             set_run_info(level='error', address='/status_operation/view.py/set_par_status',
                          keyword='修改人员状态失败：{}'.format(e))
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@authentication_classes([ExpiringTokenAuthentication])
+def set_user_status(request):
+    """
+    用户禁用或者开启，设置状态
+    :param request:
+    # :param uuid:
+    :return:
+    """
+    user_id = request.POST.get('user_id')
+    tag = int(request.POST.get('tag'))
+    try:
+        if tag == 1:
+            User.objects.filter(id=user_id).update(is_active=True)
+        else:
+            User.objects.filter(id=user_id).update(is_active=False)
+        # -- 记录开始 --
+        add_user_behavior(keyword='', search_con='禁用/开启用户({}):{}'.format(user_id, tag), user_obj=request.user)
+        # -- 记录结束 --
+        return Response(1)
+    except Exception as e:
+        set_run_info(level='error', address='/status_operation/view.py/set_user_status',
+                     keyword='修改用户状态失败：{}'.format(e))
+        return Response(0)
+
+
+@api_view(['GET'])
+def user_username_search(request):
+    """
+    新建用户-用户名是否存在验证
+    :param request:
+    :return:
+    """
+    username = request.GET.get('username', '')
+    # print(username)
+    data = User.objects.filter(username=username)
+    if data:
+        return Response(1)
+    else:
+        return Response(0)
+
+
+@api_view(['GET'])
+def get_daily_logins(request):
+    # 统计每日登录量
+    if request.method == 'GET':
+        try:
+            current_date = time.strftime('%Y-%m-%d')
+            data = UserBehavior.objects.values('user_id').filter(
+                create_time__gte=current_date, user__isnull=False).distinct('user_id')
+            data_count = data.count()
+            return Response({"data": data, "count": data_count}, status=status.HTTP_200_OK)
+        except Exception as e:
+            set_run_info(level='error', address='/status_operation/view.py/get_daily_logins',
+                         keyword='统计每日登录量失败：{}'.format(e))
             return Response(status=status.HTTP_404_NOT_FOUND)

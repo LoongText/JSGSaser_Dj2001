@@ -13,15 +13,15 @@ from django.views.static import serve
 router = routers.DefaultRouter()
 # 成果检索
 router.register(r'query', ProjectsQueryView, basename='query')
-# 我的成果检索
+# 我的成果检索/修改
 router.register(r'my_query', MyProjectsQueryView, basename='my_query')
-# 我的成果检索
+# 成果审批
 router.register(r'sp_query', SPProjectsQueryView, basename='sp_query')
 # 综合启动屏数据统计
 router.register(r'count', NumCountView, basename='count')
 # 招标信息检索
 router.register(r'search', ResearchQueryView, basename='search')
-# 我的投标信息
+# 我的投标信息检索
 router.register(r'my_bid', MyBidQueryView, basename='my_bid')
 # 获得审批的投标信息
 router.register(r'get_sp_bid', SPBidHistoryView, basename='get_sp_bid')
@@ -49,6 +49,8 @@ router.register(r'org', OrgQueryView, basename='org')
 router.register(r'my_org', MyOrgView, basename='my_org')
 # 我的机构管理-增删改
 router.register(r'org_manage', OrgManageView, basename='org_manage')
+# 我的用户
+router.register(r'my_user', MyUserView, basename='my_user')
 # 登录
 router.register(r'login', LoginView, basename='login')
 # 退出登录
@@ -91,6 +93,10 @@ urlpatterns = [
     path(r'set_org_status/', set_org_status),
     # 设置专家状态
     path(r'set_par_status/', set_par_status),
+    # 设置用户状态
+    path(r'set_user_status/', set_user_status),
+    # 查询用户名是否已存在
+    path(r'username_search/', user_username_search),
     # 获得所有机构名称
     path(r'get_org_name/', get_org_name),
     # 成果上传2-添加基本信息--修改
@@ -105,6 +111,8 @@ urlpatterns = [
     path(r'set_passwd/', set_passwd),
     # 按照机构属性分别统计有多少所属机构和人员
     path(r'get_ab_org/', get_ab_org),
+    # 统计每日操作量
+    path(r'get_daily_logins/', get_daily_logins),
     # 后台；
     # path('admin/', admin.site.urls),
     # 自定义后台

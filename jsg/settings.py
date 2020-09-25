@@ -197,84 +197,6 @@ HOPE_KEYWORDS_LIST = [
     "希望", "我期待", "请省长", "请市长", "还希望", "能不能", "是否可以", "恳请领导", "希望领导", "希望",
 ]
 
-# 日志文件设置
-# BASE_LOG_DIR = os.path.join(BASE_DIR, "logs")
-# LOGGING = {
-#     # 保留字
-#     'version': 1,
-#     # 禁用已经存在的logger实例
-#     'disable_existing_loggers': False,
-#     # 日志文件的格式
-#     'formatters': {
-#         # 详细的日志格式
-#         'standard': {
-#             'format': '[%(asctime)s][%(threadName)s:%(thread)d][task_id:%(name)s][%(filename)s:%(lineno)d]'
-#                       '[%(levelname)s][%(message)s]'
-#         },
-#         # 简单的日志格式
-#         'simple': {
-#             'format': '[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d]%(message)s'
-#         },
-#         # 定义一个特殊的日志格式
-#         'collect': {
-#             'format': '%(message)s'
-#         }
-#     },
-#     # 过滤器
-#     'filters': {
-#         'require_debug_true': {
-#             '()': 'django.utils.log.RequireDebugTrue',
-#         },
-#     },
-#     # 处理器
-#     'handlers': {
-#         # 在终端打印
-#         'console': {
-#             'level': 'DEBUG',
-#             # 只有在Django debug为True时才在屏幕打印日志
-#             'filters': ['require_debug_true'],
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'simple'
-#         },
-#         # 默认的
-#         'default': {
-#             'level': 'INFO',
-#             # 保存到文件，自动切
-#             'class': 'logging.handlers.RotatingFileHandler',
-#             # 日志文件
-#             'filename': os.path.join(BASE_LOG_DIR, "info.log"),
-#             # 日志大小50M
-#             'maxBytes': 1024 * 1024 * 50,
-#             # 最多备份几个
-#             'backupCount': 3,
-#             'formatter': 'standard',
-#             'encoding': 'utf-8',
-#         },
-#         # 专门用来记错误日志
-#         'error': {
-#             'level': 'ERROR',
-#             # 保存到文件，自动切
-#             'class': 'logging.handlers.RotatingFileHandler',
-#             # 日志文件
-#             'filename': os.path.join(BASE_LOG_DIR, "errors.log"),
-#             # 日志大小50m
-#             'maxBytes': 1024 * 1024 * 50,
-#             'backupCount': 5,
-#             'formatter': 'standard',
-#             'encoding': 'utf-8',
-#         },
-#     },
-#     'loggers': {
-#         # 默认的logger应用如下配置
-#         '': {
-#             # 上线之后可以把'console'移除
-#             'handlers': ['default', 'console', 'error'],
-#             'level': 'INFO',
-#             # 向不向更高级别的logger传递
-#             'propagate': True,
-#         },
-#     },
-# }
 
 SIMPLEPRO_INFO = False
 # SIMPLEUI_HOME_PAGE = 'https://www.sunwu.zone'
@@ -309,3 +231,7 @@ ORG_NATURE_HIGHER_LEVEL = 1
 ORG_GROUP_LOWER_LEVEL = 4
 ORG_GROUP_SUPERUSER_LEVEL = 1
 ORG_GROUP_MANAGER_LEVEL = 2
+
+# 组长副组长组员三个角色分别对应的分数
+ROLES_NAME = {"组长": 1, "副组长": 2, "组员": 3}
+ROLES_SCORE = {1: 1.2, 2: 1.1, 3: 1}

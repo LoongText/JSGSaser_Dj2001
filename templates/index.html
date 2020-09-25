@@ -61,6 +61,23 @@
             </div>
         </div><!--/.col-->
         <div class="col-lg-3 col-md-6">
+            <div class="card text-white bg-flat-color-6">
+                <div class="card-body">
+                    <div class="stat-widget-four">
+                        <div class="stat-icon dib">
+                            <i class="ti-face-smile text-white"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="text-left dib">
+                                <div class="stat-heading">研究机构</div>
+                                <div class="stat-text">{{ data.org_sum }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--/.col-->
+        <div class="col-lg-3 col-md-6">
             <div class="card text-white bg-flat-color-3">
                 <div class="card-body">
                     <div class="stat-widget-four">
@@ -111,60 +128,44 @@
                 </div>
             </div>
         </div><!--/.col-->
-{#        <div class="col-lg-6">#}
-{#            <div class="card">#}
-{#                <div class="card-body">#}
-{#                    <h4 class="mb-3">Pie Chart</h4>#}
-{#                    <div class="flot-container">#}
-{#                        <div id="flot-pie" class="flot-pie-container" style="padding: 0px; position: relative;">#}
-{#                            <canvas class="flot-base" width="705" height="275"#}
-{#                                    style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 705px; height: 275px;"></canvas>#}
-{#                            <canvas class="flot-overlay" width="705" height="275"#}
-{#                                    style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 705px; height: 275px;"></canvas>#}
-{#                            <div class="legend">#}
-{#                                <div style="position: absolute; width: 68px; height: 84px; top: 5px; right: 5px; background-color: rgb(255, 255, 255); opacity: 0.85;"></div>#}
-{#                                <table style="position:absolute;top:5px;right:5px;;font-size:smaller;color:#545454">#}
-{#                                    <tbody>#}
-{#                                    <tr>#}
-{#                                        <td class="legendColorBox">#}
-{#                                            <div style="border:1px solid #ccc;padding:1px">#}
-{#                                                <div style="width:4px;height:0;border:5px solid #8fc9fb;overflow:hidden"></div>#}
-{#                                            </div>#}
-{#                                        </td>#}
-{#                                        <td class="legendLabel">Primary</td>#}
-{#                                    </tr>#}
-{#                                    <tr>#}
-{#                                        <td class="legendColorBox">#}
-{#                                            <div style="border:1px solid #ccc;padding:1px">#}
-{#                                                <div style="width:4px;height:0;border:5px solid #007BFF;overflow:hidden"></div>#}
-{#                                            </div>#}
-{#                                        </td>#}
-{#                                        <td class="legendLabel">Success</td>#}
-{#                                    </tr>#}
-{#                                    <tr>#}
-{#                                        <td class="legendColorBox">#}
-{#                                            <div style="border:1px solid #ccc;padding:1px">#}
-{#                                                <div style="width:4px;height:0;border:5px solid #19A9D5;overflow:hidden"></div>#}
-{#                                            </div>#}
-{#                                        </td>#}
-{#                                        <td class="legendLabel">Danger</td>#}
-{#                                    </tr>#}
-{#                                    <tr>#}
-{#                                        <td class="legendColorBox">#}
-{#                                            <div style="border:1px solid #ccc;padding:1px">#}
-{#                                                <div style="width:4px;height:0;border:5px solid #DC3545;overflow:hidden"></div>#}
-{#                                            </div>#}
-{#                                        </td>#}
-{#                                        <td class="legendLabel">Warning</td>#}
-{#                                    </tr>#}
-{#                                    </tbody>#}
-{#                                </table>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div><!-- /# card -->#}
-{#        </div>#}
+        <div class="col-lg-3 col-md-6">
+            <div class="card text-white bg-flat-color-7">
+                <div class="card-body">
+                    <div class="stat-widget-four">
+                        <div class="stat-icon dib">
+                            <i class="fa fa-users text-white"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="text-left dib">
+                                <div class="stat-heading">用户总数</div>
+                                <div class="stat-text">{{ data.user_sum }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--/.col-->
+        {% if request.session.group_id == 1 or request.session.group_id == 2 %}
+            <div class="col-lg-3 col-md-6">
+                <div class="card text-white bg-flat-color-8">
+                    <div class="card-body">
+                        <div class="stat-widget-four">
+                            <div class="stat-icon dib">
+                                <a href="{% url 'back:get_daily_user' %}">
+                                    <i class="fa fa-desktop text-white"></i>
+                                </a>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-heading">今日用户登陆</div>
+                                    <div class="stat-text">{{ data.user_daily_sum }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!--/.col-->
+        {% endif %}
     </div> <!-- .content -->
 </div><!-- /#right-panel -->
 
@@ -172,12 +173,12 @@
 
 {% include 'common/include_js.html' %}
 {% block add_js %}
-{#    <script src="{% static 'backstage/vendors/chart.js/dist/Chart.bundle.min.js' %}"></script>#}
-{#    <script src="{% static 'backstage/assets/js/dashboard.js' %}"></script>#}
-{#    <script src="{% static 'backstage/assets/js/widgets.js' %}"></script>#}
-{#    <script src="{% static 'backstage/vendors/jqvmap/dist/jquery.vmap.min.js' %}"></script>#}
-{#    <script src="{% static 'backstage/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>#}
-{#    <script src="{% static 'backstage/vendors/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>#}
+    {#    <script src="{% static 'backstage/vendors/chart.js/dist/Chart.bundle.min.js' %}"></script>#}
+    {#    <script src="{% static 'backstage/assets/js/dashboard.js' %}"></script>#}
+    {#    <script src="{% static 'backstage/assets/js/widgets.js' %}"></script>#}
+    {#    <script src="{% static 'backstage/vendors/jqvmap/dist/jquery.vmap.min.js' %}"></script>#}
+    {#    <script src="{% static 'backstage/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>#}
+    {#    <script src="{% static 'backstage/vendors/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>#}
 
 {% endblock %}
 

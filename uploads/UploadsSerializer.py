@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from tables.models import Research, Projects, Bid, Organization, Participant
+from tables.models import Research, Projects, Bid, Organization, Participant, User
 
 
 class BaseListSerializer(serializers.ModelSerializer):
@@ -18,8 +18,8 @@ class BaseCreateSerializer(serializers.ModelSerializer):
 class BaseUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Research
-        fields = ['name', 'classify', 'start_date', 'end_date', 'status', 'guidelines',
-                  'funds', 'brief', 'contacts', 'phone', 'user']
+        fields = ['classify', 'start_date', 'end_date', 'status', 'guidelines',
+                  'funds', 'brief', 'contacts', 'phone']
 
 
 class ProListSerializer(serializers.ModelSerializer):
@@ -101,7 +101,7 @@ class OrgUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Organization
-        fields = ['name', 'nature', 'is_a', 'is_b', 'brief', 'photo']
+        fields = ['nature', 'is_a', 'is_b', 'brief', 'photo']
 
 
 class ParListSerializer(serializers.ModelSerializer):
@@ -130,4 +130,4 @@ class ParUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Participant
-        fields = ['name', 'gender', 'unit', 'job', 'email', 'brief', 'photo']
+        fields = ['name', 'gender', 'job', 'email', 'brief', 'photo']

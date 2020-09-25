@@ -12,9 +12,6 @@ from collections import Counter
 from collections import OrderedDict
 
 
-# logger = log.getLogger('djayngo')
-
-
 def get_org_roles_control(org_roles, choose_role, data):
     """
     首页-第三屏-权限控制,性质3在上边，4在下边
@@ -44,16 +41,16 @@ class NumCountView(viewsets.ViewSet):
     def list(request):
         # 成果总数--合格的
         pro_sum = Projects.objects.filter(status=1).count()
-        # 课题招标总数
-        res_sum = Research.objects.filter(status__in=[1, 2, 3]).count()
+        # 课题招标-正在进行招标的数量
+        res_sum = Research.objects.filter(status=1).count()
         # 成果浏览量
         views_sum = Projects.objects.aggregate(Sum('views'))['views__sum']
         # 成果下载量
         download_sum = Projects.objects.aggregate(Sum('downloads'))['downloads__sum']
         # 推进中的课题量(算小课题)
-        res_ing_sum = Bid.objects.filter(bidder_status=2).count()
+        res_ing_sum = Bid.objects.filter(bidder_status__in=[1, 2], conclusion_status=0).count()
         # 课题结题量(算小课题)
-        res_ed_sum = Bid.objects.filter(conclusion_status=2).count()
+        res_ed_sum = Bid.objects.filter(conclusion_status__in=[1, 2]).count()
         # 研究机构量
         org_sum = Organization.objects.count()
         # 研究人员量
@@ -77,17 +74,15 @@ def get_ab_org(request):
 
         if roles == 'more':
             #  获取所有机构性质
-            data = OrgNature.objects.values('id', 'remarks')
+            data = OrgNature.objects.values('id', 'remarks').order_by('ord_by')
             return Response({"data": data}, status=status.HTTP_200_OK)
 
         user_id = request.query_params.get('userid', 0)
         choose_role = request.query_params.get('choose_role')  # 甲方：a,乙方：b,其他：全部数据
         tag = request.query_params.get('tag')  # t代表图标统计（不统计成果数为0的机构或人员）
-        data = Organization.objects.values('nature__id', 'nature__remarks').filter(is_show=True)
-        print(request.query_params)
+        data = Organization.objects.values('nature__id', 'nature__remarks', 'nature__ord_by').filter(is_show=True)
+        # print(request.query_params)
         # ---权限控制开始---
-        # org_level = get_user_org_level(user_id)
-        # data = data.filter(nature__level__in=[3, 4]).exclude(nature__level__lt=org_level)
         org_roles = get_user_org_roles(user_id)
         data = get_org_roles_control(org_roles, choose_role, data)
         # ---权限控制结束---
@@ -96,12 +91,13 @@ def get_ab_org(request):
             if tag == 't':
                 data = data.exclude(pro_sum=0)
             data = data.annotate(org_num=Count('id')).order_by('nature__id')
-            print(data.query)
+            # print(data.query)
         else:
             if tag == 't':
                 data = data.exclude(par_sum=0)
             data = data.exclude(is_a=True).annotate(par_num=Sum('par_sum')).order_by('nature__id')
-        return Response({"data": data}, status=status.HTTP_200_OK)
+        data_fin = sorted(data, key=lambda x: x['nature__ord_by'], reverse=False)
+        return Response({"data": data_fin}, status=status.HTTP_200_OK)
 
 
 class ProOrgCountView(viewsets.ViewSet):
@@ -133,8 +129,6 @@ class ProOrgCountView(viewsets.ViewSet):
         data = Organization.objects.values('id', 'name', 'pro_sum', 'par_sum').filter(is_show=True)
 
         # ---权限控制开始---
-        # org_level = get_user_org_level(user_id)
-        # data = data.filter(nature__level__in=[3, 4]).exclude(nature__level__lt=org_level)
         org_roles = get_user_org_roles(user_id)
         data = get_org_roles_control(org_roles, choose_role, data)
         # ---权限控制结束---
@@ -149,7 +143,7 @@ class ProOrgCountView(viewsets.ViewSet):
 
         if order == 'p':
             # 成果总数排序
-            data = data.order_by('-pro_sum')
+            data = data.order_by('-pro_sum', '-id')
             for i in range(len(data)):
                 if data[i]['pro_sum'] == 0:
                     data[i]['view_sum'] = 0
@@ -175,15 +169,12 @@ class ProOrgCountView(viewsets.ViewSet):
                     if data[i]['view_sum'] is None:
                         data[i]['view_sum'] = 0
                 data_obj_list.append(data[i])
-            # print(data_obj_list)
-            # for i in data_obj_list:
-            #     if i['view_sum'] is None or data[i]['view_sum'] == 'null':
-            #         print(i)
+
             data = sorted(data_obj_list, key=lambda x: x['view_sum'], reverse=True)
             data_sum = len(data)
         else:
             # 根据学者量排序
-            data = data.order_by('-par_sum')
+            data = data.order_by('-par_sum', '-id')
             for i in range(len(data)):
                 if data[i]['pro_sum'] == 0:
                     data[i]['view_sum'] = 0
@@ -201,7 +192,6 @@ class ProOrgCountView(viewsets.ViewSet):
         data_list = data[(page - 1) * page_num: page * page_num]
         res = {'sum': data_sum, 'page_num': data_page_sum, 'res': data_list}
 
-        # res = {'res': data}
         return Response(res, status=status.HTTP_200_OK)
 
     @staticmethod
@@ -242,13 +232,10 @@ class ProParCountView(viewsets.ViewSet):
             order = 't'
             set_run_info(level='error', address='/gather_statistics/view.py/ParOrgCountView',
                          user=user_id, keyword='按机构统计成果-order参数传参不正确：{}'.format(order))
-            # logger.error('par_count 未获取到order参数')
 
         org_id_list_obj = Organization.objects.values('id').filter(is_show=True).exclude(is_a=True)
 
         #  ---控制权限开始---
-        # org_level = get_user_org_level(user_id)
-        # org_id_list_obj = org_id_list_obj.filter(nature__level__in=[3, 4]).exclude(nature__level__lt=org_level)
         org_roles = get_user_org_roles(user_id)
         org_id_list_obj = get_org_roles_control(org_roles, choose_role, org_id_list_obj)
 
@@ -328,8 +315,6 @@ class ProjectsStatisticsView(viewsets.ViewSet):
             # 按人员
             pro_id_obj = ProRelations.objects.values('pro').filter(par=par_id, is_eft=True).distinct()
             pro_id_list = [i['pro'] for i in pro_id_obj]
-        # print(pro_id_obj)
-        # pro_id_list = [i['pro'] for i in pro_id_obj]
 
         if column == 'y':
             # 根据指定类型，按年份分类统计
@@ -346,8 +331,6 @@ class ProjectsStatisticsView(viewsets.ViewSet):
                 # 按学者发布成果量统计，发布量倒序排列
                 par_id_obj = ProRelations.objects.values('par', 'par__name').annotate(
                     pro_sum=Count('pro')).filter(org=org_id, is_eft=True, par_id__isnull=False).order_by('-pro_sum')
-                # for i in range(len(par_id_obj)):
-                #     par_id_obj[i]['par'] = Participant.objects.values('name').get(pk=par_id_obj[i]['par'])['name']
                 res = {'res': par_id_obj}
             else:
                 # 合作学者,返回指定格式
@@ -356,14 +339,9 @@ class ProjectsStatisticsView(viewsets.ViewSet):
                 par_id_obj_list = list(filter(lambda x: x['par'] != par_id, par_id_obj))  # 删除本身
                 # print('22', par_id_obj_list)
                 par_name_cur = Participant.objects.get(pk=par_id).name
-                # for i in range(len(par_id_obj_list)):
-                #     par_id_obj_list[i]['par_name'] = \
-                #         Participant.objects.values('name').get(pk=par_id_obj_list[i]['par'])['name']
                 res = {'name': par_name_cur, 'name_id': par_id, 'res': par_id_obj_list}
         elif column == 'co':
             # 合作机构成果量
-            # co_obj = ProRelations.objects.values('org').annotate(pro_sum=Count('pro', distinct=True)).filter(
-            #     pro__in=pro_id_list, org_id__isnull=False, is_eft=True)
             co_org_obj = Projects.objects.values('lead_org', 'research').filter(status=1, id__in=pro_id_list)
             # print(co_org_obj)
             co_org_list = []
@@ -375,9 +353,6 @@ class ProjectsStatisticsView(viewsets.ViewSet):
 
             # print(co_org_list)
             co_obj_list = Organization.objects.values('name', 'pro_sum').filter(id__in=co_org_list)
-            # co_obj_list = list(filter(lambda x: x['org'] != org_id, co_obj))  # 删除本身
-            # for i in range(len(co_obj_list)):
-            #     co_obj_list[i]['org'] = Organization.objects.get(pk=co_obj_list[i]['org']).name
             res = {'res': co_obj_list}
         else:
             res = {'res': ['参数错误']}
@@ -391,7 +366,6 @@ class ProjectsStatisticsView(viewsets.ViewSet):
             if param_key < 1:
                 param_key = param_default
         except Exception as e:
-            # logger.info('pro_statistics --view.py --try_except --强转参数出错{}，--赋默认值'.format(e))
             set_run_info(level='error', address='/gather_statistics/view.py/ProjectsStatisticsView',
                          keyword='强转参数失败：{}'.format(e))
             param_key = param_default
@@ -431,7 +405,6 @@ class ProjectsStatisticsYearView(viewsets.ViewSet):
             if param_key < 1:
                 param_key = param_default
         except Exception as e:
-            # logger.info('pro_statistics --view.py --try_except --强转参数出错{}，--赋默认值'.format(e))
             set_run_info(level='error', address='/gather_statistics/view.py/ProjectsStatisticsYearView',
                          keyword='强转参数失败：{}'.format(e))
             param_key = param_default
@@ -532,8 +505,8 @@ class UserClickStsView(viewsets.ViewSet):
         pro_obj_fin = UserClickBehavior.objects.values("create_time__year", "create_time__month").annotate(
             click_sum=Count("id"))
         # print(pro_obj_fin.query)
-        # 招标中
-        res = pro_obj_fin
+        res = sorted(pro_obj_fin, key=lambda x: x['create_time__year'] + x['create_time__month'], reverse=False)
+        # print(res)
         return Response(res, status=status.HTTP_200_OK)
 
 

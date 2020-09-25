@@ -4770,7 +4770,7 @@
 }
 
 .bg-flat-color-2 {
-    background: #63c2de;
+    background: #5bc0de;
 }
 
 .bg-flat-color-3 {
@@ -4783,6 +4783,18 @@
 
 .bg-flat-color-5 {
     background: #4dbd74;
+}
+
+.bg-flat-color-6 {
+    background: #9fcdff;
+}
+
+.bg-flat-color-7 {
+    background: #6f42c1;
+}
+
+.bg-flat-color-8 {
+    background: #6f42c1;
 }
 
 .transition {
@@ -5977,7 +5989,8 @@ header .form-inline .search-form.close {
     background: #128cda;
     margin-top: 20px;
 }
-.login-form .form-group{
+
+.login-form .form-group {
     width: 240px !important;
     padding-left: 46px;
     margin: 20px auto;
@@ -5986,28 +5999,34 @@ header .form-inline .search-form.close {
     line-height: 42px !important;
     height: 42px !important;
 }
-.login-form  input{
+
+.login-form input {
     line-height: 40px;
     height: 40px;
     background: transparent;
     color: #15538e;
     font-size: 14px;
-    border:none;
+    border: none;
     outline: none;
 }
 
-.login-form  input:focus { outline: none;     border: none;
+.login-form input:focus {
+    outline: none;
+    border: none;
     box-shadow: none;
-    background: transparent;}
-.login-form  .form-group{
-    background:url("../../images/user.png") 16px center no-repeat;
-    background-size:20px;
+    background: transparent;
+}
+
+.login-form .form-group {
+    background: url("../../images/user.png") 16px center no-repeat;
+    background-size: 20px;
     width: 20px;
     height: 20px;
 }
-.login-form  .form-group2{
-    background:url("../../images/psw.png") 16px center no-repeat;
-    background-size:20px;
+
+.login-form .form-group2 {
+    background: url("../../images/psw.png") 16px center no-repeat;
+    background-size: 20px;
     width: 20px;
     height: 20px;
 }
@@ -6868,4 +6887,8 @@ header .form-inline .search-form.close {
     .right-panel .content #bootstrap-data-table_wrapper .table th {
         padding: 5px;
     }
+}
+
+.col-lg-3 {
+    max-width: 33%;
 }

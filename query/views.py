@@ -13,6 +13,12 @@ from jsg.settings import ORG_NATURE_LOWER_LEVEL, ORG_NATURE_HIGHER_LEVEL
 from jsg.settings import ORG_GROUP_LOWER_LEVEL, ORG_GROUP_MANAGER_LEVEL, ORG_GROUP_SUPERUSER_LEVEL
 from login.views import add_user_behavior
 from login.views import set_run_info
+from django.contrib.auth.hashers import make_password
+from rest_framework.decorators import action
+import os
+import time
+import json
+from query.upload_file import UploadFile
 
 
 def get_user_org_level(user_id):
@@ -54,7 +60,7 @@ def get_user_permission(user):
     :param user: 登录对象
     :return: user_permission-查看等级，1：所有数据可操作 0：只能看自己的数据
     """
-    print(user, type(user))
+    # print(user, type(user))
     if user.is_active:
         group_id_obj = Group.objects.filter(user=user.id)
         # 属于多个组的，取最小id（权限最大）
@@ -74,6 +80,25 @@ def get_user_permission(user):
         return {"user_permission": user_permission, "org_id": org_id}
     else:
         return {"user_permission": 0, "org_id": 0}
+
+
+def permission_filter_data(user_permission_dict, data, args, **kwargs):
+    """
+    权限过滤数据--目前只区分管理员和普通用户
+    :param user_permission_dict: 权限和机构id字典{"user_permission": 0, "org_id": 0}
+    :param data: 数据对象
+    :param args: 过滤条件1
+    :param kwargs: 过滤条件2
+    :return:
+    """
+    if user_permission_dict['user_permission']:
+        # 是管理员
+        data = data.filter(**kwargs)
+    else:
+        # 普通用户
+        data = data.filter(**{args: user_permission_dict['org_id']})
+    # print('---', data.query)
+    return data
 
 
 class ProjectsQueryView(viewsets.ViewSet):
@@ -111,50 +136,11 @@ class ProjectsQueryView(viewsets.ViewSet):
 
         if keyword:
             data = self.filter_keyword(data, keyword, column, user_id)
-        #     keyword = str(keyword).replace(' ', '')
-        #     column_kd = '{}__contains'.format(column)
-        #     if cls_t == 100:
-        #         # cls_t不作为检索条件
-        #         data = data.filter(**{column_kd: keyword})
-        #         print('111', data.query)
-        #     else:
-        #         data = data.filter(classify=cls_t).filter(**{column_kd: keyword})
-        #         print('222', data.query)
-        #
-        #     # 添加行为记录
-        #     try:
-        #         if user_id and user_id != 'undefined' and user_id != 'null':
-        #             user_obj = User.objects.filter(pk=user_id)
-        #         else:
-        #             user_obj = None
-        #         if user_obj:
-        #             # -- 记录开始 --
-        #             add_user_behavior(
-        #                 keyword=keyword,
-        #                 search_con='查询成果信息({})'.format(str(data.query)),
-        #                 user_obj=user_obj[0])
-        #             # -- 记录结束 --
-        #         else:
-        #             add_user_behavior(keyword=keyword, search_con='查询成果信息({})'.format(str(data.query)))
-        #     except Exception as e:
-        #         add_user_behavior(keyword=keyword, search_con='查询成果信息({})'.format(str(data.query)))
-        #         # print('add user_behavior data', e)
-        #         set_run_info(level='error', address='/query/view.py/ProjectsQueryView-list',
-        #                      user=user_id, keyword='搜索成果-添加行为记录失败：{}'.format(e))
-        #         # logger.info('query 添加行为记录 --未获取到用户id：{}'.format(user_id))
+
         if cls_t != 100:
             data = data.filter(classify=cls_t)
 
         data = self.filter_date(data, s_date, e_date)
-        # if s_date and s_date != 'NaN-NaN-NaN' and s_date != 'null':
-        #     # 判断日期
-        #     if e_date and e_date != 'NaN-NaN-NaN' and e_date != 'null':
-        #         data = data.filter(release_date__gte=s_date, release_date__lte=e_date)
-        #     else:
-        #         data = data.filter(release_date__gte=s_date)
-        # else:
-        #     if e_date and e_date != 'NaN-NaN-NaN' and e_date != 'null':
-        #         data = data.filter(release_date__lte=e_date)
 
         org_obj = ''
         par_obj = ''
@@ -163,24 +149,11 @@ class ProjectsQueryView(viewsets.ViewSet):
             data = self.designated_org_inquiry(data, org_id)
             # 机构研究人员姓名
             par_obj = Participant.objects.values('id', 'name').filter(unit__id=org_id, is_show=True)
-            # lead_org_data = data.filter(lead_org__id=org_id)
-            # re_org_data = data.filter(research__id=org_id)
-            # lead_org_data_list = []
-            # re_org_data_list = []
-            # if lead_org_data:
-            #     lead_org_data_list = [i['id'] for i in lead_org_data]
-            # if re_org_data:
-            #     re_org_data_list = [i['id'] for i in re_org_data]
-            # all_org_list_set = set(lead_org_data_list + re_org_data_list)
-            # # data = data.filter(Q(research__id=org_id) | Q(lead_org__id=org_id))
-            # data = data.filter(id__in=all_org_list_set)
+
         elif par_id and not org_id:
             # 指定人员查询
             data = self.designated_par_inquiry(data, par_id)
-            # relation_data = ProRelations.objects.values('pro').filter(is_eft=1, par=par_id).distinct('pro')
-            # # print('***', relation_data.query)
-            # pro_id_list = [i['pro'] for i in relation_data]
-            # data = data.filter(id__in=pro_id_list)
+
         else:
             # 根据成果按机构统计数量
             org_obj = data.values('research', 'research__name').annotate(pro_sum=Count('id', distinct=True)).filter(
@@ -193,8 +166,8 @@ class ProjectsQueryView(viewsets.ViewSet):
 
         if order == 't':
             # 按时间倒序排列
-            # data = data.order_by('-release_date')
-            data = data.order_by('-release_time')
+            data = data.order_by('-release_date', '-id')
+            # data = data.order_by('-release_time')
         elif order == 'v':
             # 按浏览量倒序排列
             data = data.order_by('-views')
@@ -356,12 +329,12 @@ class ProjectsQueryView(viewsets.ViewSet):
 
 class MyProjectsQueryView(viewsets.ViewSet):
     """
-    我的成果信息
+    我的成果信息--查询列表和修改
     """
     authentication_classes = (ExpiringTokenAuthentication,)
 
     def list(self, request):
-        print(request.query_params)
+        # print(request.query_params)
         # 分类（1：发展，2：监管，3：党建，4：改革，5：其他，100：全部）
         cls_t = request.query_params.get('cls', 100)
         keyword = request.query_params.get('kw', '')  # 搜索关键字
@@ -374,14 +347,14 @@ class MyProjectsQueryView(viewsets.ViewSet):
         page_num = self.try_except(page_num, 30)  # 验证每页的数量
 
         # status=5 删除状态 0:不显示
-        data = Projects.objects.values('uuid', 'name', 'classify__cls_name', 'key_word',
+        data = Projects.objects.values('uuid', 'name', 'classify__cls_name', 'key_word', 'user__first_name',
                                        'status').exclude(status__in=[0, 5]).order_by('-id')
         if keyword:
             data = data.filter(Q(name__contains=keyword) | Q(key_word__contains=keyword))
             # -- 记录开始 --
 
             add_user_behavior(keyword=keyword, search_con='搜索成果信息：{}'.format(str(data.query)),
-                            user_obj=request.user)
+                              user_obj=request.user)
 
             # -- 记录结束 --
 
@@ -394,10 +367,7 @@ class MyProjectsQueryView(viewsets.ViewSet):
         # -- 权限开始 --
         user = request.user
         user_permission_dict = get_user_permission(user)
-        if user_permission_dict['user_permission']:
-            data = data.filter(status=1)
-        else:
-            data = data.filter(user__org=user_permission_dict['org_id'])
+        data = permission_filter_data(user_permission_dict, data, 'user__org', status=1)
         # -- 权限结束 --
 
         sp = SplitPages(data, page, page_num)
@@ -412,6 +382,139 @@ class MyProjectsQueryView(viewsets.ViewSet):
             res['res'][i]['status'] = settings.PROJECTS_STATUS_CHOICE[res['res'][i]['status']]
 
         return Response(res, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        """
+        成果修改
+        :param request:
+        :return:
+        """
+        param_dict = request.data
+        print('---', param_dict)
+        pro_status = param_dict.get('pro_status', 0)
+        name = param_dict.get('name')
+        uuid = param_dict.get('uuid')
+        bid = param_dict.get('bid_id')
+        lead_org_id_list_str = param_dict.get('lead_org_id_list')
+        research_id_list_str = param_dict.get('research_id_list')
+        classify = param_dict.get('classify')
+        key_word = param_dict.get('key_word')
+        release_date = param_dict.get('release_date')
+        attached = request.FILES.get('attached')
+        par_obj_list_str = param_dict.get('par_obj_list')
+
+        pro_obj = Projects.objects.filter(uuid=uuid)
+
+        current_year = datetime.datetime.now().year
+        current_month = '{:02d}'.format(datetime.datetime.now().month)
+        current_date = time.strftime('%Y-%m-%d')
+
+        # 成果上传保存路径
+        pro_save_path_dirs = os.path.join(
+            os.path.join(os.path.join(settings.MEDIA_ROOT, 'attached'), str(current_year)),
+            current_month)
+
+        # 若用户不选择发布时间，自动填充发布时间
+        if pro_status == 3:
+            if release_date == 'Null' or release_date is None:
+                release_date = current_date
+        else:
+            if release_date == 'Null' or release_date is None:
+                release_date = None
+
+        try:
+            # 设置关系表
+            par_obj_list = json.loads(par_obj_list_str)
+            if par_obj_list:
+                self.set_pro_relations(pro_obj, par_obj_list)
+
+            # 设置研究机构和立项机构
+            lead_org_id_list = json.loads(lead_org_id_list_str)
+            research_id_list = json.loads(research_id_list_str)
+            self.set_many_to_many_org(pro_obj, lead_org_id_list, research_id_list)
+
+            # print('attached_path', attached, type(attached))
+            if attached:
+                file_obj = UploadFile(pro_save_path_dirs, attached)
+                attached_name_fin = file_obj.handle()
+
+                pro_obj.update(
+                    name=name,
+                    classify=classify,
+                    key_word=key_word,
+                    status=pro_status,
+                    release_date=release_date,
+                    bid=bid,
+                    attached="attached/{}/{}/{}".format(current_year, current_month, attached_name_fin)
+                )
+            else:
+                pro_obj.update(
+                    name=name,
+                    classify=classify,
+                    key_word=key_word,
+                    status=pro_status,
+                    bid=bid,
+                    release_date=release_date,
+                )
+            # -- 记录开始 --
+            add_user_behavior(keyword='', search_con='修改成果信息：{};{}'.format(str(request.data), str(attached)),
+                              user_obj=request.user)
+            # -- 记录结束 --
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            # print(e)
+            set_run_info(level='error', address='/backstage/view.py/project_edit_do',
+                         user=request.user.id, keyword='修改成果失败：{}'.format(e))
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @staticmethod
+    def set_pro_relations(pro_obj, par_obj_list):
+        """
+        填写关系表， 三表对应
+        :param pro_obj: 成果对象
+        :param par_obj_list: 人员对象列表
+        :return:
+        """
+        for par_dict in par_obj_list:
+            # print(par_dict, type(par_dict))
+            roles = int(par_dict['roles'])
+            par_id = int(par_dict['id'])
+            job = par_dict['job']
+            pro_relation_obj = ProRelations.objects.filter(pro=pro_obj[0].id, par=par_id)
+            score = settings.ROLES_SCORE[roles]
+            if pro_relation_obj:
+                pro_relation_obj.update(job=job, roles=roles, score=score)
+            else:
+                par_obj = Participant.objects.get(id=par_id)
+                ProRelations.objects.create(is_eft=False, par=par_obj, org=par_obj.unit, pro=pro_obj[0],
+                                            job=job, roles=roles, score=score)
+
+    @staticmethod
+    def set_many_to_many_org(pro_obj, lead_org_id_list, research_id_list):
+        """
+        设置研究机构和立项机构
+        :param pro_obj: 成果对象
+        :param lead_org_id_list: 立项机构列表
+        :param research_id_list: 研究机构列表
+        :return:
+        """
+        # 多对多对象删除
+        pro_obj[0].lead_org.clear()
+        pro_obj[0].research.clear()
+
+        # 多对多对象创建
+        if lead_org_id_list:
+            # lead_org_id_list = lead_org_id_str.split(';')
+            print('&&&', lead_org_id_list, type(lead_org_id_list))
+            lead_org_id_list_obj = Organization.objects.filter(id__in=lead_org_id_list)
+            # print(lead_org_id_list_obj)
+            pro_obj[0].lead_org.add(*lead_org_id_list_obj)
+
+        if research_id_list:
+            # research_id_list = research_id_str.split(';')
+            print(research_id_list)
+            research_id_list_obj = Organization.objects.filter(id__in=research_id_list)
+            pro_obj[0].research.add(*research_id_list_obj)
 
     @staticmethod
     def try_except(param_key, param_default):
@@ -447,10 +550,10 @@ class SPProjectsQueryView(viewsets.ViewSet):
 
         # status=5 删除状态
         if tag == 'td':
-            data = Projects.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'status', 'attached'
-                                           ).filter(status=3).order_by('-id')
+            data = Projects.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'status',
+                                           'attached', 'user__first_name').filter(status=3).order_by('-id')
         else:
-            data = Projects.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'status'
+            data = Projects.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'status', 'user__first_name',
                                            ).filter(status__in=[1, 4]).order_by('-id')
         if keyword:
             data = data.filter(Q(name__contains=keyword) | Q(lead_org__name__contains=keyword) |
@@ -543,17 +646,17 @@ class ProDetailView(viewsets.ViewSet):
             research_org_obj = obj.research.all()
 
             par_id_obj = ProRelations.objects.values(
-                'id', 'par__name', 'roles', 'speciality', 'job', 'task', 'org__name').filter(
+                'par__name', 'roles', 'speciality', 'job', 'task', 'org__name', 'par__id').filter(
                 pro=obj.id, par__id__isnull=False).order_by('roles')
 
             if org_level == ORG_NATURE_HIGHER_LEVEL:
-                lead_org_str = self.filter_show_org(lead_org_obj, [])
-                research_org_str = self.filter_show_org(research_org_obj, [])
+                lead_org_dict = self.filter_show_org(lead_org_obj, [])
+                research_org_dict = self.filter_show_org(research_org_obj, [])
                 UserClickBehavior.objects.create(user=user_obj, pro=obj)  # 创建点击记录
             else:
                 par_id_obj = par_id_obj.filter(org__nature__level__in=[4])
-                lead_org_str = self.filter_show_org(lead_org_obj, [1, 2, 3])
-                research_org_str = self.filter_show_org(research_org_obj, [1, 2, 3])
+                lead_org_dict = self.filter_show_org(lead_org_obj, [1, 2, 3])
+                research_org_dict = self.filter_show_org(research_org_obj, [1, 2, 3])
                 UserClickBehavior.objects.create(pro=obj)  # 创建点击记录
 
             cls_t = ''
@@ -562,7 +665,7 @@ class ProDetailView(viewsets.ViewSet):
 
             obj.views_num_update()  # 浏览量+1
 
-            obj_dict = {"lead_org": lead_org_str, "research": research_org_str, "key_word": obj.key_word,
+            obj_dict = {"lead_org": lead_org_dict, "research": research_org_dict, "key_word": obj.key_word,
                         "release_date": obj.release_date, "abstract": obj.abstract,
                         "attached": str(obj.attached), "classify": cls_t,
                         "reference": str(obj.reference).split(';'), "par": par_id_obj, 'name': obj.name
@@ -570,12 +673,21 @@ class ProDetailView(viewsets.ViewSet):
             # print(obj_dict)
             if tag == 'back':
                 bid_re_title = obj.bid
+                submitter_org = obj.user
                 if bid_re_title:
                     bid_re_title = bid_re_title.re_title
+                if submitter_org:
+                    submitter_org = submitter_org.first_name
                 back_append_dict = {'status': settings.PROJECTS_STATUS_CHOICE[obj.status],
                                     'bid_re_title': bid_re_title,
                                     'downloads': obj.downloads, 'views': obj.views,
+                                    'submitter_org': submitter_org
                                     }
+                # 与前段一致，将人员的par__id值命名为id
+                for i in range(len(par_id_obj)):
+                    # print(par_id_obj[i])
+                    par_id_obj[i]['id'] = par_id_obj[i]['par__id']
+                back_append_dict['par'] = par_id_obj
                 obj_dict.update(back_append_dict)
 
             res = {'res': obj_dict}
@@ -621,17 +733,17 @@ class ProDetailView(viewsets.ViewSet):
         :level_list:可以展示的机构等级
         :return:
         """
-        org_list = []
+        org_dict = {}
         if org_obj:
             if level_list:
                 for l_org in org_obj:
                     if l_org.nature.level not in [1, 2, 3]:
-                        org_list.append(l_org.name)
+                        org_dict[l_org.id] = l_org.name
             else:
                 for l_org in org_obj:
-                    org_list.append(l_org.name)
-        org_str = ';'.join(org_list)
-        return org_str
+                    org_dict[l_org.id] = l_org.name
+        # org_str = ';'.join(org_list)
+        return org_dict
 
 
 class ResearchQueryView(viewsets.ViewSet):
@@ -664,16 +776,14 @@ class ResearchQueryView(viewsets.ViewSet):
             # print('1', data.query)
 
         if tag == 'all':
-            # 前方页面不显示未发布状态的招标
-            data = data.exclude(status=0).order_by('-start_date')
+            # 前方页面显示未发布中状态的招标
+            data = data.filter(status=1).order_by('-start_date')
         elif tag == 'personal':
             # -- 权限开始 --
             user = request.user
             user_permission_dict = get_user_permission(user)
-            if user_permission_dict['user_permission']:
-                data = data.exclude(status=0)
-            else:
-                data = data.filter(user__org=user_permission_dict['org_id'])
+            data = permission_filter_data(user_permission_dict, data, 'user__org', status__in=[1, 2, 3])
+
             # -- 权限结束 --
             # 排序
             data = data.order_by('-id')
@@ -745,40 +855,64 @@ class ResearchDetailView(viewsets.ViewSet):
             res = {'res': '缺失参数'}
             return Response(res, status=status.HTTP_404_NOT_FOUND)
 
-    @staticmethod
-    def post(request):
-        # 修改
-        param_dict = request.data
-        uuid = param_dict.get('uuid', '')
-        name = param_dict.get('name', '')
-        classify = param_dict.get('classify', 5)
-        start_date = param_dict.get('start_date', '')
-        end_date = param_dict.get('end_date', '')
-        guidelines = param_dict.get('guidelines', '')
-        re_status = param_dict.get('status', 0)
-        funds = param_dict.get('funds', 0)
-        contacts = param_dict.get('contacts', '')
-        phone = param_dict.get('phone', '')
-        brief = param_dict.get('brief', '')
-        # print('guuuuu', param_dict)
-        re_obj = Research.objects.filter(uuid=uuid)
-        if re_obj:
-            try:
-                if guidelines:
-                    re_obj.update(name=name, classify=classify, start_date=start_date, funds=funds, contacts=contacts,
-                                  end_date=end_date, guidelines=guidelines, phone=phone, brief=brief, status=re_status)
-                else:
-                    re_obj.update(name=name, classify=classify, start_date=start_date, funds=funds, contacts=contacts,
-                                  end_date=end_date, phone=phone, brief=brief, status=re_status)
-                return Response(1, status=status.HTTP_200_OK)
-            except Exception as e:
-                set_run_info(level='error', address='/query/view.py/ResearchDetailView-post',
-                             keyword='修改课题详情失败：{}'.format(e))
-                return Response(0, status=status.HTTP_200_OK)
-        else:
-            set_run_info(level='error', address='/query/view.py/ResearchDetailView-post',
-                         keyword='修改课题详情失败：未获取到记录')
-            return Response(0, status=status.HTTP_200_OK)
+    # def post(self, request):
+    #     # 修改
+    #     param_dict = request.data
+    #     uuid = param_dict.get('uuid', '')
+    #     name = param_dict.get('name', '')
+    #     classify = param_dict.get('classify', 5)
+    #     start_date = param_dict.get('start_date', '')
+    #     end_date = param_dict.get('end_date', '')
+    #     guidelines = param_dict.get('guidelines', '')
+    #     re_status = param_dict.get('status', 0)
+    #     funds = param_dict.get('funds', 0)
+    #     contacts = param_dict.get('contacts', '')
+    #     phone = param_dict.get('phone', '')
+    #     brief = param_dict.get('brief', '')
+    #     # print('guuuuu', param_dict)
+    #     re_obj = Research.objects.filter(uuid=uuid)
+    #     current_year = datetime.datetime.now().year
+    #     current_month = '{:02d}'.format(datetime.datetime.now().month)
+    #     # current_time = time.strftime('%H%M%S')
+    #     # 课题上传保存路径
+    #     re_save_path_dirs = os.path.join(
+    #         os.path.join(os.path.join(settings.MEDIA_ROOT, 'guide'), str(current_year)),
+    #         current_month)
+    #
+    #     if re_obj:
+    #         try:
+    #             if guidelines:
+    #                 file_obj = UploadFile(re_save_path_dirs, guidelines)
+    #                 attached_name_fin = file_obj.handle()
+    #                 # 重新上传文件操作  setting/MEDIA.ROOT
+    #                 # 判断目录是否存在,不存在就创建
+    #                 # self.create_dirs_not_exist(re_save_path_dirs)
+    #                 # 保存的路径
+    #                 # save_path = os.path.join(re_save_path_dirs, guidelines.name)
+    #                 # 判断文件是否存在, 避免重名
+    #                 # save_path, attached_name_fin = self.file_name_is_exits(re_save_path_dirs, guidelines, current_time)
+    #                 # print('save_path', save_path)
+    #                 # 在保存路径下，建立文件
+    #                 # with open(save_path, 'wb') as f:
+    #                 #     在f.chunks()上循环保证大文件不会大量使用你的系统内存
+    #                 #     for content in guidelines.chunks():
+    #                 #         f.write(content)
+    #
+    #                 re_obj.update(name=name, classify=classify, start_date=start_date, funds=funds, contacts=contacts,
+    #                               end_date=end_date, phone=phone, brief=brief, status=re_status,
+    #                               guidelines="guide/{}/{}/{}".format(current_year, current_month, attached_name_fin))
+    #             else:
+    #                 re_obj.update(name=name, classify=classify, start_date=start_date, funds=funds, contacts=contacts,
+    #                               end_date=end_date, phone=phone, brief=brief, status=re_status)
+    #             return Response(1, status=status.HTTP_200_OK)
+    #         except Exception as e:
+    #             set_run_info(level='error', address='/query/view.py/ResearchDetailView-post',
+    #                          keyword='修改课题详情失败：{}'.format(e))
+    #             return Response(0, status=status.HTTP_200_OK)
+    #     else:
+    #         set_run_info(level='error', address='/query/view.py/ResearchDetailView-post',
+    #                      keyword='修改课题详情失败：未获取到记录')
+    #         return Response(0, status=status.HTTP_200_OK)
 
 
 class SPBidHistoryView(viewsets.ViewSet):
@@ -883,26 +1017,14 @@ class MyBidQueryView(viewsets.ViewSet):
             # -- 权限开始 --
             # user = request.user
             user_permission_dict = get_user_permission(user)
-            if user_permission_dict['user_permission']:
-                data = data.filter(bidder_status__in=[2, 3])
-            else:
-                data = data.filter(submitter__org=user_permission_dict['org_id'])
+            data = permission_filter_data(user_permission_dict, data, 'submitter__org', bidder_status__in=[1, 2, 3])
             # -- 权限结束 --
 
-            # for i in range(len(data)):
-            #     data[i]['conclusion'] = 0
-            #     data[i]['edit'] = 0
-            #     if data[i]['bidder_status'] == 0 or data[i]['bidder_status'] == 3:
-            #         data[i]['edit'] = 1
-            #     elif data[i]['bidder_status'] == 2:
-            #         if data[i]['conclusion_status'] == 0:
-            #             data[i]['conclusion'] = 1
-            #     data[i]['bidder_status'] = settings.BIDDER_STATUS_CHOICE[data[i]['bidder_status']]
-            #     data[i]['conclusion_status'] = settings.BIDDER_CONCLUSION_STATUS[data[i]['conclusion_status']]
-            print(data.count())
+            # print(data.count())
             sp = SplitPages(data, page, page_num)
             res = sp.split_page()
-            print(res['res'])
+            for i in range(len(res['res'])):
+                res['res'][i]['bidder_status'] = settings.BIDDER_STATUS_CHOICE[res['res'][i]['bidder_status']]
             return Response(res, status=status.HTTP_200_OK)
 
     @staticmethod
@@ -938,7 +1060,7 @@ class BidQueryView(viewsets.ViewSet):
                                   'bidder_date__year', 'leader', 'bidder_status', 'conclusion_status').order_by('-id')
 
         if tag == 'doing':
-            data = data.filter(bidder_status__in=[1, 2])
+            data = data.filter(bidder_status__in=[1, 2], conclusion_status=0)
         elif tag == 'done':
             data = data.filter(conclusion_status__in=[1, 2])
 
@@ -994,7 +1116,7 @@ class ParticipantsQueryView(viewsets.ViewSet):
 
         page = self.try_except(page, 1)  # 验证页码
         page_num = self.try_except(page_num, 8)  # 验证每页的数量
-        par_id = self.try_except(par_id, 0)  # 验证人员id
+        # par_id = self.try_except(par_id, 0)  # 验证人员id
 
         if par_id:
             data = Participant.objects.values('id', 'name', 'unit', 'brief', 'job', 'pro_sum', 'photo'
@@ -1063,14 +1185,13 @@ class MyParView(viewsets.ViewSet):
         page = self.try_except(page, 1)  # 验证类型
         page_num = self.try_except(page_num, 10)  # 验证返回数量
 
-        data = Participant.objects.values('uuid', 'name', 'unit__name', 'job', 'email'
+        data = Participant.objects.values('id', 'uuid', 'name', 'unit__name', 'job', 'email'
                                           ).exclude(is_show=0).order_by('-id')
 
         # -- 权限开始 --
         user = request.user
         user_permission_dict = get_user_permission(user)
-        if not user_permission_dict['user_permission']:
-            data = data.filter(unit=user_permission_dict['org_id'])
+        data = permission_filter_data(user_permission_dict, data, 'unit')
         # -- 权限结束 --
 
         if keyword:
@@ -1187,8 +1308,7 @@ class MyOrgView(viewsets.ViewSet):
         # -- 权限开始 --
         user = request.user
         user_permission_dict = get_user_permission(user)
-        if not user_permission_dict['user_permission']:
-            data = data.filter(id=user_permission_dict['org_id'])
+        data = permission_filter_data(user_permission_dict, data, 'id')
         # -- 权限结束 --
 
         if keyword:
@@ -1211,6 +1331,196 @@ class MyOrgView(viewsets.ViewSet):
                 param_key = param_default
         except Exception as e:
             set_run_info(level='error', address='/query/view.py/MyOrgView-list',
+                         keyword='强转参数出错{}'.format(e))
+            param_key = param_default
+        return param_key
+
+
+class MyUserView(viewsets.ViewSet):
+    """
+    后台-用户检索
+    """
+    authentication_classes = (ExpiringTokenAuthentication,)
+
+    @action(methods=['get'], detail=False)
+    def get_user_list(self, request):
+        """
+        用户列表搜索
+        :param request:
+        :return:
+        """
+        page = request.query_params.get('page', 1)
+        page_num = request.query_params.get('page_num', 10)
+        keyword = request.query_params.get('kw', '')
+
+        page = self.try_except(page, 1)  # 验证类型
+        page_num = self.try_except(page_num, 10)  # 验证返回数量
+
+        data = User.objects.values('id', 'username', 'first_name', 'is_active').order_by('-id')
+
+        # -- 权限开始 --
+        user = request.user
+        user_permission_dict = get_user_permission(user)
+        data = permission_filter_data(user_permission_dict, data, 'org')
+        # -- 权限结束 --
+        # if user_permission_dict['user_permission']:
+        #     is_manage = 1
+        # else:
+        #     is_manage = 0
+
+        if keyword:
+            data = data.filter(Q(username__contains=keyword) | Q(first_name__contains=keyword))
+
+            # -- 记录开始 --
+            add_user_behavior(keyword=keyword, search_con='搜索用户信息', user_obj=request.user)
+            # -- 记录结束 --
+
+        sp = SplitPages(data, page, page_num)
+        res = sp.split_page()
+        # res['is_manage'] = is_manage
+        return Response(res, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=True)
+    def get_user_detail(self, request, pk):
+        """
+        用户详情
+        :param request:
+        :param pk: 用户id
+        :return:
+        """
+        data = User.objects.filter(id=pk)
+        if data:
+            user_permission_dict = get_user_permission(data[0])
+            data_fin = data.values('username', 'first_name', 'org', 'date_joined', 'last_login', 'is_active')[0]
+            if user_permission_dict['user_permission']:
+                data_fin['is_manage'] = 1
+            else:
+                data_fin['is_manage'] = 0
+            # -- 记录开始 --
+            add_user_behavior(keyword='', search_con='查看用户信息详情({})'.format(pk),
+                              user_obj=request.user)
+            # -- 记录结束 --
+            return Response(data_fin, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @staticmethod
+    def create(request):
+        """
+        创建用户
+        :param request:
+        :return:
+        """
+        param_dict = request.data
+        username = param_dict.get('username')
+        first_name = param_dict.get('first_name')
+        password = param_dict.get('password')
+        org_id = param_dict.get('org_id')
+        org_name = param_dict.get('org')
+        is_manage = int(param_dict.get('is_manage'), 0)
+        groups_list = []
+        print(param_dict)
+        if is_manage:
+            # 添加管理员组
+            groups_list.append(2)
+
+        if not first_name:
+            # 如果没有昵称，则默认显示机构名称
+            first_name = org_name
+
+        org_name = org_name.replace(' ', '')
+        org_obj_list = Organization.objects.filter(id=org_id, name=org_name)
+        if org_obj_list:
+            org_obj = org_obj_list[0]
+            if org_obj.is_a:
+                # 添加甲方组
+                groups_list.append(3)
+            if org_obj.is_b:
+                # 添加乙方组
+                groups_list.append(4)
+            # print(group_obj_list)
+        else:
+            # 机构不存在
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        password_end = make_password(password, None, 'pbkdf2_sha256')  # 源字符串，固定字符串，加密方式
+        try:
+            User.objects.create(
+                first_name=first_name,
+                username=username,
+                password=password_end,
+                org=org_obj,
+            )
+            # 添加组
+            user_obj = User.objects.get(username=username)
+            groups_list_obj = Group.objects.filter(id__in=groups_list)
+            user_obj.groups.add(*groups_list_obj)
+
+            # -- 记录开始 --
+            add_user_behavior(keyword='', search_con='新增用户信息({})'.format(user_obj.id), user_obj=request.user)
+            # -- 记录结束 --
+
+            return Response(status=status.HTTP_201_CREATED)
+        except Exception as e:
+            # 创建失败
+            set_run_info(level='error', address='/query/view.py/MyUserView-create',
+                         user=request.user.id, keyword='新增用户信息失败：{}'.format(e))
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @staticmethod
+    def put(request):
+        """
+        用户信息修改
+        :param request:
+        :return:
+        """
+        param_dict = request.data
+        user_id = param_dict.get('user_id')
+        first_name = param_dict.get('first_name')
+        is_active = param_dict.get('is_active')
+        org_id = param_dict.get('org_id')
+        org_name = param_dict.get('org')
+        is_manage = int(param_dict.get('is_manage'))
+        print(param_dict)
+        if is_manage:
+            print(1)
+            User.objects.get(id=user_id).groups.add(2)
+        else:
+            print(2)
+            User.objects.get(id=user_id).groups.remove(2)
+
+        try:
+            org_name = org_name.replace(' ', '')
+            org_obj_list = Organization.objects.filter(id=org_id, name=org_name)
+            if not org_obj_list:
+                # 机构不存在
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            User.objects.filter(id=user_id).update(
+                first_name=first_name,
+                is_active=is_active,
+                org=org_id
+            )
+            # -- 记录开始 --
+            add_user_behavior(keyword='', search_con='编辑用户信息({}):{}'.format(user_id, str(param_dict)),
+                              user_obj=request.user)
+            # -- 记录结束 --
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            set_run_info(level='error', address='/query/view.py/MyUserView-update',
+                         user=request.user.id, keyword='编辑用户信息失败：{}'.format(e))
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @staticmethod
+    def try_except(param_key, param_default):
+        # 判断参数是否可以被是否是数字，不是的话，强转，强转不成功或者是负数，置为默认值
+        try:
+            param_key = int(param_key)
+            if param_key < 1:
+                param_key = param_default
+        except Exception as e:
+            set_run_info(level='error', address='/query/view.py/MyUserView-list',
                          keyword='强转参数出错{}'.format(e))
             param_key = param_default
         return param_key

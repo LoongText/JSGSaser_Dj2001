@@ -5,10 +5,10 @@
 
 .pop {
     display: none;
-    width: 800px;
-    min-height: 655px;
-    max-height: 750px;
-    height: 655px;
+    width: 700px;
+    min-height: 500px;
+    max-height: 600px;
+    height: 500px;
     position: fixed;
     top: 0;
     left: 0;
@@ -65,13 +65,13 @@
 }
 
 .pop-content {
-    height: 560px;
+    height: 400px;
     overflow: hidden;
 }
 
 .pop-content-con {
     margin-top: 30px;
-    height: 547px;
+    height: 400px;
     overflow-y: scroll;
 }
 .pop-content-left {

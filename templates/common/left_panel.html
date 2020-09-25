@@ -42,6 +42,7 @@
                         <li><i class="fa fa-table"></i><a href="{% url 'back:pm' %}">成果管理</a></li>
                         {% if request.session.group_id == 1 or request.session.group_id == 2 %}
                             <li><i class="fa fa-table"></i><a href="{% url 'back:psp' %}">成果审批</a></li>
+                            <li><i class="fa fa-table"></i><a href="{% url 'back:good_pro_mng' %}">优秀成果</a></li>
                         {% endif %}
                         {% if request.session.group_id != 4 %}
                             {#                            乙方组不显示#}

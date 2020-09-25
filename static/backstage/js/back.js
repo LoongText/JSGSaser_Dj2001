@@ -3,11 +3,11 @@
 function show_detail(data) {
     // console.log('1111111');
     //移除旧数据结构
-    if ($('#pop-content-con-id')) {
-        $('#pop-content-con-id').remove();
+    if ($("#pop-content-con-id")) {
+        $("#pop-content-con-id").remove();
     }
-    if ($('.stamp-box')) {
-        $('.stamp-box').remove();
+    if ($(".stamp-box")) {
+        $(".stamp-box").remove();
     }
     //邮戳
     var $stamp_div = $('<div class="stamp-box"></div>');

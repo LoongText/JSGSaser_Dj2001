@@ -57,7 +57,7 @@ class ExpiringTokenAuthentication(BaseAuthentication):
         # 加入缓存增加查询速度，下面和上面是配套的，上面没有从缓存中读取，这里就不用保存到缓存中了
         # if token:
         #     token_cache = 'token_' + key
-        #     cache.set(token_cache, token.user, 600)
+        #     cache.set(token_cache, token.user, 24 * 7 * 60 * 60)
         
         # 返回用户信息
         return token.user, token

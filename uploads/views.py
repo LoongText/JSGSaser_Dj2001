@@ -2,7 +2,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from tables.models import Projects, Research, Participant, Organization, ProRelations, Bid
+from tables.models import Projects, Research, Participant, Organization, ProRelations, Bid, User
 from uploads.UploadsSerializer import BaseListSerializer as Bls
 from uploads.UploadsSerializer import BaseCreateSerializer as Cls
 from uploads.UploadsSerializer import BaseUpdateSerializer as Uls
@@ -14,23 +14,21 @@ from uploads.UploadsSerializer import BidderListSerializer as Bdls
 from uploads.UploadsSerializer import BidderCreateSerializer as Bdcs
 from uploads.UploadsSerializer import BidderUpdateSerializer as Bdus
 from uploads.UploadsSerializer import BidderRetirveSerializer as Bdrs
-from uploads.UploadsSerializer import OrgListSerializer as Ols
 from uploads.UploadsSerializer import OrgCreateSerializer as Ocs
 from uploads.UploadsSerializer import OrgRetriveSerializer as Ors
 from uploads.UploadsSerializer import OrgUpdateSerializer as Ous
-from uploads.UploadsSerializer import ParListSerializer as Par_ls
 from uploads.UploadsSerializer import ParCreateSerializer as Par_cs
 from uploads.UploadsSerializer import ParRetriveSerializer as Par_rs
 from uploads.UploadsSerializer import ParUpdateSerializer as Par_us
-# from rest_framework.decorators import authentication_classes
 from django.views.decorators.csrf import csrf_exempt
 from login.auth import ExpiringTokenAuthentication
 from backstage.views import add_user_behavior
 from uploads.read_pdf import pdf2txtmanager
 from login.views import set_run_info
-from jsg.settings import MEDIA_ROOT
 import time
 import json
+from jsg import settings
+from rest_framework.decorators import action
 
 
 class ResearchUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin):
@@ -69,6 +67,8 @@ class ResearchUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixin
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        print(request.data)
+        # print(serializer.data)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
@@ -106,7 +106,7 @@ class ProjectsUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixin
         serializer.is_valid(raise_exception=True)
         obj = self.perform_create(serializer)
         if obj.attached:
-            path = '{}/{}'.format(MEDIA_ROOT, str(obj.attached))
+            path = '{}/{}'.format(settings.MEDIA_ROOT, str(obj.attached))
             try:
                 content = self.read_con(path)
                 obj.text_part = content
@@ -247,11 +247,12 @@ def pro_update_pars(request):
 
         # 根据输入的小组成员信息在人员信息和机构库中创建记录,进而在关系表中创建数据
         if par_list:
-            print(par_list)
+            # print(par_list)
             par_list = json.loads(par_list)
             for par_dict in par_list:
                 # print('----------------------', par_dict)
-                unit = par_dict.get('unit', '')
+                unit = par_dict.get('org__name', '')
+                par_name = par_dict.get('par__name', '')
                 # 判断机构
                 org_obj = Organization.objects.filter(name__contains=unit)
                 if not org_obj:
@@ -263,7 +264,7 @@ def pro_update_pars(request):
 
                 # 判断人员
                 try:
-                    par_obj = Participant.objects.filter(name=par_dict['par'], unit__name=unit)
+                    par_obj = Participant.objects.filter(name=par_name, unit__name=unit)
                 except Exception as e:
                     # print(e)
                     set_run_info(level='error', address='/uploads/view.py/pro_update_pars',
@@ -273,22 +274,15 @@ def pro_update_pars(request):
                 if not par_obj:
                     # print('chuang jian par')
                     unit_obj = Organization.objects.filter(name=unit)[0]
-                    new_par_obj = Participant.objects.create(name=par_dict['par'], unit=unit_obj)
+                    new_par_obj = Participant.objects.create(name=par_name, unit=unit_obj)
                     par_id = new_par_obj.id
                 else:
                     par_id = par_obj[0].id
 
                 # 在关系表中建立数据
-                if par_dict['roles'] == '组长':
-                    roles = 1
-                    score = 1.2
-                elif par_dict['roles'] == '副组长':
-                    roles = 2
-                    score = 1.1
-                else:
-                    roles = 3
-                    score = 1
-
+                # roles = settings.ROLES_NAME[par_dict['roles']]
+                roles = par_dict['roles']
+                score = settings.ROLES_SCORE[roles]
                 pro_id = pro_obj[0].id
                 relation_obj = ProRelations.objects.filter(pro_id=pro_id, par_id=par_id, org_id=org_id)
 
@@ -378,8 +372,8 @@ class OrgManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Upd
             return Ors
 
     def create(self, request, *args, **kwargs):
-        # print(request.data)
-        # print('--------------------- ')
+        print(request.data)
+        print('--------------------- ')
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         obj = self.perform_create(serializer)

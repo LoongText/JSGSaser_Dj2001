@@ -89,6 +89,7 @@ class OrgNature(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ID')
     remarks = models.CharField(max_length=20, verbose_name='备注', null=True)
     level = models.IntegerField(verbose_name='级别', null=True)
+    ord_by = models.IntegerField(verbose_name='排序', null=False, default=1)
 
     def __str__(self):
         return self.remarks
@@ -136,13 +137,31 @@ class Organization(models.Model):
 
     def pro_sum_cut(self):
         # 成果总数-1
-        self.pro_sum -= 1
+        if self.pro_sum > 0:
+            self.pro_sum -= 1
+        else:
+            self.pro_sum = 0
         self.save(update_fields=['pro_sum'])
 
     def par_sum_cut(self):
         # 研究人员总数-1
-        self.par_sum -= 1
+        if self.par_sum > 0:
+            self.par_sum -= 1
+        else:
+            self.par_sum = 0
         self.save(update_fields=['par_sum'])
+
+
+class ProjectsMark(models.Model):
+    """
+    优秀成果标志表
+    """
+    id = models.AutoField(primary_key=True, verbose_name='ID')
+    remarks = models.CharField(max_length=20, verbose_name='备注', null=True)
+    level = models.IntegerField(verbose_name='级别', null=True)
+
+    def __str__(self):
+        return self.remarks
 
 
 class Projects(models.Model):
@@ -167,10 +186,10 @@ class Projects(models.Model):
     release_date = models.DateField(null=True, verbose_name='发布时间')
     update_date = models.DateField(auto_now_add=True, verbose_name='上传时间')
     release_time = models.DateTimeField(auto_now_add=True, verbose_name='变动时间', null=True)
-    # （0：不显示，1:合格，2:待完善，3:检测中，4:不合格， 5:删除）
     status = models.IntegerField(choices=STATUS_CHOICE, default=1, verbose_name='状态')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="提交用户", null=True)
     bid = models.ForeignKey(Bid, on_delete=models.CASCADE, verbose_name="对应投标", null=True)
+    good_mark = models.ForeignKey(ProjectsMark, on_delete=models.CASCADE, verbose_name="优秀成果标志", null=True)
 
     class Meta:
         verbose_name_plural = '成果信息表'
@@ -238,7 +257,10 @@ class Participant(models.Model):
 
     def pro_sum_cut(self):
         # 成果总数-1
-        self.pro_sum -= 1
+        if self.pro_sum > 0:
+            self.pro_sum -= 1
+        else:
+            self.pro_sum = 0
         self.save(update_fields=['pro_sum'])
 
 

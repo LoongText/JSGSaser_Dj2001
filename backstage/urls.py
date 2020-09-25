@@ -20,6 +20,8 @@ urlpatterns = [
     path(r'psp', views.project_sp, name='psp'),
     path(r'pro_rel_del', views.pro_relations_del, name='pro_rel_del'),
     path(r'pro_add', views.pro_add, name='pro_add'),
+    path(r'good_pro_mng', views.good_project_manage, name='good_pro_mng'),
+    path(r'choose_good_project', views.choose_good_project_manage, name='choose_good_project'),
     # 招标管理
     path(r'rm', views.research_manage, name='rm'),
     path(r'rd', views.research_detail, name='rd'),
@@ -56,6 +58,7 @@ urlpatterns = [
     path(r'user_org', views.user_org_search, name='user_org'),
     path(r'user_uname', views.user_username_search, name='user_uname'),
     path(r'user_mp/<str:uuid>', views.user_modify_password, name='user_mp'),
+    path(r'get_daily_user', views.get_daily_login_user, name='get_daily_user'),
     # 机构管理
     path(r'org', views.org_manage, name='org'),
     path(r'orgd', views.org_detail, name='orgd'),
@@ -63,7 +66,6 @@ urlpatterns = [
     path(r'orgdel', views.org_del, name='orgdel'),
     path(r'org_e/<str:uuid>', views.org_edit, name='org_e'),
     path(r'org_search', views.org_search, name='org_search'),
-    # path(r'org_ed/<str:uuid>', views.org_edit, name='org_ed'),
     # path('to_start_screen/', RedirectView.as_view(url='http://10.170.128.150/static/jsg-dist/index.html#/'), name='login_out_re'),
     # login.js也要修改
     # path('to_start_screen/', RedirectView.as_view(url='http://wlaq.cnki.net/vue-jsg/#/'), name='to_start_screen'),

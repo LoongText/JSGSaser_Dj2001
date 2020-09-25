@@ -9,6 +9,7 @@ from jsg import settings
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
 from backstage.split_pages import split_page
+from query.split_page import SplitPages
 from uploads.read_pdf import pdf2txtmanager
 import datetime
 import os
@@ -16,18 +17,6 @@ import time
 import json
 from rest_framework.authtoken.models import Token
 from login.views import set_run_info
-
-current_year = datetime.datetime.now().year
-current_month = '{:02d}'.format(datetime.datetime.now().month)
-current_time = time.strftime('%H%M%S')
-current_date = time.strftime('%Y-%m-%d')
-# 成果上传保存路径
-pro_save_path_dirs = os.path.join(
-    os.path.join(os.path.join(settings.MEDIA_ROOT, 'attached'), str(current_year)),
-    current_month)
-re_save_path_dirs = os.path.join(
-    os.path.join(os.path.join(settings.MEDIA_ROOT, 'guide'), str(current_year)),
-    current_month)
 
 
 def add_user_behavior(keyword: str, search_con: str, user_obj=None):
@@ -56,6 +45,14 @@ def file_name_is_exits(path, file_obj):
     :param file_obj: 文件对象
     :return: 不重复的文件绝对路径
     """
+    current_time = time.strftime('%H%M%S')
+    current_year = datetime.datetime.now().year
+    current_month = '{:02d}'.format(datetime.datetime.now().month)
+
+    # 成果上传保存路径
+    pro_save_path_dirs = os.path.join(
+        os.path.join(os.path.join(settings.MEDIA_ROOT, 'attached'), str(current_year)),
+        current_month)
     if os.path.exists(path):
         (filename, extension) = os.path.splitext(file_obj.name)
         attached_name = '{}_{}{}'.format(filename, current_time, extension)
@@ -168,13 +165,18 @@ def main(request):
     # 成果总数--合格的
     pro_sum_obj = models.Projects.objects.filter(status=1)
     # 课题招标总数--招标中的
-    res_sum_obj = models.Research.objects.filter(status__in=[1, 2, 3])
+    res_sum_obj = models.Research.objects.filter(status=1)
     # 推进中的课题量
-    res_ing_sum_obj = models.Bid.objects.filter(bidder_status=2)
+    res_ing_sum_obj = models.Bid.objects.filter(bidder_status__in=[1, 2], conclusion_status=0)
     # 课题结题量
-    res_ed_sum_obj = models.Bid.objects.filter(conclusion_status=2)
+    res_ed_sum_obj = models.Bid.objects.filter(conclusion_status__in=[1, 2])
     # 研究人员量
     par_sum_obj = models.Participant.objects
+    # 研究机构总数
+    org_sum_obj = models.Organization.objects
+    # 用户总数
+    user_sum_obj = models.User.objects
+    user_daily_sum = 0
 
     if not user_permission_dict['user_permission']:
         pro_sum_obj = pro_sum_obj.filter(user__org=user_permission_dict['org_id'])
@@ -182,16 +184,36 @@ def main(request):
         res_ing_sum_obj = res_ing_sum_obj.filter(submitter__org=user_permission_dict['org_id'])
         res_ed_sum_obj = res_ed_sum_obj.filter(submitter__org=user_permission_dict['org_id'])
         par_sum_obj = par_sum_obj.filter(unit=user_permission_dict['org_id'])
+        org_sum_obj = org_sum_obj.filter(id=user_permission_dict['org_id'])
+        user_sum_obj = user_sum_obj.filter(org=user_permission_dict['org_id'])
+    else:
+        # 今日用户访问
+        current_date = time.strftime('%Y-%m-%d')
+        user_daily_obj = models.UserBehavior.objects.values('user_id').filter(
+            create_time__gte=current_date, user__isnull=False).distinct('user_id')
+        user_daily_sum = user_daily_obj.count()
 
     pro_sum = pro_sum_obj.count()
     res_sum = res_sum_obj.count()
     res_ing_sum = res_ing_sum_obj.count()
     res_ed_sum = res_ed_sum_obj.count()
     par_sum = par_sum_obj.count()
+    org_sum_obj = org_sum_obj.count()
+    user_sum_obj = user_sum_obj.count()
 
-    res = {'pro_sum': pro_sum, 'res_sum': res_sum, 'res_ing_sum': res_ing_sum,
-           'res_ed_sum': res_ed_sum, 'par_sum': par_sum}
+    res = {'pro_sum': pro_sum, 'res_sum': res_sum, 'res_ing_sum': res_ing_sum, 'user_sum': user_sum_obj,
+           'res_ed_sum': res_ed_sum, 'par_sum': par_sum, 'org_sum': org_sum_obj, 'user_daily_sum': user_daily_sum}
     return render(request, 'index.html', {'data': res})
+
+
+def get_daily_login_user(request):
+    # 今日用户访问
+    current_date = time.strftime('%Y-%m-%d')
+    user_obj = models.UserBehavior.objects.values('user_id').filter(
+        create_time__gte=current_date, user__isnull=False).distinct('user_id')
+    user_obj_list = [i['user_id'] for i in user_obj]
+    user_daily_obj = models.User.objects.values('username', 'first_name').filter(id__in=user_obj_list)
+    return render(request, 'user_manage/user/check_user_login.html', {'data': user_daily_obj})
 
 
 # 成果管理
@@ -228,7 +250,7 @@ def projects_manage(request):
     keyword = request.GET.get('keyword', '')
     # status=5 删除状态
     data = models.Projects.objects.values('uuid', 'name', 'classify__cls_name', 'key_word',
-                                          'status', 'user__username').exclude(status=5).order_by('-id')
+                                          'status', 'user__first_name').exclude(status=5).order_by('-id')
     if keyword:
         data = data.filter(Q(name__contains=keyword) | Q(key_word__contains=keyword))
         # -- 记录开始 --
@@ -284,6 +306,7 @@ def pro_add(request):
 
         if int(bt):
             status = 3
+            current_date = time.strftime('%Y-%m-%d')
             release_date = current_date
         else:
             status = 2
@@ -305,6 +328,13 @@ def pro_add(request):
             if attached:
                 # 上传文件操作  setting/MEDIA.ROOT
                 # 判断目录是否存在,不存在就创建
+                current_year = datetime.datetime.now().year
+                current_month = '{:02d}'.format(datetime.datetime.now().month)
+
+                # 成果上传保存路径
+                pro_save_path_dirs = os.path.join(
+                    os.path.join(os.path.join(settings.MEDIA_ROOT, 'attached'), str(current_year)),
+                    current_month)
                 create_dirs_not_exist(pro_save_path_dirs)
                 # 保存的路径
                 save_path = os.path.join(pro_save_path_dirs, attached.name)
@@ -402,7 +432,7 @@ def project_edit(request, uuid):
     :return:
     """
     # data = get_object_or_404(models.Projects, uuid=uuid)
-    data = models.Projects.objects.values('id', 'uuid', 'name', 'classify', 'key_word',
+    data = models.Projects.objects.values('id', 'uuid', 'name', 'classify', 'key_word', 'release_date',
                                           'status', 'attached', 'bid__re_title', 'bid__id').filter(uuid=uuid)
     print(data)
     obj = data[0]
@@ -435,16 +465,23 @@ def project_edit_do(request):
     key_word = param_dict.get('key_word')
     abstract = param_dict.get('abstract')
     reference = param_dict.get('reference')
+    release_date = param_dict.get('release_date')
     attached = request.FILES.get('attached')
 
     pro_obj = models.Projects.objects.filter(uuid=uuid)
 
     if int(bt):
         status = 3
-        release_date = current_date
+        if release_date == 'None' or release_date is None:
+            current_date = time.strftime('%Y-%m-%d')
+            release_date = current_date
     else:
         status = 2
-        release_date = None
+        if release_date == 'None' or release_date is None:
+            release_date = None
+
+    if release_date.find('年'):
+        release_date = release_date.replace('年', '-').replace('月', '-').replace('日', '')
 
     # ------研发人员信息--------
     par_id_list = param_dict.getlist('par_id')
@@ -480,8 +517,15 @@ def project_edit_do(request):
             pro_obj[0].research.add(*research_id_list_obj)
 
         print('attached_path', attached, type(attached))
-
+        print('---', release_date)
         if attached:
+            current_year = datetime.datetime.now().year
+            current_month = '{:02d}'.format(datetime.datetime.now().month)
+
+            # 成果上传保存路径
+            pro_save_path_dirs = os.path.join(
+                os.path.join(os.path.join(settings.MEDIA_ROOT, 'attached'), str(current_year)),
+                current_month)
             # 重新上传文件操作  setting/MEDIA.ROOT
             # 判断目录是否存在,不存在就创建
             create_dirs_not_exist(pro_save_path_dirs)
@@ -671,7 +715,6 @@ def pro_relations_del(request):
         return HttpResponse(0)
 
 
-# @login_required(login_url='/back/login/')
 @login_required(login_url='/back/to_start_screen/')
 @csrf_exempt
 def project_sp(request):
@@ -686,7 +729,7 @@ def project_sp(request):
         keyword = request.GET.get('keyword', '')
         if his:
             # status=1 合格 4 不合格
-            data = models.Projects.objects.values('uuid', 'name', 'classify__cls_name', 'status'
+            data = models.Projects.objects.values('uuid', 'name', 'classify__cls_name', 'status', 'user__first_name'
                                                   ).filter(status__in=[1, 4]).order_by('-id')
             if keyword:
                 data = data.filter(Q(name__contains=keyword) | Q(lead_org__name__contains=keyword))
@@ -709,7 +752,7 @@ def project_sp(request):
             return render(request, 'data_manage/projects/projects_sp_his.html', {'data': data, 'keyword': keyword})
         else:
             # status=3 待审批
-            data = models.Projects.objects.values('uuid', 'name', 'classify__cls_name', 'attached'
+            data = models.Projects.objects.values('uuid', 'name', 'classify__cls_name', 'attached', 'user__first_name'
                                                   ).filter(status=3).order_by('-id')
             if keyword:
                 data = data.filter(Q(name__contains=keyword) | Q(lead_org__name__contains=keyword))
@@ -758,8 +801,98 @@ def project_sp(request):
             return HttpResponse(0)
 
 
+@login_required(login_url='/back/to_start_screen/')
+@csrf_exempt
+def good_project_manage(request):
+    """
+    优秀成果管理
+    :param request:
+    :return:
+    """
+    if request.method == 'GET':
+        page = request.GET.get('page', 1)
+        keyword = request.GET.get('keyword')
+        mark_id = request.GET.get('mark_id')
+        # tag = request.GET.get('tag')
+
+        data = models.Projects.objects.values('uuid', 'name', 'classify__cls_name', 'key_word', 'good_mark__remarks',
+                                              'release_date', 'user__first_name').filter(status=1).order_by('-id')
+        if keyword:
+            data = data.filter(Q(name__contains=keyword) | Q(key_word__contains=keyword))
+            # -- 记录开始 --
+            add_user_behavior(keyword=keyword, search_con='搜索优秀成果信息：{}'.format(str(data.query)), user_obj=request.user)
+            # -- 记录结束 --
+
+        pro_mark = models.ProjectsMark.objects.all().order_by('-level')
+
+        # if tag:
+        #     data = data.filter(good_mark__isnull=True)
+        # else:
+        if mark_id:
+            data = data.filter(good_mark=mark_id)
+        else:
+            if pro_mark:
+                mark_id = pro_mark[0].id
+                data = data.filter(good_mark=mark_id)
+
+        # -- 分页开始 --
+        data = split_page(page, 7, data, 10)
+        # print(data)
+        # -- 分页结束 --
+
+        # print(pro_mark)
+        return render(request, 'data_manage/projects/project_good.html',
+                      {"data": data, "keyword": keyword, "pro_mark": pro_mark, "mark_id": int(mark_id)})
+
+    elif request.method == 'POST':
+        print(request.POST)
+        uuid = request.POST.get('uuid')
+        mark_id = request.POST.get('mark_id', None)  # 若能获取到mark_id,则代表选中，若没有则代表撤销
+        try:
+            uuid_list = uuid.split(';')
+            pro_obj = models.Projects.objects.filter(uuid__in=uuid_list)
+            pro_obj.update(good_mark=mark_id)
+            # -- 记录开始 --
+            add_user_behavior(keyword='', search_con='优秀成果管理:{},{}'.format(uuid, str(mark_id)), user_obj=request.user)
+            # -- 记录结束 --
+            return HttpResponse(1)
+        except Exception as e:
+            set_run_info(level='error', address='/backstage/view.py/good_project_manage-post',
+                         user=request.user.id, keyword='优秀成果管理失败：{}'.format(e))
+            return HttpResponse(0)
+
+
+def choose_good_project_manage(request):
+    """
+    选择优秀成果
+    :param request:
+    :return:
+    """
+    if request.method == 'GET':
+        page = request.GET.get('page', 1)
+        keyword = request.GET.get('keyword')
+
+        data = models.Projects.objects.values('uuid', 'name', 'release_date', 'user__first_name'
+                                              ).filter(status=1).order_by('-id')
+        if keyword:
+            data = data.filter(Q(name__contains=keyword) | Q(key_word__contains=keyword))
+            # -- 记录开始 --
+            add_user_behavior(keyword=keyword, search_con='搜索优秀成果信息：{}'.format(str(data.query)), user_obj=request.user)
+            # -- 记录结束 --
+
+        data = data.filter(good_mark__isnull=True)
+
+        # -- 分页开始 --
+        # sp = SplitPages(data, page, 10)
+        # res = sp.split_page()
+        # print(data)
+        # -- 分页结束 --
+
+        # print(pro_mark)
+        return JsonResponse({"data": list(data), "keyword": keyword})
+
+
 # 课题管理
-# @login_required(login_url='/back/login/')
 @login_required(login_url='/back/to_start_screen/')
 def research_manage(request):
     """
@@ -867,6 +1000,11 @@ def research_edit_do(request):
         status = 0
     try:
         if guidelines:
+            current_year = datetime.datetime.now().year
+            current_month = '{:02d}'.format(datetime.datetime.now().month)
+            re_save_path_dirs = os.path.join(
+                os.path.join(os.path.join(settings.MEDIA_ROOT, 'guide'), str(current_year)),
+                current_month)
             # 重新上传文件操作  setting/MEDIA.ROOT
             # 判断目录是否存在,不存在就创建
             create_dirs_not_exist(re_save_path_dirs)
@@ -959,7 +1097,11 @@ def research_add(request):
         try:
             if guidelines:
                 # 重新上传文件操作  setting/MEDIA.ROOT
-
+                current_year = datetime.datetime.now().year
+                current_month = '{:02d}'.format(datetime.datetime.now().month)
+                re_save_path_dirs = os.path.join(
+                    os.path.join(os.path.join(settings.MEDIA_ROOT, 'guide'), str(current_year)),
+                    current_month)
                 # 判断目录是否存在,不存在就创建
                 create_dirs_not_exist(re_save_path_dirs)
                 # 保存的路径
@@ -1269,7 +1411,7 @@ def bid_manage(request):
         if data[i]['bidder_status'] == 0 or data[i]['bidder_status'] == 3:
             data[i]['edit'] = 1
         elif data[i]['bidder_status'] == 2:
-            if data[i]['conclusion_status'] == 0:
+            if data[i]['conclusion_status'] in [0, 3]:
                 data[i]['conclusion'] = 1
         data[i]['bidder_status'] = settings.BIDDER_STATUS_CHOICE[data[i]['bidder_status']]
         data[i]['conclusion_status'] = settings.BIDDER_CONCLUSION_STATUS[data[i]['conclusion_status']]
@@ -1318,6 +1460,7 @@ def bid_edit_do(request):
     lea_phone = param_dict.get('lea_phone')
     brief = param_dict.get('brief')
     status = param_dict.get('bbt')
+    current_date = time.strftime('%Y-%m-%d')
     try:
         status = int(status)
     except Exception as e:
@@ -1546,6 +1689,7 @@ def participant_edit_do(request):
             # 保存的路径
             save_path = os.path.join(save_path_dirs, photo.name)
             # 判断文件是否存在, 避免重名
+            current_time = time.strftime('%H%M%S')
             if os.path.exists(save_path):
                 (filename, extension) = os.path.splitext(photo.name)
                 attached_name = '{}_{}.{}'.format(filename, current_time, extension)
@@ -2184,6 +2328,7 @@ def org_edit(request, uuid):
                 # 保存的路径
                 save_path = os.path.join(save_path_dirs, photo.name)
                 # 判断文件是否存在, 避免重名
+                current_time = time.strftime('%H%M%S')
                 if os.path.exists(save_path):
                     (filename, extension) = os.path.splitext(photo.name)
                     attached_name = '{}_{}.{}'.format(filename, current_time, extension)

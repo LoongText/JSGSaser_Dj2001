@@ -38,6 +38,7 @@ class LoginView(viewsets.ViewSet):
                 old_token.delete()
                 # 创建新的Token
                 token = Token.objects.create(user=user)
+                # print('---', token)
                 if user.first_name:
                     nickname = user.first_name
                 else:
@@ -106,27 +107,31 @@ def do_something(request):
 @authentication_classes([ExpiringTokenAuthentication])
 def set_passwd(request):
     """
-    修改密码
+    修改密码--当有user_id的时候，是重置密码功能
+    只有激活状态下才能修改密码
     :param request:
     :return:
     """
     param_dict = request.data
-    print(request.user)
+    # print(param_dict)
+    user_id = param_dict.get('userid', 0)
     old_psd = param_dict.get('old_password', '')
     new_psd = param_dict.get('new_password', '')
-    username = request.user.username
-    user = authenticate(username=username, password=old_psd)
+    # user = None
     try:
-        # print('---', user)
-        if user.is_active:
-            user.set_password(new_psd)
-            user.save()
-            res = {"code": 201, "msg": "修改成功"}
+        if user_id:
+            user = User.objects.get(pk=user_id)
         else:
-            res = {"code": 403, "msg": "修改失败, 用户未激活"}
+            username = request.user.username
+            user = authenticate(username=username, password=old_psd)
+
+        user.set_password(new_psd)
+        user.save()
+        res = {"code": 201, "msg": "修改成功"}
     except Exception as e:
         # print(e, type(e))
-        RunInfo.objects.create(level='error', address='/login/view.py/set_passwd', user=user, keyword='修改密码失败：{}'.format(e))
+        RunInfo.objects.create(level='error', address='/login/view.py/set_passwd',
+                               user=user, keyword='修改密码失败：{}'.format(e))
         res = {"code": 403, "msg": "修改失败，{}".format(e)}
     return Response(res)
 

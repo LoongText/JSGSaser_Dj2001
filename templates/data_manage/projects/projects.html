@@ -52,29 +52,22 @@
                                 <button class="btn btn-success btn-sm" style="margin-left: 20px; width: 70px;">添加
                                 </button>
                             </a>
+{#                            <a href="{% url 'back:good_pro_mng' %}">#}
+{#                                <button class="btn btn-success btn-sm" style="margin-left: 20px; width: 100px;">优秀课题添加#}
+{#                                </button>#}
+{#                            </a>#}
                         </div>
                         <div class="card-body">
                             <div class="dataTables_wrapper dt-bootstrap4 no-footer">
                                 <div class="row">
                                     <div class="col-sm-12 col-md-6">
                                         <div class="dataTables_length">
-                                            {#                                            <label>每页展示#}
-                                            {#                                                <select name="bootstrap-data-table-export_length"#}
-                                            {#                                                        aria-controls="bootstrap-data-table-export"#}
-                                            {#                                                        class="custom-select custom-select-sm form-control form-control-sm">#}
-                                            {#                                                    <option value="10">10</option>#}
-                                            {#                                                    <option value="25">25</option>#}
-                                            {#                                                    <option value="50">50</option>#}
-                                            {#                                                    <option value="-1">All</option>#}
-                                            {#                                                </select> 条#}
-                                            {#                                            </label>#}
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
                                         <div class="dataTables_filter">
                                             <label><input type="search" class="form-control form-control-sm"
                                                           placeholder="" id="search-id" value="{{ keyword }}">
-                                                {#                                                <a href="#search" style="font-size: 20px; color: #0e6498;"><i class="fa fa-search"></i></a>#}
                                                 <a id="search-a-id" onclick="search_all('pm', '')">
                                                     <button type="button" class="btn btn-outline-primary btn-sm">
                                                         搜索
@@ -97,35 +90,9 @@
                                             <tr>
                                                 <th>成果名称</th>
                                                 <th>关键词</th>
-                                                <th>分类
-{#                                                    <a style="float: right;color: #999;cursor: pointer;"><i#}
-{#                                                            class="fa fa-align-right"></i></a>#}
-{#                                                    <div style="display: inline-block;float: right;cursor: pointer;">#}
-{#                                                        <select name="classify" id="select" class="form-control">#}
-{#                                                            <option value="100">全部</option>#}
-{#                                                            <option value="1">发展</option>#}
-{#                                                            <option value="2">监管</option>#}
-{#                                                            <option value="3">党建</option>#}
-{#                                                            <option value="4">改革</option>#}
-{#                                                            <option value="5">其他</option>#}
-{#                                                        </select>#}
-{#                                                    </div>#}
-                                                </th>
-                                                {#                                                <th>发布者</th>#}
-                                                <th>状态
-{#                                                    <a style="float: right;color: #999;cursor: pointer;"><i#}
-{#                                                            class="fa fa-align-right"></i></a>#}
-{#                                                    <div style="display: inline-block;float: right;cursor: pointer;">#}
-{#                                                        <select name="classify" id="select" class="form-control">#}
-{#                                                            <option value="0">全部</option>#}
-{#                                                            <option value="1">合格</option>#}
-{#                                                            <option value="2">不合格</option>#}
-{#                                                            <option value="3">待完善</option>#}
-{#                                                            <option value="4">审批中</option>#}
-{#                                                            <option value="5">其他</option>#}
-{#                                                        </select>#}
-{#                                                    </div>#}
-                                                </th>
+                                                <th>分类</th>
+                                                <th>发布者</th>
+                                                <th>状态</th>
                                                 <th>操作</th>
                                             </tr>
                                             </thead>
@@ -140,7 +107,7 @@
                                                             {{ d.key_word }}{% else %}{{ d.key_word|slice:20 }}...
                                                         {% endif %}{% endif %}</td>
                                                     <td>{{ d.classify__cls_name }}</td>
-                                                    {#                                                    <td>{{ d.user__username }}</td>#}
+                                                    <td>{{ d.user__first_name }}</td>
                                                     <td>{{ d.status }}</td>
                                                     <td>
                                                         <a href="/back/pd?uuid={{ d.uuid }}" target="_blank">
@@ -250,12 +217,6 @@
                                                         </li>
                                                     {% endif %}
                                                 {% endfor %}
-
-                                                {#                                                <li class="paginate_button page-item disabled"#}
-                                                {#                                                    id="bootstrap-data-table-export_ellipsis">#}
-                                                {#                                                    <a href="#" aria-controls="bootstrap-data-table-export"#}
-                                                {#                                                       class="page-link">…</a>#}
-                                                {#                                                </li>#}
                                                 {% if data.pages.has_next %}
                                                     <li class="paginate_button page-item next"
                                                         id="bootstrap-data-table-export_next">

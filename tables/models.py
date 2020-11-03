@@ -58,15 +58,15 @@ class Bid(models.Model):
     """
     投标信息表
     """
-    BIDDER_STATUS_CHOICE = ((0, '暂存'), (1, '投标中'), (2, '中标'), (3, '驳回'), (4, '删除'))
-    CONCLUSION_STATUS_CHOICE = ((0, '未开始'), (1, '审批中'), (2, '已通过'), (3, '已驳回'))
+    BIDDER_STATUS_CHOICE = ((0, '暂存'), (1, '投标中'), (2, '初审通过'), (3, '初审驳回'), (4, '删除'), (5, '中标'), (6, '立项驳回'))
+    INTERIM_REVIEW_STATUS_CHOICE = ((0, '未开始'), (1, '审批中'), (2, '已通过'), (3, '已驳回'), (4, '待提交'))
+    CONCLUSION_STATUS_CHOICE = ((0, '未开始'), (1, '审批中'), (2, '已通过'), (3, '已驳回'), (4, '待提交'))
     id = models.AutoField(primary_key=True, verbose_name='ID')
     bidder = models.CharField(max_length=50, verbose_name='投标方', null=False)
     bidding = models.ForeignKey(Research, on_delete=models.CASCADE, verbose_name='课题招标id')
     bidder_date = models.DateField(verbose_name='投标时间', null=True)
-    # bidder_sp_date = models.DateField(verbose_name='投标审批时间', null=True)
-    # bidder_jt_date = models.DateField(verbose_name='投标结题审批时间', null=True)
     bidder_status = models.IntegerField(choices=BIDDER_STATUS_CHOICE, verbose_name='投标状态', default=0)
+    interim_status = models.IntegerField(choices=BIDDER_STATUS_CHOICE, verbose_name='中期评审状态', default=0)
     conclusion_status = models.IntegerField(choices=CONCLUSION_STATUS_CHOICE, verbose_name='结题状态', default=0)
     funds = models.FloatField(verbose_name='申请经费/万元', null=True)
     re_title = models.CharField(max_length=100, verbose_name='课题名称', null=True)
@@ -76,6 +76,9 @@ class Bid(models.Model):
     lea_phone = models.CharField(max_length=20, verbose_name='课题负责人电话', null=True)
     brief = models.TextField(verbose_name='申报理由及研究内容提要', null=True)
     submitter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='提交者')
+    bid_attached = models.FileField(verbose_name='附件', null=True, upload_to='bid/%Y/%m')
+    interim_attached = models.FileField(verbose_name='中期报告', null=True, upload_to='bid/%Y/%m')
+    conclusion_attached = models.FileField(verbose_name='结题报告', null=True, upload_to='bid/%Y/%m')
 
     class Meta:
         verbose_name_plural = '课题投标信息表'
@@ -101,16 +104,27 @@ class Organization(models.Model):
     """
     id = models.AutoField(primary_key=True, verbose_name='ID')
     uuid = models.CharField(max_length=32, verbose_name='唯一标识', null=False, unique=True)
+    id_card_code = models.CharField(max_length=18, verbose_name="社会信用码", null=True)
     name = models.CharField(max_length=50, null=False, verbose_name='机构名称')
-    is_a = models.BooleanField(verbose_name='是否是甲方', default=0)
-    is_b = models.BooleanField(verbose_name='是否是乙方', default=0)
+    competent_dpt = models.IntegerField(verbose_name='主管部门', default=0)
+    superior_unit = models.IntegerField(verbose_name='上级单位', default=0)
     nature = models.ForeignKey(OrgNature, verbose_name='机构性质', null=True, on_delete=models.CASCADE)
     brief = models.TextField(verbose_name='机构简介', null=True)
     par_sum = models.IntegerField(verbose_name='研究人员总数', default=0)
     pro_sum = models.IntegerField(verbose_name='成果总数', default=0)
     is_show = models.BooleanField(verbose_name='是否展示', default=1)
     created_date = models.DateField(auto_now_add=True, verbose_name='创建时间', null=True, editable=False)
-    photo = models.ImageField(upload_to='organizations/', verbose_name='头像', null=True)
+    register_type = models.CharField(max_length=100, verbose_name="注册类型", null=True)
+    register_capital = models.FloatField(verbose_name="注册资本", null=True)
+    register_date = models.DateField(verbose_name="注册时间", null=True)
+    address = models.CharField(max_length=300, verbose_name="地址", null=True)
+    postcode = models.IntegerField(verbose_name="邮政编码", null=True)
+    unit_tel = models.CharField(max_length=20, verbose_name="单位电话", null=True)
+    unit_fax = models.CharField(max_length=20, verbose_name="单位传真", null=True)
+    photo = models.ImageField(upload_to='organizations/logo/', verbose_name='单位logo', null=True)
+    certification_materials = models.FileField(verbose_name="证明材料", null=True,
+                                               upload_to='organizations/materials/')
+    business_license = models.FileField(verbose_name="营业执照", null=True, upload_to='organizations/license/')
 
     class Meta:
         verbose_name_plural = '机构信息表'
@@ -185,7 +199,7 @@ class Projects(models.Model):
     text_part = models.TextField(null=True, verbose_name='正文')
     release_date = models.DateField(null=True, verbose_name='发布时间')
     update_date = models.DateField(auto_now_add=True, verbose_name='上传时间')
-    release_time = models.DateTimeField(auto_now_add=True, verbose_name='变动时间', null=True)
+    approval_time = models.DateField(verbose_name='审批时间', null=True)
     status = models.IntegerField(choices=STATUS_CHOICE, default=1, verbose_name='状态')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="提交用户", null=True)
     bid = models.ForeignKey(Bid, on_delete=models.CASCADE, verbose_name="对应投标", null=True)
@@ -210,7 +224,7 @@ class Projects(models.Model):
         # 下载量+1
         self.downloads += 1
         self.save(update_fields=['downloads'])
-    
+
     def export_num_update(self):
         # 导出量+1
         self.export += 1
@@ -224,13 +238,20 @@ class Participant(models.Model):
     GENDER_CHOICES = ((1, '男'), (2, '女'))
     id = models.AutoField(primary_key=True, verbose_name='ID')
     uuid = models.CharField(max_length=32, verbose_name='唯一标识', null=False, unique=True)
+    id_card = models.CharField(max_length=18, verbose_name="身份证号", null=True)
     name = models.CharField(max_length=10, null=False, verbose_name='姓名')
+    cell_phone = models.CharField(max_length=18, null=True, verbose_name="手机号")
     gender = models.IntegerField(choices=GENDER_CHOICES, verbose_name='性别', default=1)
     birth = models.DateField(null=True, verbose_name='出生日期')
+    education = models.CharField(max_length=10, null=True, verbose_name="本人最高学历")
+    academic_degree = models.CharField(max_length=10, null=True, verbose_name="本人学位")
+    address = models.CharField(max_length=300, null=True, verbose_name="地址")
+    postcode = models.IntegerField(null=True, verbose_name="邮编")
     unit = models.ForeignKey(Organization, null=True, verbose_name='现所属单位',
                              on_delete=models.CASCADE, related_name='pts')
     brief = models.TextField(null=True, verbose_name='简介')
     job = models.CharField(max_length=100, verbose_name='现职务职称', null=True)
+    research_direction = models.CharField(max_length=100, verbose_name='研究方向', null=True)
     email = models.EmailField(verbose_name='邮箱', null=True)
     photo = models.ImageField(upload_to='participants/', verbose_name='头像', null=True)
     created_date = models.DateField(auto_now_add=True, verbose_name='创建时间', null=True)
@@ -380,8 +401,63 @@ class LimitNums(models.Model):
 
 class User(AbstractUser):
     org = models.ForeignKey(Organization, verbose_name="机构关联", on_delete=models.CASCADE, null=True)
-    id_card = models.CharField(verbose_name="身份证号码", max_length=18, null=True)
-    back_is_login = models.BooleanField(default=0, verbose_name="判断后台是否登录")
+    par = models.ForeignKey(Participant, verbose_name="人员关联", on_delete=models.CASCADE, null=True)
+    id_card = models.CharField(verbose_name="社会信用码/身份证号", max_length=18, null=True)
+    cell_phone = models.CharField(max_length=11, verbose_name="手机号", null=True)
+    # certification_materials = models.FileField(verbose_name="证明材料", null=True,
+    #                                            upload_to='register/certification_materials/%Y/%m')
+    # business_license = models.FileField(verbose_name="营业执照", null=True, upload_to='register/business_license/%Y/%m')
+    # back_is_login = models.BooleanField(default=0, verbose_name="判断后台是否登录")
 
     class Meta:
         verbose_name_plural = '用户信息表'
+
+
+class UserRegister(models.Model):
+    id = models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, editable=False)
+    roles = models.IntegerField(verbose_name="角色", null=False)
+    username = models.CharField(max_length=20, verbose_name="用户名", null=False)
+    id_card_code = models.CharField(max_length=18, verbose_name="社会信用码/身份证号", null=True)
+    name = models.CharField(max_length=100, verbose_name="名称", null=True)
+    cell_phone = models.CharField(max_length=11, verbose_name="手机号", null=False)
+    login_pwd = models.CharField(max_length=10, verbose_name="登录密码", null=False)
+    certification_materials = models.FileField(verbose_name="证明材料", null=True,
+                                               upload_to='register/materials/%Y/%m')
+    verification_code_photo = models.ImageField(verbose_name="验证码图片", null=True,
+                                                upload_to='register/verify_code/%Y/%m')
+    verification_code = models.CharField(max_length=5, verbose_name="验证码", null=True)
+    email = models.CharField(max_length=100, verbose_name="邮箱", null=True)
+    create_date = models.DateField(auto_now_add=True, verbose_name="创建时间", editable=False)
+    info_status = models.IntegerField(verbose_name="状态", null=False, default=0)  # 1：通过 2：否决  0：未处理
+
+    class Meta:
+        verbose_name = "注册表"
+        verbose_name_plural = "注册表"
+
+
+class BidEvaluation(models.Model):
+    id = models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, editable=False)
+    relate_bid = models.ForeignKey(Bid, on_delete=models.CASCADE, null=False, verbose_name='对应投标')
+    designated_experts = models.ForeignKey(Participant, on_delete=models.CASCADE, null=True, verbose_name='指定专家')
+    operate_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, verbose_name='操作账号')
+    result = models.CharField(max_length=10, verbose_name="评审结果", null=False, default='无')  # 通过、否决、无
+    stage = models.CharField(max_length=10, verbose_name="阶段", null=False, default="初审")  # 初审、评审、中期、验收
+    remarks = models.TextField(verbose_name="备注", null=True)
+    evaluate_attached = models.FileField(verbose_name="附件", null=True, upload_to='bid_evaluation/%Y/%m')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    class Meta:
+        verbose_name = "课题评审表-针对投标小课题"
+
+
+class News(models.Model):
+    id = models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, editable=False)
+    title = models.CharField(max_length=300, null=False, verbose_name='新闻标题')
+    is_show = models.BooleanField(verbose_name="是否显示", null=False, default=1)
+    text_attached = models.FileField(verbose_name="正文附件", null=True, upload_to='news/text_part/%Y/%m')
+    image_attached = models.FileField(verbose_name="图片附件", null=True, upload_to='news/image/%Y/%m')
+    text_create_time = models.DateTimeField(verbose_name="正文发布时间", null=False)  # 用户自行选择
+    image_create_time = models.DateTimeField(verbose_name="图片上传时间", null=True)  # 用户自行选择
+
+    class Meta:
+        verbose_name = "新闻管理"

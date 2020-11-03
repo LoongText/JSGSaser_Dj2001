@@ -13,4 +13,15 @@ def a():
     print(time.strftime('%Y-%m-%d %H%M%S'))
 
 
-a()
+def is_valid_date(str_date):
+    '''判断是否是一个有效的日期字符串'''
+    try:
+        time.strptime(str_date, "%Y-%m-%d")
+    except Exception:
+        raise Exception("时间参数错误 near : {}".format(str_date))
+
+
+if __name__ == "__main__":
+    a_date = '2020/10/12'
+    is_valid_date(a_date)
+

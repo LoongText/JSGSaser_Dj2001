@@ -1,0 +1,5278 @@
+ [
+        {
+            "org__id": 54,
+            "org__name": "东风汽车集团有限公司",
+            "user_sum": 8,
+            "user_list": [
+                {
+                    "username": "dfqc",
+                    "first_name": "东风汽车"
+                },
+                {
+                    "username": "dfqc-csw",
+                    "first_name": "楚生伟"
+                },
+                {
+                    "username": "dfqc-xxy",
+                    "first_name": "夏向阳"
+                },
+                {
+                    "username": "dfqc-zjg",
+                    "first_name": "张建国"
+                },
+                {
+                    "username": "dfqc-zlh",
+                    "first_name": "张林浩"
+                },
+                {
+                    "username": "dfqc-mgq",
+                    "first_name": "马国庆"
+                },
+                {
+                    "username": "dfqc-zx",
+                    "first_name": "曾昕"
+                },
+                {
+                    "username": "dfqc-gl",
+                    "first_name": "郭磊"
+                }
+            ]
+        },
+        {
+            "org__id": 323,
+            "org__name": "五矿资本股份有限公司",
+            "user_sum": 14,
+            "user_list": [
+                {
+                    "username": "wkzb-xb",
+                    "first_name": "肖斌"
+                },
+                {
+                    "username": "wkzb-dy",
+                    "first_name": "董岩"
+                },
+                {
+                    "username": "wkzb-ybn",
+                    "first_name": "杨宝宁"
+                },
+                {
+                    "username": "wkzb-wyj",
+                    "first_name": "王咏军"
+                },
+                {
+                    "username": "wkzb-cq",
+                    "first_name": "蔡琦"
+                },
+                {
+                    "username": "wkzb-lj",
+                    "first_name": "吕静"
+                },
+                {
+                    "username": "wkzb-zm",
+                    "first_name": "周敏"
+                },
+                {
+                    "username": "wkzb-lch",
+                    "first_name": "连晨浩"
+                },
+                {
+                    "username": "wkzb-wzm",
+                    "first_name": "吴治民"
+                },
+                {
+                    "username": "wkzb-jyy",
+                    "first_name": "贾媛媛"
+                },
+                {
+                    "username": "wkzb-zy",
+                    "first_name": "张炀"
+                },
+                {
+                    "username": "wkzb-lyq",
+                    "first_name": "刘也琪"
+                },
+                {
+                    "username": "wkzb-thn",
+                    "first_name": "田浩男"
+                },
+                {
+                    "username": "wkzb",
+                    "first_name": "五矿资本股份有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 218,
+            "org__name": "中国节能环保集团有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "zgjn",
+                    "first_name": "中国节能"
+                },
+                {
+                    "username": "zgjn-zb",
+                    "first_name": "张兵"
+                },
+                {
+                    "username": "zgjn-ybr",
+                    "first_name": "袁宝荣"
+                },
+                {
+                    "username": "zgjn-slj",
+                    "first_name": "申丽娟"
+                }
+            ]
+        },
+        {
+            "org__id": 266,
+            "org__name": "中节能咨询有限公司",
+            "user_sum": 12,
+            "user_list": [
+                {
+                    "username": "zjnzx-lsy",
+                    "first_name": "吕韶阳"
+                },
+                {
+                    "username": "zjnzx-lqh",
+                    "first_name": "刘霁晖"
+                },
+                {
+                    "username": "zjnzx-mkl",
+                    "first_name": "马克乐"
+                },
+                {
+                    "username": "zjnzx-xsm",
+                    "first_name": "夏淑貌"
+                },
+                {
+                    "username": "zjnzx-xmc",
+                    "first_name": "许明超"
+                },
+                {
+                    "username": "zjnzx-hy",
+                    "first_name": "霍越"
+                },
+                {
+                    "username": "zjnzx-zcs",
+                    "first_name": "赵春爽"
+                },
+                {
+                    "username": "zjnzx-zyk",
+                    "first_name": "张英魁"
+                },
+                {
+                    "username": "zjnzx-jqs",
+                    "first_name": "金秋实"
+                },
+                {
+                    "username": "zjnzx",
+                    "first_name": "中节能咨询"
+                },
+                {
+                    "username": "zjnzx-ly",
+                    "first_name": "李云"
+                },
+                {
+                    "username": "zjnzx-hqh",
+                    "first_name": "胡秋红"
+                }
+            ]
+        },
+        {
+            "org__id": 336,
+            "org__name": "长沙矿冶研究院有限责任公司智能装备研究所",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "znzb-zsg",
+                    "first_name": "张胜广"
+                },
+                {
+                    "username": "znzb-slq",
+                    "first_name": "孙凌崎"
+                },
+                {
+                    "username": "znzb",
+                    "first_name": "长沙矿冶研究院有限责任公司智能装备研究所"
+                }
+            ]
+        },
+        {
+            "org__id": 333,
+            "org__name": "长沙矿冶研究院有限责任公司矿产资源开发利用技术研究所",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "kczy-lx",
+                    "first_name": "刘旭"
+                },
+                {
+                    "username": "kczy-dyq",
+                    "first_name": "邓亚琴"
+                },
+                {
+                    "username": "kczy",
+                    "first_name": "长沙矿冶研究院有限责任公司矿产资源开发利用技术研究所"
+                }
+            ]
+        },
+        {
+            "org__id": 225,
+            "org__name": "北京市国资委",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "bjgzw",
+                    "first_name": "北京市国资委"
+                },
+                {
+                    "username": "bjgzw-cf",
+                    "first_name": "陈峰"
+                },
+                {
+                    "username": "bjgzw-sl",
+                    "first_name": "石磊"
+                },
+                {
+                    "username": "bjgzw-wx",
+                    "first_name": "王逊"
+                }
+            ]
+        },
+        {
+            "org__id": 300,
+            "org__name": "山西建设投资集团有限责任公司",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "sxjs-whf",
+                    "first_name": "王鸿飞"
+                },
+                {
+                    "username": "sxjs-ljj",
+                    "first_name": "梁建军"
+                },
+                {
+                    "username": "sxjs-yrc",
+                    "first_name": "岳润春"
+                },
+                {
+                    "username": "sxjs-fxk",
+                    "first_name": "范小康"
+                },
+                {
+                    "username": "sxjs-gzy",
+                    "first_name": "高志远"
+                },
+                {
+                    "username": "sxjs",
+                    "first_name": "山西建设"
+                }
+            ]
+        },
+        {
+            "org__id": 436,
+            "org__name": "中国节能减排有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "jnjpgs-bxb",
+                    "first_name": "白晓冰"
+                },
+                {
+                    "username": "jnjpgs-jxw",
+                    "first_name": "季夏微"
+                },
+                {
+                    "username": "jnjpgs",
+                    "first_name": "中国节能减排有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 327,
+            "org__name": "五矿勘察开发有限公司",
+            "user_sum": 5,
+            "user_list": [
+                {
+                    "username": "wkgc-ljf",
+                    "first_name": "李建锋"
+                },
+                {
+                    "username": "wkgc-wss",
+                    "first_name": "王珊珊"
+                },
+                {
+                    "username": "wkgc-zx",
+                    "first_name": "张喜"
+                },
+                {
+                    "username": "wkgc-wxj",
+                    "first_name": "王雪洁"
+                },
+                {
+                    "username": "wkgc",
+                    "first_name": "五矿勘察开发有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 29,
+            "org__name": "中国社科院经济研究所",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "skyjjs",
+                    "first_name": "中国社科院经济研究所"
+                },
+                {
+                    "username": "jjs-hqh",
+                    "first_name": "黄群慧"
+                },
+                {
+                    "username": "jjs-wyf",
+                    "first_name": "王砚峰"
+                }
+            ]
+        },
+        {
+            "org__id": 222,
+            "org__name": "中国铁路工程集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "zgzt",
+                    "first_name": "中国中铁"
+                },
+                {
+                    "username": "zgzt-zh",
+                    "first_name": "张瀚"
+                },
+                {
+                    "username": "zgzt-sxp",
+                    "first_name": "尚宪鹏"
+                }
+            ]
+        },
+        {
+            "org__id": 224,
+            "org__name": "中国国新控股有限责任公司",
+            "user_sum": 9,
+            "user_list": [
+                {
+                    "username": "zggx",
+                    "first_name": "中国国新"
+                },
+                {
+                    "username": "zggx-tyl",
+                    "first_name": "唐玉立"
+                },
+                {
+                    "username": "zggx-sxl",
+                    "first_name": "申小林"
+                },
+                {
+                    "username": "zggx-wb",
+                    "first_name": "王博"
+                },
+                {
+                    "username": "zggx-dmj",
+                    "first_name": "董敏杰"
+                },
+                {
+                    "username": "zggx-zxz",
+                    "first_name": "朱孝忠"
+                },
+                {
+                    "username": "zggx-zy",
+                    "first_name": "张颖"
+                },
+                {
+                    "username": "zggx-wcy",
+                    "first_name": "温晨阳"
+                },
+                {
+                    "username": "zggx-tyn",
+                    "first_name": "唐元宁"
+                }
+            ]
+        },
+        {
+            "org__id": 394,
+            "org__name": "中国神华能源股份有限公司",
+            "user_sum": 5,
+            "user_list": [
+                {
+                    "username": "zgshny-gq",
+                    "first_name": "郭青"
+                },
+                {
+                    "username": "zgshny-ldm",
+                    "first_name": "李代民"
+                },
+                {
+                    "username": "zgshny-zsy",
+                    "first_name": "张苏阳"
+                },
+                {
+                    "username": "zgshny-hhr",
+                    "first_name": "贺河荣"
+                },
+                {
+                    "username": "zgshny",
+                    "first_name": "中国神华能源股份有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 401,
+            "org__name": "国家能源集团国神集团",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "nygsjt-cb",
+                    "first_name": "常波"
+                },
+                {
+                    "username": "nygsjt-zxl",
+                    "first_name": "朱晓露"
+                },
+                {
+                    "username": "nygsjt",
+                    "first_name": "国家能源集团国神集团"
+                }
+            ]
+        },
+        {
+            "org__id": 442,
+            "org__name": "神华粤电珠海港煤炭码头有限责任公司",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "shzhmt-zl",
+                    "first_name": "曾垒"
+                },
+                {
+                    "username": "shzhmt",
+                    "first_name": "神华粤电珠海港煤炭码头有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 306,
+            "org__name": "东风本田发动机有限公司",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "btfdj",
+                    "first_name": "本田发动机"
+                }
+            ]
+        },
+        {
+            "org__id": 249,
+            "org__name": "中国大唐集团技术经济研究院有限公司",
+            "user_sum": 5,
+            "user_list": [
+                {
+                    "username": "dtjyy-lyf",
+                    "first_name": "李云峰"
+                },
+                {
+                    "username": "dtjyy-gjx",
+                    "first_name": "高均旋"
+                },
+                {
+                    "username": "dtjyy-hhw",
+                    "first_name": "胡红伟"
+                },
+                {
+                    "username": "dtjyy",
+                    "first_name": "大唐技术经济研究院"
+                },
+                {
+                    "username": "dtjyy-lsy",
+                    "first_name": "刘晟毓"
+                }
+            ]
+        },
+        {
+            "org__id": 342,
+            "org__name": "长沙矿冶研究院有限责任公司湖南金拓置业有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "hnjt-wsg",
+                    "first_name": "邬曙国"
+                },
+                {
+                    "username": "hnjt-lz",
+                    "first_name": "李至"
+                },
+                {
+                    "username": "hnjt-xjx",
+                    "first_name": "谢景秀"
+                },
+                {
+                    "username": "hnjt",
+                    "first_name": "长沙矿冶研究院有限责任公司湖南金拓置业有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 444,
+            "org__name": "陕西神延煤炭有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "sxsymt-yxh",
+                    "first_name": "袁心伙"
+                },
+                {
+                    "username": "sxsymt-zsj",
+                    "first_name": "赵树军"
+                },
+                {
+                    "username": "sxsymt",
+                    "first_name": "陕西神延煤炭有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 166,
+            "org__name": "吉林大学中国国有经济研究中心",
+            "user_sum": 16,
+            "user_list": [
+                {
+                    "username": "jdjjyjzx",
+                    "first_name": "吉林大学中国国有经济研究中心"
+                },
+                {
+                    "username": "jldx-lzy",
+                    "first_name": "李中义"
+                },
+                {
+                    "username": "jldx-lz",
+                    "first_name": "李政"
+                },
+                {
+                    "username": "jldx-sxf",
+                    "first_name": "邵学峰"
+                },
+                {
+                    "username": "jldx-zxy",
+                    "first_name": "赵新宇"
+                },
+                {
+                    "username": "jldx-sl",
+                    "first_name": "邵琳"
+                },
+                {
+                    "username": "jldx-fld",
+                    "first_name": "范立东"
+                },
+                {
+                    "username": "jldx-wyz",
+                    "first_name": "王亚卓"
+                },
+                {
+                    "username": "jldx-wwc",
+                    "first_name": "王文成"
+                },
+                {
+                    "username": "jldx-zbl",
+                    "first_name": "张炳雷"
+                },
+                {
+                    "username": "jldx-lhw",
+                    "first_name": "廖红伟"
+                },
+                {
+                    "username": "jldx-zdm",
+                    "first_name": "张东明"
+                },
+                {
+                    "username": "jldx-hb",
+                    "first_name": "何彬"
+                },
+                {
+                    "username": "jldx-lh",
+                    "first_name": "李何"
+                },
+                {
+                    "username": "jldx-zyy",
+                    "first_name": "赵岳阳"
+                },
+                {
+                    "username": "jldx-swl",
+                    "first_name": "石纬林"
+                }
+            ]
+        },
+        {
+            "org__id": 341,
+            "org__name": "长沙矿冶研究院有限责任公司贵州松桃金瑞锰业有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gzst-hjw",
+                    "first_name": "黄军武"
+                },
+                {
+                    "username": "gzst-qy",
+                    "first_name": "秦艳"
+                },
+                {
+                    "username": "gzst",
+                    "first_name": "长沙矿冶研究院有限责任公司贵州松桃金瑞锰业有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 420,
+            "org__name": "国电四川发电有限公司",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "gdscgs-lxf",
+                    "first_name": "兰晓峰"
+                },
+                {
+                    "username": "gdscgs",
+                    "first_name": "国电四川发电有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 400,
+            "org__name": "国电华北电力有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gdhbgs-cxf",
+                    "first_name": "丛晓飞"
+                },
+                {
+                    "username": "gdhbgs-wjm",
+                    "first_name": "吴健民"
+                },
+                {
+                    "username": "gdhbgs",
+                    "first_name": "国电华北电力有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 383,
+            "org__name": "招商交科院",
+            "user_sum": 5,
+            "user_list": [
+                {
+                    "username": "zsjky-zz",
+                    "first_name": "郑直"
+                },
+                {
+                    "username": "zsjky-zfd",
+                    "first_name": "张福东"
+                },
+                {
+                    "username": "zsjky-cy",
+                    "first_name": "陈扬"
+                },
+                {
+                    "username": "zsjky-zyp",
+                    "first_name": "张业鹏"
+                },
+                {
+                    "username": "zsjky",
+                    "first_name": "招商交科院"
+                }
+            ]
+        },
+        {
+            "org__id": 360,
+            "org__name": "安徽省国有资本运营控股集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahzbyy-ctx",
+                    "first_name": "蔡天行"
+                },
+                {
+                    "username": "ahzbyy-zwh",
+                    "first_name": "张文虎"
+                },
+                {
+                    "username": "ahzbyy",
+                    "first_name": "安徽国有资本运营集团"
+                }
+            ]
+        },
+        {
+            "org__id": 217,
+            "org__name": "招商局集团有限公司",
+            "user_sum": 21,
+            "user_list": [
+                {
+                    "username": "zsjjt",
+                    "first_name": "招商局集团"
+                },
+                {
+                    "username": "zsjjt-qyb",
+                    "first_name": "钱益兵"
+                },
+                {
+                    "username": "zsjjt-zxp",
+                    "first_name": "张晓鹏"
+                },
+                {
+                    "username": "zsjjt-xzw",
+                    "first_name": "薛志旺"
+                },
+                {
+                    "username": "zsjjt-sy",
+                    "first_name": "史允"
+                },
+                {
+                    "username": "zsjjt-wsy",
+                    "first_name": "王陟昀"
+                },
+                {
+                    "username": "zsjjt-lh",
+                    "first_name": "李辉"
+                },
+                {
+                    "username": "zsjjt-xwn",
+                    "first_name": "许薇娜"
+                },
+                {
+                    "username": "zsjjt-xsj",
+                    "first_name": "徐绍机"
+                },
+                {
+                    "username": "zsjjt-xw",
+                    "first_name": "熊伟"
+                },
+                {
+                    "username": "zsjjt-xw1",
+                    "first_name": "徐文"
+                },
+                {
+                    "username": "zsjjt-pyx",
+                    "first_name": "彭译萱"
+                },
+                {
+                    "username": "zsjjt-mzb",
+                    "first_name": "梅赞宾"
+                },
+                {
+                    "username": "zsjjt-px",
+                    "first_name": "潘雄"
+                },
+                {
+                    "username": "zsjjt-yg",
+                    "first_name": "严刚"
+                },
+                {
+                    "username": "zsjjt-llw",
+                    "first_name": "罗利伟"
+                },
+                {
+                    "username": "zsjjt-lxl",
+                    "first_name": "李晓璐"
+                },
+                {
+                    "username": "zsjjt-nc",
+                    "first_name": "聂超"
+                },
+                {
+                    "username": "zsjjt-zjt",
+                    "first_name": "赵金涛"
+                },
+                {
+                    "username": "zsjjt-hn",
+                    "first_name": "赫楠"
+                },
+                {
+                    "username": "zsjjt-lke",
+                    "first_name": "梁凯恩"
+                }
+            ]
+        },
+        {
+            "org__id": 288,
+            "org__name": "云南省国资委",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "yngzw",
+                    "first_name": "云南省国资委"
+                }
+            ]
+        },
+        {
+            "org__id": 397,
+            "org__name": "国电科技环保集团股份有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "khjt-lc",
+                    "first_name": "梁超"
+                },
+                {
+                    "username": "khjt-lz",
+                    "first_name": "栾智"
+                },
+                {
+                    "username": "khjt",
+                    "first_name": "国电科技环保集团股份有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 404,
+            "org__name": "内蒙古平庄煤业（集团）有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "pzmy-wyq",
+                    "first_name": "王友全"
+                },
+                {
+                    "username": "pzmy-jxz",
+                    "first_name": "季晓哲"
+                },
+                {
+                    "username": "pzmy",
+                    "first_name": "内蒙古平庄煤业（集团）有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 238,
+            "org__name": "中国国新研究院",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "zggxyjy",
+                    "first_name": "国新研究院"
+                }
+            ]
+        },
+        {
+            "org__id": 357,
+            "org__name": "安徽省引江济淮集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "yjjh-cl",
+                    "first_name": "陈磊"
+                },
+                {
+                    "username": "yjjh-ly",
+                    "first_name": "李英"
+                },
+                {
+                    "username": "ahyjjh",
+                    "first_name": "安徽引江济淮集团"
+                }
+            ]
+        },
+        {
+            "org__id": 432,
+            "org__name": "神华黄骅港务有限责任公司",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "shbstl-fsk",
+                    "first_name": "冯曙葵"
+                }
+            ]
+        },
+        {
+            "org__id": 320,
+            "org__name": "中商商业经济研究中心",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "zssy-ssw",
+                    "first_name": "孙树伟"
+                },
+                {
+                    "username": "zssy-ylm",
+                    "first_name": "姚力鸣"
+                },
+                {
+                    "username": "zssy-ss",
+                    "first_name": "石烁"
+                },
+                {
+                    "username": "zssy",
+                    "first_name": "中商商业经济研究中心"
+                }
+            ]
+        },
+        {
+            "org__id": 402,
+            "org__name": "国电东北电力有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gddbgs-lj",
+                    "first_name": "刘金"
+                },
+                {
+                    "username": "gddbgs-lgq",
+                    "first_name": "李功强"
+                },
+                {
+                    "username": "gddbgs",
+                    "first_name": "国电东北电力有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 165,
+            "org__name": "中国国际工程咨询有限公司",
+            "user_sum": 13,
+            "user_list": [
+                {
+                    "username": "zzzxb",
+                    "first_name": "中咨公司战略咨询部"
+                },
+                {
+                    "username": "zzzxb-xmh",
+                    "first_name": "谢明华"
+                },
+                {
+                    "username": "zzzxb-ty",
+                    "first_name": "田煜"
+                },
+                {
+                    "username": "zzzxb-cc",
+                    "first_name": "陈聪"
+                },
+                {
+                    "username": "zzzxb-zm",
+                    "first_name": "张萌"
+                },
+                {
+                    "username": "zzzxb-dyq",
+                    "first_name": "董亚秋"
+                },
+                {
+                    "username": "zzzxb-jcx",
+                    "first_name": "鞠传霄"
+                },
+                {
+                    "username": "zzzxb-wzw",
+                    "first_name": "王志伟"
+                },
+                {
+                    "username": "zzzxb-lh",
+                    "first_name": "李华"
+                },
+                {
+                    "username": "zzzxb-xyz",
+                    "first_name": "许有志"
+                },
+                {
+                    "username": "zzzxb-dd",
+                    "first_name": "丁丹"
+                },
+                {
+                    "username": "zzzxb-wc",
+                    "first_name": "王琤"
+                },
+                {
+                    "username": "zzzxb-zxf",
+                    "first_name": "赵旭峰"
+                }
+            ]
+        },
+        {
+            "org__id": 354,
+            "org__name": "安徽江淮汽车集团控股有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "jhqc-xcl",
+                    "first_name": "徐春林"
+                },
+                {
+                    "username": "jhqc-lz",
+                    "first_name": "刘柱"
+                },
+                {
+                    "username": "jhqc",
+                    "first_name": "安徽江淮汽车集团"
+                }
+            ]
+        },
+        {
+            "org__id": 307,
+            "org__name": "华远国际陆港有限公司",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "hygj-wpf",
+                    "first_name": "王鹏飞"
+                },
+                {
+                    "username": "hygj",
+                    "first_name": "华远国际"
+                }
+            ]
+        },
+        {
+            "org__id": 84,
+            "org__name": "深圳市创新投资集团有限公司",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "szcxtz-qxd",
+                    "first_name": "乔旭东"
+                },
+                {
+                    "username": "szcxtz-scp",
+                    "first_name": "施程鹏"
+                }
+            ]
+        },
+        {
+            "org__id": 386,
+            "org__name": "招商局集团发展研究中心",
+            "user_sum": 16,
+            "user_list": [
+                {
+                    "username": "zsjyjzx-qbz",
+                    "first_name": "曲保智"
+                },
+                {
+                    "username": "zsjyjzx-wsh",
+                    "first_name": "吴少华"
+                },
+                {
+                    "username": "zsjyjzx-lqj",
+                    "first_name": "卢奇骏"
+                },
+                {
+                    "username": "zsjyjzx-csk",
+                    "first_name": "陈三可"
+                },
+                {
+                    "username": "zsjyjzx-wh",
+                    "first_name": "王瀚"
+                },
+                {
+                    "username": "zsjyjzx-lt",
+                    "first_name": "刘挺"
+                },
+                {
+                    "username": "zsjyjzx-csc",
+                    "first_name": "陈世超"
+                },
+                {
+                    "username": "zsjyjzx-zch",
+                    "first_name": "周春晖"
+                },
+                {
+                    "username": "zsjyjzx-shm",
+                    "first_name": "史宏梅"
+                },
+                {
+                    "username": "zsjyjzx-mh",
+                    "first_name": "孟弘"
+                },
+                {
+                    "username": "zsjyjzx-ljw",
+                    "first_name": "梁竞文"
+                },
+                {
+                    "username": "zsjyjzx-cr",
+                    "first_name": "程瑞"
+                },
+                {
+                    "username": "zsjyjzx-hyl",
+                    "first_name": "侯跃龙"
+                },
+                {
+                    "username": "zsjyjzx-lyc",
+                    "first_name": "刘永超"
+                },
+                {
+                    "username": "zsjyjzx-cdy",
+                    "first_name": "陈丹阳"
+                },
+                {
+                    "username": "zsjyjzx",
+                    "first_name": "招商局研究中心"
+                }
+            ]
+        },
+        {
+            "org__id": 282,
+            "org__name": "山西省国新能源发展集团有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "gxny-lq",
+                    "first_name": "刘祺"
+                },
+                {
+                    "username": "gxny-wlp",
+                    "first_name": "王莉萍"
+                },
+                {
+                    "username": "gxny-xbj",
+                    "first_name": "薛斌军"
+                },
+                {
+                    "username": "gxny",
+                    "first_name": "国新能源"
+                }
+            ]
+        },
+        {
+            "org__id": 446,
+            "org__name": "安徽省国资国企改革研究基地",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "ahyjjd-oy",
+                    "first_name": "欧园"
+                },
+                {
+                    "username": "ahyjjd",
+                    "first_name": "安徽国资国企改革研究基地"
+                }
+            ]
+        },
+        {
+            "org__id": 287,
+            "org__name": "贵州省国资委",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "gzgzw",
+                    "first_name": "贵州省国资委"
+                }
+            ]
+        },
+        {
+            "org__id": 396,
+            "org__name": "龙源电力集团股份有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "lydl-bxs",
+                    "first_name": "白雪松"
+                },
+                {
+                    "username": "lydl-wds",
+                    "first_name": "王大胜"
+                },
+                {
+                    "username": "lydl",
+                    "first_name": "龙源电力集团股份有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 324,
+            "org__name": "五矿地产",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "wkdc-wjs",
+                    "first_name": "王久生"
+                },
+                {
+                    "username": "wkdc-xn",
+                    "first_name": "许宁"
+                },
+                {
+                    "username": "wkdc",
+                    "first_name": "五矿地产"
+                }
+            ]
+        },
+        {
+            "org__id": 373,
+            "org__name": "徽商职业学院",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahhsxy-lt",
+                    "first_name": "刘涛"
+                },
+                {
+                    "username": "ahhsxy-wj",
+                    "first_name": "吴瑾"
+                },
+                {
+                    "username": "ahhsxy",
+                    "first_name": "徽商职业学院"
+                }
+            ]
+        },
+        {
+            "org__id": 376,
+            "org__name": "上海市国资国企改革发展研究中心",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "shyjzx-ht",
+                    "first_name": "黄坦"
+                },
+                {
+                    "username": "shyjzx-hjy",
+                    "first_name": "黄璟怡"
+                },
+                {
+                    "username": "shyjzx-cwq",
+                    "first_name": "陈武清"
+                },
+                {
+                    "username": "shyjzx-jj",
+                    "first_name": "姜静"
+                },
+                {
+                    "username": "shyjzx-zq",
+                    "first_name": "周琦"
+                },
+                {
+                    "username": "shyjzx",
+                    "first_name": "上海国资国企改革发展研究中心"
+                }
+            ]
+        },
+        {
+            "org__id": 424,
+            "org__name": "国电陕西电力有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gdsxgs-djp",
+                    "first_name": "代军平"
+                },
+                {
+                    "username": "gdsxgs-zxf",
+                    "first_name": "张晓峰"
+                },
+                {
+                    "username": "gdsxgs",
+                    "first_name": "国电陕西电力有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 375,
+            "org__name": "安徽省华强工贸集团有限责任公司",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "ahhqgm",
+                    "first_name": "安徽华强工贸集团"
+                }
+            ]
+        },
+        {
+            "org__id": 374,
+            "org__name": "安徽省国资委党委党校",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "ahgzwdx",
+                    "first_name": "安徽国资委党校"
+                }
+            ]
+        },
+        {
+            "org__id": 435,
+            "org__name": "国家能源集团煤焦化有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "mjhgs-wy",
+                    "first_name": "王亚"
+                },
+                {
+                    "username": "mjhgs-hd",
+                    "first_name": "哈达"
+                },
+                {
+                    "username": "mjhgs",
+                    "first_name": "国家能源集团煤焦化有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 451,
+            "org__name": "中国国际工程咨询有限公司研究中心",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "zzyjzx-lkm",
+                    "first_name": "李开孟"
+                },
+                {
+                    "username": "zzyjzx-shy",
+                    "first_name": "申海燕"
+                },
+                {
+                    "username": "zzyjzx-cm",
+                    "first_name": "曹玫"
+                },
+                {
+                    "username": "zzyjzx-lyc",
+                    "first_name": "刘义成"
+                },
+                {
+                    "username": "zzyjzx-tha",
+                    "first_name": "唐淮安"
+                },
+                {
+                    "username": "zzyjzx-ld",
+                    "first_name": "李东"
+                }
+            ]
+        },
+        {
+            "org__id": 353,
+            "org__name": "铜陵有色金属集团控股有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "tlys-zlx",
+                    "first_name": "周龙兴"
+                },
+                {
+                    "username": "tlys-hj",
+                    "first_name": "胡军"
+                },
+                {
+                    "username": "tlys",
+                    "first_name": "铜陵有色金属集团"
+                }
+            ]
+        },
+        {
+            "org__id": 234,
+            "org__name": "中国社科院大学工商学院",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "gsxy-zwx",
+                    "first_name": "赵卫星"
+                }
+            ]
+        },
+        {
+            "org__id": 443,
+            "org__name": "榆林神华能源有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "llsh-lap",
+                    "first_name": "李爱萍"
+                },
+                {
+                    "username": "llsh-wn",
+                    "first_name": "王楠"
+                },
+                {
+                    "username": "llsh",
+                    "first_name": "榆林神华能源有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 343,
+            "org__name": "长沙矿冶研究院有限责任公司湖南金瑞新冶材料有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "hnjr-ym",
+                    "first_name": "叶茂"
+                },
+                {
+                    "username": "hnjr-zyd",
+                    "first_name": "张宇丹"
+                },
+                {
+                    "username": "hnjr-wyh",
+                    "first_name": "王玉慧"
+                },
+                {
+                    "username": "hnjr",
+                    "first_name": "长沙矿冶研究院有限责任公司湖南金瑞新冶材料有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 362,
+            "org__name": "安徽民航机场集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahmh-wzy",
+                    "first_name": "万政云"
+                },
+                {
+                    "username": "ahmh-yhn",
+                    "first_name": "杨海宁"
+                },
+                {
+                    "username": "ahmh",
+                    "first_name": "安徽民航机场集团"
+                }
+            ]
+        },
+        {
+            "org__id": 364,
+            "org__name": "煤炭工业合肥设计研究院有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "mtgyy-cr",
+                    "first_name": "程锐"
+                },
+                {
+                    "username": "mtgyy-cfy",
+                    "first_name": "成方圆"
+                },
+                {
+                    "username": "mtgyy",
+                    "first_name": "煤炭工业合肥设计研究院"
+                }
+            ]
+        },
+        {
+            "org__id": 286,
+            "org__name": "山西晋城无烟煤矿业集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "jcwym-wmg",
+                    "first_name": "王明港"
+                },
+                {
+                    "username": "jcwym-lcl",
+                    "first_name": "李春龙"
+                },
+                {
+                    "username": "jcwym",
+                    "first_name": "晋城无烟煤"
+                }
+            ]
+        },
+        {
+            "org__id": 418,
+            "org__name": "神华杭锦能源有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "shhmny-fhb",
+                    "first_name": "樊红兵"
+                },
+                {
+                    "username": "shhmny-zzj",
+                    "first_name": "郑占杰"
+                },
+                {
+                    "username": "shhmny",
+                    "first_name": "神华杭锦能源有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 456,
+            "org__name": "北京航天情报与信息研究所",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "htqbs-zl",
+                    "first_name": "周丽"
+                },
+                {
+                    "username": "htqbs-cmn",
+                    "first_name": "曹梦楠"
+                },
+                {
+                    "username": "htqbs-wqg",
+                    "first_name": "王庆国"
+                },
+                {
+                    "username": "htqbs",
+                    "first_name": "北京航天情报与信息研究所"
+                }
+            ]
+        },
+        {
+            "org__id": 419,
+            "org__name": "国电贵州电力有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gdgzgs-zj",
+                    "first_name": " 周菁"
+                },
+                {
+                    "username": "gdgzgs-yxz",
+                    "first_name": "杨秀周"
+                },
+                {
+                    "username": "gdgzgs",
+                    "first_name": "国电贵州电力有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 349,
+            "org__name": "淮河能源控股集团有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "hhny-xwb",
+                    "first_name": "徐维彬"
+                },
+                {
+                    "username": "hhny-hlj",
+                    "first_name": "韩凌杰"
+                },
+                {
+                    "username": "hhny",
+                    "first_name": "淮河能源集团"
+                }
+            ]
+        },
+        {
+            "org__id": 30,
+            "org__name": "国家电网有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gjdw",
+                    "first_name": "国家电网"
+                },
+                {
+                    "username": "gjdw-zjj",
+                    "first_name": "赵九斤"
+                },
+                {
+                    "username": "gjdw-zhb",
+                    "first_name": "赵宏波"
+                }
+            ]
+        },
+        {
+            "org__id": 405,
+            "org__name": "国家能源集团乌海能源有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "whny-lcq",
+                    "first_name": "刘春桥"
+                },
+                {
+                    "username": "whny-sxf",
+                    "first_name": "史学锋"
+                },
+                {
+                    "username": "whny",
+                    "first_name": "国家能源集团乌海能源有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 309,
+            "org__name": "山西航空产业集团有限公司",
+            "user_sum": 5,
+            "user_list": [
+                {
+                    "username": "sxhk-ypg",
+                    "first_name": "贠佩刚"
+                },
+                {
+                    "username": "sxhk-zl",
+                    "first_name": "赵论"
+                },
+                {
+                    "username": "sxhk-hr",
+                    "first_name": "郝睿"
+                },
+                {
+                    "username": "sxhk-yx",
+                    "first_name": "杨啸"
+                },
+                {
+                    "username": "sxhk",
+                    "first_name": "山西航空"
+                }
+            ]
+        },
+        {
+            "org__id": 458,
+            "org__name": "北京海鹰科技情报研究所",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "bjhyqb-cys",
+                    "first_name": "陈英硕"
+                },
+                {
+                    "username": "bjhyqb-zj",
+                    "first_name": "张杰"
+                },
+                {
+                    "username": "bjhyqb-htt",
+                    "first_name": "韩婷婷"
+                },
+                {
+                    "username": "bjhyqb-yl",
+                    "first_name": "杨柳"
+                },
+                {
+                    "username": "bjhyqb-gx",
+                    "first_name": "高欣"
+                },
+                {
+                    "username": "bjhyqb",
+                    "first_name": "海鹰科技情报所"
+                }
+            ]
+        },
+        {
+            "org__id": 445,
+            "org__name": "安徽省投资集团控股有限公司中安研究院",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "zayjy-lxr",
+                    "first_name": "梁欣然"
+                },
+                {
+                    "username": "zayjy-wn",
+                    "first_name": "王娜"
+                },
+                {
+                    "username": "zayjy",
+                    "first_name": "安徽投资集团中安院"
+                }
+            ]
+        },
+        {
+            "org__id": 365,
+            "org__name": "安徽军工集团控股有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahjgjt",
+                    "first_name": "安徽军工集团"
+                },
+                {
+                    "username": "ahjgjt-hxf",
+                    "first_name": "胡学峰"
+                },
+                {
+                    "username": "ahjgjt-hh",
+                    "first_name": "胡浩"
+                }
+            ]
+        },
+        {
+            "org__id": 398,
+            "org__name": "国家能源集团神东煤炭集团",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "sdmt-wgq",
+                    "first_name": "王国青"
+                },
+                {
+                    "username": "sdmt-wxw",
+                    "first_name": "王新伟"
+                },
+                {
+                    "username": "sdmt",
+                    "first_name": "神东煤炭集团"
+                }
+            ]
+        },
+        {
+            "org__id": 348,
+            "org__name": "淮北矿业（集团）有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "hbky-ch",
+                    "first_name": "陈华"
+                },
+                {
+                    "username": "hbky-yj",
+                    "first_name": "杨洁"
+                },
+                {
+                    "username": "hbky",
+                    "first_name": "淮北矿业集团"
+                }
+            ]
+        },
+        {
+            "org__id": 450,
+            "org__name": "中国船舶第七一四研究所",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "zgcb714",
+                    "first_name": "中国船舶七一四所"
+                },
+                {
+                    "username": "zgcb714-lsj",
+                    "first_name": "李升江"
+                }
+            ]
+        },
+        {
+            "org__id": 350,
+            "org__name": "安徽国元金融控股集团有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahgy-zxy",
+                    "first_name": "朱秀玉"
+                },
+                {
+                    "username": "ahgy-yhy",
+                    "first_name": "严和宇"
+                },
+                {
+                    "username": "ahgy",
+                    "first_name": "安徽国元集团"
+                }
+            ]
+        },
+        {
+            "org__id": 330,
+            "org__name": "湖南有色金属控股集团",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "hnys-wpy",
+                    "first_name": "王鹏宇"
+                },
+                {
+                    "username": "hnys",
+                    "first_name": "湖南有色金属控股集团"
+                }
+            ]
+        },
+        {
+            "org__id": 335,
+            "org__name": "长沙矿冶研究院有限责任公司先进材料所",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "xjcl-xfy",
+                    "first_name": "涂飞跃"
+                },
+                {
+                    "username": "xjcl-wyh",
+                    "first_name": "王艳华"
+                },
+                {
+                    "username": "xjcl",
+                    "first_name": "长沙矿冶研究院有限责任公司先进材料所"
+                }
+            ]
+        },
+        {
+            "org__id": 236,
+            "org__name": "中国社会科学院社会发展战略研究院",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "zlyjj-zhw",
+                    "first_name": "钟宏武"
+                }
+            ]
+        },
+        {
+            "org__id": 340,
+            "org__name": "长沙矿冶研究院有限责任公司贵州金瑞新材料有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gzjr-zrb",
+                    "first_name": "赵荣波"
+                },
+                {
+                    "username": "gzjr-yz",
+                    "first_name": "袁柱"
+                },
+                {
+                    "username": "gzjr",
+                    "first_name": "长沙矿冶研究院有限责任公司贵州金瑞新材料有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 454,
+            "org__name": "南京航天管理干部学院",
+            "user_sum": 20,
+            "user_list": [
+                {
+                    "username": "njhtxy-jp",
+                    "first_name": "晋鹏"
+                },
+                {
+                    "username": "njhtxy",
+                    "first_name": "南京航天管理干部学院"
+                },
+                {
+                    "username": "njhtxy-zwj",
+                    "first_name": "邹文俊"
+                },
+                {
+                    "username": "njhtxy-th",
+                    "first_name": "童辉"
+                },
+                {
+                    "username": "njhtxy-bh",
+                    "first_name": "包涵"
+                },
+                {
+                    "username": "njhtxy-cll",
+                    "first_name": "陈丽丽"
+                },
+                {
+                    "username": "njhtxy-btx",
+                    "first_name": "白天玺"
+                },
+                {
+                    "username": "njhtxy-zp",
+                    "first_name": "赵攀"
+                },
+                {
+                    "username": "njhtxy-wy",
+                    "first_name": "韦怡"
+                },
+                {
+                    "username": "njhtxy-lxy",
+                    "first_name": "李昕远"
+                },
+                {
+                    "username": "njhtxy-ll",
+                    "first_name": "李林"
+                },
+                {
+                    "username": "njhtxy-ykx",
+                    "first_name": "殷坤霞"
+                },
+                {
+                    "username": "njhtxy-pmc",
+                    "first_name": "皮明川"
+                },
+                {
+                    "username": "njhtxy-cjz",
+                    "first_name": "程久志"
+                },
+                {
+                    "username": "njhtxy-wcy",
+                    "first_name": "王春洋"
+                },
+                {
+                    "username": "njhtxy-yhx",
+                    "first_name": "禹红霞"
+                },
+                {
+                    "username": "njhtxy-dl",
+                    "first_name": "丁磊"
+                },
+                {
+                    "username": "njhtxy-th2",
+                    "first_name": "唐慧"
+                },
+                {
+                    "username": "njhtxy-om",
+                    "first_name": "欧梅"
+                },
+                {
+                    "username": "njhtxy-qym",
+                    "first_name": "邱艳梅"
+                }
+            ]
+        },
+        {
+            "org__id": 254,
+            "org__name": "中国石化集团经济技术研究院",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "zgshjyy",
+                    "first_name": "中石化经研院"
+                }
+            ]
+        },
+        {
+            "org__id": 441,
+            "org__name": "神华信息技术有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "shxxgs-syp",
+                    "first_name": "宋宇鹏"
+                },
+                {
+                    "username": "shxxgs-md",
+                    "first_name": "孟丹"
+                },
+                {
+                    "username": "shxxgs",
+                    "first_name": "神华信息技术有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 385,
+            "org__name": "招商局邮轮研究院（上海）有限公司",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "zsjyl-gx",
+                    "first_name": "郭歆"
+                },
+                {
+                    "username": "zsjyl-jyx",
+                    "first_name": "蒋永旭"
+                },
+                {
+                    "username": "zsjyl-lc",
+                    "first_name": "刘臣"
+                },
+                {
+                    "username": "zsjyl-hg",
+                    "first_name": "黄戈"
+                },
+                {
+                    "username": "zsjyl-jjh",
+                    "first_name": "姬佳慧"
+                },
+                {
+                    "username": "zsjyl",
+                    "first_name": "招商局邮轮"
+                }
+            ]
+        },
+        {
+            "org__id": 214,
+            "org__name": "中国电子科技集团有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "zgdk",
+                    "first_name": "中国电科"
+                },
+                {
+                    "username": "zgdk-yzj",
+                    "first_name": "姚志杰"
+                },
+                {
+                    "username": "zgdk-gfj",
+                    "first_name": "高福军"
+                },
+                {
+                    "username": "zgdk-lxy",
+                    "first_name": "李小余"
+                }
+            ]
+        },
+        {
+            "org__id": 226,
+            "org__name": "河北省国资委",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "hbgzw",
+                    "first_name": "河北省国资委"
+                }
+            ]
+        },
+        {
+            "org__id": 205,
+            "org__name": "上海康智管理咨询有限公司",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "shkzzx",
+                    "first_name": "上海康智管理咨询有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 339,
+            "org__name": "长沙矿冶研究院有限责任公司湖南金炉科技股份有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "hnjl-oyj",
+                    "first_name": "欧阳建"
+                },
+                {
+                    "username": "hnjl-dk",
+                    "first_name": "丁凯"
+                },
+                {
+                    "username": "hnjl",
+                    "first_name": "长沙矿冶研究院有限责任公司湖南金炉科技股份有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 415,
+            "org__name": "国电科学技术研究院有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gdkxy-zjj",
+                    "first_name": "张佳洁"
+                },
+                {
+                    "username": "gdkxy",
+                    "first_name": "国电科学技术研究院有限公司"
+                },
+                {
+                    "username": "gdkxy-lt",
+                    "first_name": "刘涛"
+                }
+            ]
+        },
+        {
+            "org__id": 431,
+            "org__name": "国电金沙江旭龙水电开发公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gdjsj-ty",
+                    "first_name": "唐毅"
+                },
+                {
+                    "username": "gdjsj-lyg",
+                    "first_name": "李云高"
+                },
+                {
+                    "username": "gdjsj",
+                    "first_name": "国电金沙江旭龙水电开发公司"
+                }
+            ]
+        },
+        {
+            "org__id": 344,
+            "org__name": "长沙矿冶研究院有限责任公司湖南金磨科技有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "hnjm-zgw",
+                    "first_name": "张国旺"
+                },
+                {
+                    "username": "hnjm-zx",
+                    "first_name": "赵湘"
+                },
+                {
+                    "username": "hnjm",
+                    "first_name": "长沙矿冶研究院有限责任公司湖南金磨科技有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 426,
+            "org__name": "国电广东电力有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gdgdgs-lw",
+                    "first_name": "刘伟"
+                },
+                {
+                    "username": "gdgdgs-ydw",
+                    "first_name": "杨德文"
+                },
+                {
+                    "username": "gdgdgs",
+                    "first_name": "国电广东电力有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 407,
+            "org__name": "国家能源集团神宝能源",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "sbny-pw",
+                    "first_name": "庞伟"
+                },
+                {
+                    "username": "sbny-lzq",
+                    "first_name": "李振清"
+                },
+                {
+                    "username": "sbny",
+                    "first_name": "国家能源集团神宝能源"
+                }
+            ]
+        },
+        {
+            "org__id": 9,
+            "org__name": "国网能源研究院有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gwnyy-zhf",
+                    "first_name": "郑海峰"
+                },
+                {
+                    "username": "gwnyy-llz",
+                    "first_name": "刘龙珠"
+                },
+                {
+                    "username": "gwnyy",
+                    "first_name": "国网能源研究院"
+                }
+            ]
+        },
+        {
+            "org__id": 213,
+            "org__name": "中国船舶集团有限公司",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "zgcb",
+                    "first_name": "中国船舶"
+                }
+            ]
+        },
+        {
+            "org__id": 370,
+            "org__name": "安徽省徽商集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahhs-wq",
+                    "first_name": "魏强"
+                },
+                {
+                    "username": "ahhs-zy",
+                    "first_name": "周芸"
+                },
+                {
+                    "username": "ahhs",
+                    "first_name": "安徽省徽商集团"
+                }
+            ]
+        },
+        {
+            "org__id": 369,
+            "org__name": "安徽省旅游集团有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahly-xzh",
+                    "first_name": "修治海"
+                },
+                {
+                    "username": "ahly-zll",
+                    "first_name": "朱丽丽"
+                },
+                {
+                    "username": "ahly",
+                    "first_name": "安徽旅游集团"
+                }
+            ]
+        },
+        {
+            "org__id": 13,
+            "org__name": "中国大唐集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "zgdt",
+                    "first_name": "中国大唐"
+                },
+                {
+                    "username": "zgdt-wh",
+                    "first_name": "王灏"
+                },
+                {
+                    "username": "zgdt-fys",
+                    "first_name": "冯雁山"
+                }
+            ]
+        },
+        {
+            "org__id": 232,
+            "org__name": "深圳市国资委",
+            "user_sum": 5,
+            "user_list": [
+                {
+                    "username": "szgzw",
+                    "first_name": "深圳市国资委"
+                },
+                {
+                    "username": "szgzw-nff",
+                    "first_name": "宁飞飞"
+                },
+                {
+                    "username": "szgzw-zjs",
+                    "first_name": "张坚胜"
+                },
+                {
+                    "username": "szgzw-jp",
+                    "first_name": "姜鹏"
+                },
+                {
+                    "username": "szgzw-xjq",
+                    "first_name": "修建强"
+                }
+            ]
+        },
+        {
+            "org__id": 361,
+            "org__name": "安徽建工集团控股有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahjg-cg",
+                    "first_name": "陈刚"
+                },
+                {
+                    "username": "ahjg-tsl",
+                    "first_name": "陶双龙"
+                },
+                {
+                    "username": "ahjg",
+                    "first_name": "安徽建工集团"
+                }
+            ]
+        },
+        {
+            "org__id": 429,
+            "org__name": "中国国电集团有限公司重庆分公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gdkqgs-tap",
+                    "first_name": "涂安平"
+                },
+                {
+                    "username": "gdkqgs-cx",
+                    "first_name": "陈熙"
+                },
+                {
+                    "username": "gdkqgs",
+                    "first_name": "中国国电集团有限公司重庆分公司"
+                }
+            ]
+        },
+        {
+            "org__id": 382,
+            "org__name": "招商海通",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "zsht-lsd",
+                    "first_name": "李世东"
+                },
+                {
+                    "username": "zsht-czq",
+                    "first_name": "昌子琪"
+                },
+                {
+                    "username": "zsht",
+                    "first_name": "招商海通"
+                }
+            ]
+        },
+        {
+            "org__id": 388,
+            "org__name": "招商仁和人寿",
+            "user_sum": 13,
+            "user_list": [
+                {
+                    "username": "zsrhrs-cjw",
+                    "first_name": "陈家伟"
+                },
+                {
+                    "username": "zsrhrs-nm",
+                    "first_name": "倪敏"
+                },
+                {
+                    "username": "zsrhrs-dfw",
+                    "first_name": "杜芳伟"
+                },
+                {
+                    "username": "zsrhrs-jxk",
+                    "first_name": "贾新凯"
+                },
+                {
+                    "username": "zsrhrs-ymf",
+                    "first_name": "余明锋"
+                },
+                {
+                    "username": "zsrhrs-wh",
+                    "first_name": "魏欢"
+                },
+                {
+                    "username": "zsrhrs-st",
+                    "first_name": "商韬"
+                },
+                {
+                    "username": "zsrhrs-zy",
+                    "first_name": "钟钰"
+                },
+                {
+                    "username": "zsrhrs-lyn",
+                    "first_name": "梁雨楠"
+                },
+                {
+                    "username": "zsrhrs-yy",
+                    "first_name": "杨洋"
+                },
+                {
+                    "username": "zsrhrs-zyx",
+                    "first_name": "张艺馨"
+                },
+                {
+                    "username": "zsrhrs-ymj",
+                    "first_name": "叶珉杰"
+                },
+                {
+                    "username": "zsrhrs",
+                    "first_name": "招商仁和人寿"
+                }
+            ]
+        },
+        {
+            "org__id": 325,
+            "org__name": "中钨高新材料股份有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "zwgx-cr",
+                    "first_name": "陈蓉"
+                },
+                {
+                    "username": "zwgx-zhy",
+                    "first_name": "赵慧媛"
+                },
+                {
+                    "username": "zwgx-dy",
+                    "first_name": "丁莹"
+                },
+                {
+                    "username": "zwgx",
+                    "first_name": "中钨高新材料股份有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 358,
+            "org__name": "安徽省港航集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahghjt-weg",
+                    "first_name": "王恩国"
+                },
+                {
+                    "username": "ahghjt-lq",
+                    "first_name": "李潜"
+                },
+                {
+                    "username": "ahghjt",
+                    "first_name": "安徽港航集团"
+                }
+            ]
+        },
+        {
+            "org__id": 355,
+            "org__name": "皖北煤电集团有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "wbmd-zt",
+                    "first_name": "张涛"
+                },
+                {
+                    "username": "wbmd-wrz",
+                    "first_name": "汪润泽"
+                },
+                {
+                    "username": "wbmd",
+                    "first_name": "皖北煤电集团"
+                }
+            ]
+        },
+        {
+            "org__id": 331,
+            "org__name": "五矿稀土",
+            "user_sum": 7,
+            "user_list": [
+                {
+                    "username": "wkxt-wwp",
+                    "first_name": "王崴平"
+                },
+                {
+                    "username": "wkxt-zy",
+                    "first_name": "郑禹"
+                },
+                {
+                    "username": "wkxt-sq",
+                    "first_name": "尚倩"
+                },
+                {
+                    "username": "wkxt-xds",
+                    "first_name": "修德胜"
+                },
+                {
+                    "username": "wkxt-lfc",
+                    "first_name": "刘福超"
+                },
+                {
+                    "username": "wkxt-mjy",
+                    "first_name": "孟健寅"
+                },
+                {
+                    "username": "wkxt",
+                    "first_name": "五矿稀土"
+                }
+            ]
+        },
+        {
+            "org__id": 337,
+            "org__name": "长沙矿冶研究院有限责任公司环保技术研究所",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "hbjs-zlg",
+                    "first_name": "张立刚"
+                },
+                {
+                    "username": "hbjs-lw",
+                    "first_name": "李伟"
+                },
+                {
+                    "username": "hbjs",
+                    "first_name": "长沙矿冶研究院有限责任公司环保技术研究所"
+                }
+            ]
+        },
+        {
+            "org__id": 423,
+            "org__name": "国家能源集团甘肃电力有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "nygsgs-my",
+                    "first_name": "毛渊"
+                },
+                {
+                    "username": "nygsgs-yzf",
+                    "first_name": "姚占峰"
+                },
+                {
+                    "username": "nygsgs",
+                    "first_name": "国家能源集团甘肃电力有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 326,
+            "org__name": "湖南长远锂科股份有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "hncy-zyy",
+                    "first_name": "赵媛媛"
+                },
+                {
+                    "username": "hncy-lg",
+                    "first_name": "李刚"
+                },
+                {
+                    "username": "hncy-tb",
+                    "first_name": "谈波"
+                },
+                {
+                    "username": "hncy",
+                    "first_name": "湖南长远锂科股份有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 403,
+            "org__name": "神华准能集团有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "shznjt-szk",
+                    "first_name": "尚志坤"
+                },
+                {
+                    "username": "shznjt-czq",
+                    "first_name": "陈志强"
+                },
+                {
+                    "username": "shznjt",
+                    "first_name": "神华准能集团有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 332,
+            "org__name": "长沙矿冶研究院有限责任公司",
+            "user_sum": 17,
+            "user_list": [
+                {
+                    "username": "cskz-tj",
+                    "first_name": "汤婕"
+                },
+                {
+                    "username": "cskz-gyp",
+                    "first_name": "郭亚鹏"
+                },
+                {
+                    "username": "cskz-czq",
+                    "first_name": "曹志群"
+                },
+                {
+                    "username": "cskz-sj",
+                    "first_name": "孙军"
+                },
+                {
+                    "username": "cskz-lsk",
+                    "first_name": "刘寿康"
+                },
+                {
+                    "username": "cskz-gy",
+                    "first_name": "郭轶"
+                },
+                {
+                    "username": "cskz-lxj",
+                    "first_name": "李小静"
+                },
+                {
+                    "username": "cskz-oj",
+                    "first_name": "欧君"
+                },
+                {
+                    "username": "cskz-xdy",
+                    "first_name": "修大勇"
+                },
+                {
+                    "username": "cskz-ll",
+                    "first_name": "罗玲"
+                },
+                {
+                    "username": "cskz-lz",
+                    "first_name": "卢铮"
+                },
+                {
+                    "username": "cskz-lz1",
+                    "first_name": "李哲"
+                },
+                {
+                    "username": "cskz-yl",
+                    "first_name": "易峦"
+                },
+                {
+                    "username": "cskz-zy",
+                    "first_name": "周韫"
+                },
+                {
+                    "username": "cskz-xzj",
+                    "first_name": "徐志坚"
+                },
+                {
+                    "username": "cskz-qxn",
+                    "first_name": "屈小宁"
+                },
+                {
+                    "username": "cskz",
+                    "first_name": "长沙矿冶研究院有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 53,
+            "org__name": "中国石油天然气集团有限公司",
+            "user_sum": 20,
+            "user_list": [
+                {
+                    "username": "zgsy",
+                    "first_name": "中国石油"
+                },
+                {
+                    "username": "zgsy-zhl",
+                    "first_name": "张华林"
+                },
+                {
+                    "username": "zgsy-cfx",
+                    "first_name": "陈发晓"
+                },
+                {
+                    "username": "zgsy-hhy",
+                    "first_name": "郝鸿毅"
+                },
+                {
+                    "username": "zgsy-pt",
+                    "first_name": "潘涛"
+                },
+                {
+                    "username": "zgsy-wbc",
+                    "first_name": "王柏苍"
+                },
+                {
+                    "username": "zgsy-za",
+                    "first_name": "张安"
+                },
+                {
+                    "username": "zgsy-jy",
+                    "first_name": "靳烨"
+                },
+                {
+                    "username": "zgsy-tyc",
+                    "first_name": "唐廷川"
+                },
+                {
+                    "username": "zgsy-hxc",
+                    "first_name": "贺新春"
+                },
+                {
+                    "username": "zgsy-zjj",
+                    "first_name": "朱建军"
+                },
+                {
+                    "username": "zgsy-xp",
+                    "first_name": "许萍"
+                },
+                {
+                    "username": "zgsy-zz",
+                    "first_name": "张震"
+                },
+                {
+                    "username": "zgsy-wh",
+                    "first_name": "万宏"
+                },
+                {
+                    "username": "zgsy-xfs",
+                    "first_name": "徐凤生"
+                },
+                {
+                    "username": "zgsy-blq",
+                    "first_name": "包力庆"
+                },
+                {
+                    "username": "zgsy-cq",
+                    "first_name": "陈祺"
+                },
+                {
+                    "username": "zgsy-gzy",
+                    "first_name": "郭振宇"
+                },
+                {
+                    "username": "zgsy-yzm",
+                    "first_name": "杨兆明"
+                },
+                {
+                    "username": "zgsy-ycs",
+                    "first_name": "杨春生"
+                }
+            ]
+        },
+        {
+            "org__id": 381,
+            "org__name": "招商公路创新研究院",
+            "user_sum": 12,
+            "user_list": [
+                {
+                    "username": "zsgl-ygf",
+                    "first_name": "杨国峰"
+                },
+                {
+                    "username": "zsgl-yjg",
+                    "first_name": "杨建国"
+                },
+                {
+                    "username": "zsgl-zn",
+                    "first_name": "张娜"
+                },
+                {
+                    "username": "zsgl-qz",
+                    "first_name": "谯志"
+                },
+                {
+                    "username": "zsgl-jdh",
+                    "first_name": "姜德宏"
+                },
+                {
+                    "username": "zsgl-xh",
+                    "first_name": "徐华"
+                },
+                {
+                    "username": "zsgl-zj",
+                    "first_name": "赵今"
+                },
+                {
+                    "username": "zsgl-wlm",
+                    "first_name": "吴利明"
+                },
+                {
+                    "username": "zsgl-cd",
+                    "first_name": "常迪"
+                },
+                {
+                    "username": "zsgl-zyf",
+                    "first_name": "张一凡"
+                },
+                {
+                    "username": "zsgl-cy",
+                    "first_name": "陈雨"
+                },
+                {
+                    "username": "zsgl",
+                    "first_name": "招商公路"
+                }
+            ]
+        },
+        {
+            "org__id": 212,
+            "org__name": "中国航天科工集团有限公司",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "htkg",
+                    "first_name": "航天科工"
+                }
+            ]
+        },
+        {
+            "org__id": 265,
+            "org__name": "中国大唐科学技术研究院",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "dtkjy-wbf",
+                    "first_name": "吴宝富"
+                },
+                {
+                    "username": "dtkjy-znn",
+                    "first_name": "臧宁宁"
+                }
+            ]
+        },
+        {
+            "org__id": 104,
+            "org__name": "国投创新投资管理有限公司",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "gtyjs",
+                    "first_name": "国投政策研究室"
+                }
+            ]
+        },
+        {
+            "org__id": 322,
+            "org__name": "深圳市资本运营集团有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "szzbyy-xlp",
+                    "first_name": "徐腊平"
+                },
+                {
+                    "username": "szzbyy-shr",
+                    "first_name": "孙慧荣"
+                },
+                {
+                    "username": "szzbyy-cq",
+                    "first_name": "曹取"
+                },
+                {
+                    "username": "szzbyy-sxg",
+                    "first_name": "史学贵"
+                }
+            ]
+        },
+        {
+            "org__id": 276,
+            "org__name": "万家寨水务控股集团有限公司",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "wjzsw-wxm",
+                    "first_name": "王晓萌"
+                },
+                {
+                    "username": "wjzsw",
+                    "first_name": "万家寨水务"
+                }
+            ]
+        },
+        {
+            "org__id": 440,
+            "org__name": "国家能源国际工程公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gjgcgs",
+                    "first_name": "国家能源国际工程公司"
+                },
+                {
+                    "username": "gjgcgs-hsh",
+                    "first_name": "黄绍华"
+                },
+                {
+                    "username": "gjgcgs-lly",
+                    "first_name": "李乐一"
+                }
+            ]
+        },
+        {
+            "org__id": 416,
+            "org__name": "国家能源技术经济研究院",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "nyjjy-myl",
+                    "first_name": "毛亚林"
+                },
+                {
+                    "username": "nyjjy-shl",
+                    "first_name": "孙海林"
+                },
+                {
+                    "username": "nyjjy",
+                    "first_name": "国家能源技术经济研究院"
+                }
+            ]
+        },
+        {
+            "org__id": 279,
+            "org__name": "太原钢铁集团有限公司",
+            "user_sum": 7,
+            "user_list": [
+                {
+                    "username": "tygt",
+                    "first_name": "太原钢铁"
+                },
+                {
+                    "username": "tygt-njh",
+                    "first_name": "牛建红"
+                },
+                {
+                    "username": "tygt-lzq",
+                    "first_name": "李志强"
+                },
+                {
+                    "username": "tygt-csl",
+                    "first_name": "崔双龙"
+                },
+                {
+                    "username": "tygt-nws",
+                    "first_name": "宁武生"
+                },
+                {
+                    "username": "tygt-xlw",
+                    "first_name": "解利伟"
+                },
+                {
+                    "username": "tygt-zqm",
+                    "first_name": "张绮梦"
+                }
+            ]
+        },
+        {
+            "org__id": 410,
+            "org__name": "神皖能源有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "nyswny-wr",
+                    "first_name": "王荣"
+                },
+                {
+                    "username": "nyswny",
+                    "first_name": "神皖能源有限责任公司"
+                },
+                {
+                    "username": "nyswny-wy",
+                    "first_name": "王岩"
+                }
+            ]
+        },
+        {
+            "org__id": 368,
+            "org__name": "中煤矿山建设集团有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "zmks-pj",
+                    "first_name": "彭军"
+                },
+                {
+                    "username": "zmks-wxs",
+                    "first_name": "吴旭升"
+                },
+                {
+                    "username": "zmks",
+                    "first_name": "中煤矿山建设集团"
+                }
+            ]
+        },
+        {
+            "org__id": 319,
+            "org__name": "中国电科发展战略研究中心",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "zgdk-zdc",
+                    "first_name": "朱德成"
+                },
+                {
+                    "username": "zgdk-hww",
+                    "first_name": "胡微微"
+                },
+                {
+                    "username": "zgdkyjzx",
+                    "first_name": "电科发展战略研究中心"
+                }
+            ]
+        },
+        {
+            "org__id": 406,
+            "org__name": "神华新疆能源有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "xjny-qt",
+                    "first_name": "漆涛"
+                },
+                {
+                    "username": "xjny-yrb",
+                    "first_name": " 闫瑞兵 "
+                },
+                {
+                    "username": "xjny",
+                    "first_name": "神华新疆能源有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 367,
+            "org__name": "安徽省皖中集团有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahwz-wgy",
+                    "first_name": "汪国友"
+                },
+                {
+                    "username": "ahwz-ghb",
+                    "first_name": "葛韩斌"
+                },
+                {
+                    "username": "ahwz",
+                    "first_name": "安徽皖中集团"
+                }
+            ]
+        },
+        {
+            "org__id": 347,
+            "org__name": "安徽省能源集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahny-lh",
+                    "first_name": "卢浩"
+                },
+                {
+                    "username": "ahny-gyp",
+                    "first_name": "高一鹏"
+                },
+                {
+                    "username": "ahny",
+                    "first_name": "安徽能源集团"
+                }
+            ]
+        },
+        {
+            "org__id": 227,
+            "org__name": "山西省国资委",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "sxgzw",
+                    "first_name": "山西省国资委"
+                },
+                {
+                    "username": "sxgzw-djb",
+                    "first_name": "董建斌"
+                },
+                {
+                    "username": "sxgzw-hxx",
+                    "first_name": "霍晓鑫"
+                },
+                {
+                    "username": "sxgzw-zk",
+                    "first_name": "张凯"
+                }
+            ]
+        },
+        {
+            "org__id": 412,
+            "org__name": "国家能源集团朔黄铁路",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "nyshtl-xzh",
+                    "first_name": "薛振华"
+                },
+                {
+                    "username": "nyshtl-lrh",
+                    "first_name": "李若涵"
+                },
+                {
+                    "username": "nyshtl",
+                    "first_name": "国家能源集团朔黄铁路"
+                }
+            ]
+        },
+        {
+            "org__id": 449,
+            "org__name": "工业经济研究中心",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "gyjjzx",
+                    "first_name": "工业经济研究中心"
+                },
+                {
+                    "username": "gyjjzx-lxb",
+                    "first_name": "刘兴波"
+                },
+                {
+                    "username": "gyjjzx-spl",
+                    "first_name": "施鹏丽"
+                },
+                {
+                    "username": "gyjjzx-zzf",
+                    "first_name": "周忠锋"
+                },
+                {
+                    "username": "gyjjzx-by",
+                    "first_name": "白云"
+                },
+                {
+                    "username": "gyjjzx-xk",
+                    "first_name": "向坤"
+                }
+            ]
+        },
+        {
+            "org__id": 215,
+            "org__name": "中国石油化工集团有限公司",
+            "user_sum": 15,
+            "user_list": [
+                {
+                    "username": "zgsh",
+                    "first_name": "中国石化"
+                },
+                {
+                    "username": "zgsh-zys",
+                    "first_name": "赵元生"
+                },
+                {
+                    "username": "zgsh-wyl",
+                    "first_name": "吴越磊"
+                },
+                {
+                    "username": "zgsh-ww",
+                    "first_name": "王威"
+                },
+                {
+                    "username": "zgsh-pz",
+                    "first_name": "潘喆"
+                },
+                {
+                    "username": "zgsh-wym",
+                    "first_name": "王一鸣"
+                },
+                {
+                    "username": "zgsh-zj",
+                    "first_name": "张钧"
+                },
+                {
+                    "username": "zgsh-zcl",
+                    "first_name": "张财陆"
+                },
+                {
+                    "username": "zgsh-lz",
+                    "first_name": "李志"
+                },
+                {
+                    "username": "zgsh-lhx",
+                    "first_name": "栾和新"
+                },
+                {
+                    "username": "zgsh-tzm",
+                    "first_name": "田治明"
+                },
+                {
+                    "username": "zgsh-xzs",
+                    "first_name": "徐正师"
+                },
+                {
+                    "username": "zgsh-mgy",
+                    "first_name": "马国云"
+                },
+                {
+                    "username": "zgsh-pgl",
+                    "first_name": "皮光林"
+                },
+                {
+                    "username": "zgsh-ljr",
+                    "first_name": "李佳润"
+                }
+            ]
+        },
+        {
+            "org__id": 428,
+            "org__name": "中国国电集团有限公司海南分公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gdhnfgs-jxh",
+                    "first_name": " 姜学洪"
+                },
+                {
+                    "username": "gdhnfgs-lg",
+                    "first_name": "李刚"
+                },
+                {
+                    "username": "gdhnfgs",
+                    "first_name": "中国国电集团有限公司海南分公司"
+                }
+            ]
+        },
+        {
+            "org__id": 334,
+            "org__name": "长沙矿冶研究院有限责任公司海洋矿产资源开发利用技术研究所",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "hykc-mgt",
+                    "first_name": "毛桂庭"
+                },
+                {
+                    "username": "hykc-zx",
+                    "first_name": "曾轩"
+                },
+                {
+                    "username": "hykc-wqq",
+                    "first_name": "王琼琼"
+                },
+                {
+                    "username": "hykc",
+                    "first_name": "长沙矿冶研究院有限责任公司海洋矿产资源开发利用技术研究所"
+                }
+            ]
+        },
+        {
+            "org__id": 411,
+            "org__name": "国电江西电力有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gdjxgs-hqh",
+                    "first_name": "胡奇华"
+                },
+                {
+                    "username": "gdjxgs-wxq",
+                    "first_name": "王晓庆"
+                },
+                {
+                    "username": "gdjxgs",
+                    "first_name": "国电江西电力有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 371,
+            "org__name": "安徽省盐业投资控股集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahyytz-ozr",
+                    "first_name": "偶自如"
+                },
+                {
+                    "username": "ahyytz-dxy",
+                    "first_name": "杜欣宇"
+                },
+                {
+                    "username": "ahyytz",
+                    "first_name": "安徽盐业投资控股集团"
+                }
+            ]
+        },
+        {
+            "org__id": 384,
+            "org__name": "招商局工业集团产业发展研究中心",
+            "user_sum": 5,
+            "user_list": [
+                {
+                    "username": "zsgyjt-lwj",
+                    "first_name": "罗文臣"
+                },
+                {
+                    "username": "zsgyjt-xxf",
+                    "first_name": "徐小飞"
+                },
+                {
+                    "username": "zsgyjt-zj",
+                    "first_name": "张晶"
+                },
+                {
+                    "username": "zsgyjt-zjh",
+                    "first_name": "邹佳辉"
+                },
+                {
+                    "username": "zsgyjt",
+                    "first_name": "招商局工业集团"
+                }
+            ]
+        },
+        {
+            "org__id": 228,
+            "org__name": "浙江省国资委",
+            "user_sum": 7,
+            "user_list": [
+                {
+                    "username": "zjgzw",
+                    "first_name": "浙江省国资委"
+                },
+                {
+                    "username": "zjgzw-wly",
+                    "first_name": "万力源"
+                },
+                {
+                    "username": "zjgzw-ygy",
+                    "first_name": "叶根英"
+                },
+                {
+                    "username": "zjgzw-plj",
+                    "first_name": "潘礼军"
+                },
+                {
+                    "username": "zjgzw-jzm",
+                    "first_name": "姜钲苗"
+                },
+                {
+                    "username": "zjgzw-yjj",
+                    "first_name": "叶剑俊"
+                },
+                {
+                    "username": "zjgzw-lhl",
+                    "first_name": "李会兰"
+                }
+            ]
+        },
+        {
+            "org__id": 378,
+            "org__name": "辽宁港口集团",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "lngk-djh",
+                    "first_name": "丁金辉"
+                },
+                {
+                    "username": "lngk-myj",
+                    "first_name": "马怡济"
+                },
+                {
+                    "username": "lngk-ccy",
+                    "first_name": "曹春晖"
+                },
+                {
+                    "username": "lngk",
+                    "first_name": "辽宁港口"
+                }
+            ]
+        },
+        {
+            "org__id": 351,
+            "org__name": "安徽省投资集团控股有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahtz-lxr",
+                    "first_name": "梁欣然"
+                },
+                {
+                    "username": "ahtz",
+                    "first_name": "安徽投资集团"
+                },
+                {
+                    "username": "ahtz-wn",
+                    "first_name": "王娜"
+                }
+            ]
+        },
+        {
+            "org__id": 209,
+            "org__name": "中国五矿集团有限公司",
+            "user_sum": 54,
+            "user_list": [
+                {
+                    "username": "zgwk",
+                    "first_name": "中国五矿"
+                },
+                {
+                    "username": "zgwk-jzf",
+                    "first_name": "金志峰"
+                },
+                {
+                    "username": "zgwk-zf",
+                    "first_name": "周枫"
+                },
+                {
+                    "username": "zgwk-cnn",
+                    "first_name": "崔楠楠"
+                },
+                {
+                    "username": "zgwk-zhj",
+                    "first_name": "郑宏军"
+                },
+                {
+                    "username": "zgwk-xth",
+                    "first_name": "徐天昊"
+                },
+                {
+                    "username": "zgwk-lxj",
+                    "first_name": "李晓杰"
+                },
+                {
+                    "username": "zgwk-wxy",
+                    "first_name": "王晓媛"
+                },
+                {
+                    "username": "zgwk-zg",
+                    "first_name": "左更"
+                },
+                {
+                    "username": "zgwk-cjq",
+                    "first_name": "陈俊全"
+                },
+                {
+                    "username": "zgwk-cq",
+                    "first_name": "陈琦"
+                },
+                {
+                    "username": "zgwk-zcl",
+                    "first_name": "张从丽"
+                },
+                {
+                    "username": "zgwk-sy",
+                    "first_name": "孙轶"
+                },
+                {
+                    "username": "zgwk-srf",
+                    "first_name": "孙荣飞"
+                },
+                {
+                    "username": "zgwk-wzq",
+                    "first_name": "王之泉"
+                },
+                {
+                    "username": "zgwk-wm",
+                    "first_name": "王玛"
+                },
+                {
+                    "username": "zgwk-lzm",
+                    "first_name": "刘志梅"
+                },
+                {
+                    "username": "zgwk-wwh",
+                    "first_name": "王文海"
+                },
+                {
+                    "username": "zgwk-wyl",
+                    "first_name": "王云林"
+                },
+                {
+                    "username": "zgwk-zz",
+                    "first_name": "张振"
+                },
+                {
+                    "username": "zgwk-zy",
+                    "first_name": "朱玉"
+                },
+                {
+                    "username": "zgwk-gpj",
+                    "first_name": "高培峻"
+                },
+                {
+                    "username": "zgwk-lxs",
+                    "first_name": "李勋山"
+                },
+                {
+                    "username": "zgwk-zmm",
+                    "first_name": "张萌萌"
+                },
+                {
+                    "username": "zgwk-lq",
+                    "first_name": "罗琦"
+                },
+                {
+                    "username": "zgwk-lty",
+                    "first_name": "李泰阳"
+                },
+                {
+                    "username": "zgwk-db",
+                    "first_name": "杜博"
+                },
+                {
+                    "username": "zgwk-whl",
+                    "first_name": "王华力"
+                },
+                {
+                    "username": "zgwk-wpf",
+                    "first_name": "吴鹏飞"
+                },
+                {
+                    "username": "zgwk-qht",
+                    "first_name": "钱洪涛"
+                },
+                {
+                    "username": "zgwk-zjp",
+                    "first_name": "朱积平"
+                },
+                {
+                    "username": "zgwk-sty",
+                    "first_name": "石彤阳"
+                },
+                {
+                    "username": "zgwk-zy1",
+                    "first_name": "张晔"
+                },
+                {
+                    "username": "zgwk-lzr",
+                    "first_name": "张珍荣"
+                },
+                {
+                    "username": "zgwk-lf",
+                    "first_name": "刘烽"
+                },
+                {
+                    "username": "zgwk-ml",
+                    "first_name": "孟霖"
+                },
+                {
+                    "username": "zgwk-xzm",
+                    "first_name": "辛梓萌"
+                },
+                {
+                    "username": "zgwk-cxy",
+                    "first_name": "曹修运"
+                },
+                {
+                    "username": "zgwk-hgp",
+                    "first_name": "黄国平"
+                },
+                {
+                    "username": "zgwk-xjx",
+                    "first_name": "谢继祥"
+                },
+                {
+                    "username": "zgwk-wjy",
+                    "first_name": "文建元"
+                },
+                {
+                    "username": "zgwk-njk",
+                    "first_name": "牛井坤"
+                },
+                {
+                    "username": "zgwk-dcp",
+                    "first_name": "邓楚平"
+                },
+                {
+                    "username": "zgwk-rjh",
+                    "first_name": "任建华"
+                },
+                {
+                    "username": "zgwk-ly",
+                    "first_name": "刘毅"
+                },
+                {
+                    "username": "zgwk-ylj",
+                    "first_name": "闫立军"
+                },
+                {
+                    "username": "zgwk-yjy",
+                    "first_name": "闫嘉有"
+                },
+                {
+                    "username": "zgwk-dww",
+                    "first_name": "杜维吾"
+                },
+                {
+                    "username": "zgwk-wsz",
+                    "first_name": "吴世忠"
+                },
+                {
+                    "username": "zgwk-hxl",
+                    "first_name": "何小丽"
+                },
+                {
+                    "username": "zgwk-jsx",
+                    "first_name": "姜世雄"
+                },
+                {
+                    "username": "zgwk-txj",
+                    "first_name": "唐小金"
+                },
+                {
+                    "username": "zgwk-wlx",
+                    "first_name": "吴立宪"
+                },
+                {
+                    "username": "zgwk-cx",
+                    "first_name": "陈曦"
+                }
+            ]
+        },
+        {
+            "org__id": 430,
+            "org__name": "中国国电集团有限公司西藏分公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gdxzgs-hx",
+                    "first_name": "黄鑫"
+                },
+                {
+                    "username": "gdxzgs-xxy",
+                    "first_name": "徐鑫宇"
+                },
+                {
+                    "username": "gdxzgs",
+                    "first_name": "中国国电集团有限公司西藏分公司"
+                }
+            ]
+        },
+        {
+            "org__id": 230,
+            "org__name": "安徽省国资委",
+            "user_sum": 16,
+            "user_list": [
+                {
+                    "username": "ahgzw",
+                    "first_name": "安徽省国资委"
+                },
+                {
+                    "username": "ahgzw-lz",
+                    "first_name": "李中"
+                },
+                {
+                    "username": "ahgzw-ycb",
+                    "first_name": "叶传柏"
+                },
+                {
+                    "username": "ahgzw-cf",
+                    "first_name": "陈方"
+                },
+                {
+                    "username": "ahgzw-ydp",
+                    "first_name": "杨东坡"
+                },
+                {
+                    "username": "ahgzw-hg",
+                    "first_name": "黄干"
+                },
+                {
+                    "username": "ahgzw-dyq",
+                    "first_name": "董亚庆"
+                },
+                {
+                    "username": "ahgzw-zcy",
+                    "first_name": "郑成雨"
+                },
+                {
+                    "username": "ahgzw-wjy",
+                    "first_name": "王近元"
+                },
+                {
+                    "username": "ahgzw-tgq",
+                    "first_name": "陶国群"
+                },
+                {
+                    "username": "ahgzw-dh",
+                    "first_name": "段海"
+                },
+                {
+                    "username": "ahgzw-wxx",
+                    "first_name": "完小夏"
+                },
+                {
+                    "username": "ahgzw-ly",
+                    "first_name": "李越"
+                },
+                {
+                    "username": "ahgzw-xch",
+                    "first_name": "许朝晖"
+                },
+                {
+                    "username": "ahgzw-zw",
+                    "first_name": "周威"
+                },
+                {
+                    "username": "ahgzw-sxb",
+                    "first_name": "孙小博"
+                }
+            ]
+        },
+        {
+            "org__id": 208,
+            "org__name": "南方电网能源发展研究院有限责任公司",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "nwnyy",
+                    "first_name": "南网能源院"
+                }
+            ]
+        },
+        {
+            "org__id": 393,
+            "org__name": "中节能衡准科技服务（北京）有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "zjnhz-gh",
+                    "first_name": "葛慧"
+                },
+                {
+                    "username": "zjnhz-bhc",
+                    "first_name": "白红春"
+                },
+                {
+                    "username": "zjnhz-yxc",
+                    "first_name": "姚晓春"
+                },
+                {
+                    "username": "zjnhz",
+                    "first_name": "中节能衡准"
+                }
+            ]
+        },
+        {
+            "org__id": 221,
+            "org__name": "中国中车集团有限公司",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "zgzcjt",
+                    "first_name": "中国中车集团"
+                }
+            ]
+        },
+        {
+            "org__id": 231,
+            "org__name": "河南省国资委",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "hengzw",
+                    "first_name": "河南省国资委"
+                },
+                {
+                    "username": "hengzw-hx",
+                    "first_name": "郝翔"
+                },
+                {
+                    "username": "hengzw-lxj",
+                    "first_name": "李选杰"
+                },
+                {
+                    "username": "hengzw-dn",
+                    "first_name": "丁宁"
+                },
+                {
+                    "username": "hengzw-xy",
+                    "first_name": "夏雨"
+                },
+                {
+                    "username": "hengzw-gjb",
+                    "first_name": "耿佳宝"
+                }
+            ]
+        },
+        {
+            "org__id": 38,
+            "org__name": "国资委研究中心",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "gzwyjzx",
+                    "first_name": "国资委研究中心"
+                }
+            ]
+        },
+        {
+            "org__id": 377,
+            "org__name": "中白工业园区开发股份有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "zbgy-wp",
+                    "first_name": "吴鹏"
+                },
+                {
+                    "username": "zbgy-xxd",
+                    "first_name": "信晓东"
+                },
+                {
+                    "username": "zbgy",
+                    "first_name": "中白工业"
+                }
+            ]
+        },
+        {
+            "org__id": 328,
+            "org__name": "中国冶金科工集团",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "yjkg-ls",
+                    "first_name": "李姝"
+                },
+                {
+                    "username": "yjkg-sxq",
+                    "first_name": "宋肖青"
+                },
+                {
+                    "username": "yjkg-lzp",
+                    "first_name": "刘泽平"
+                },
+                {
+                    "username": "yjkg",
+                    "first_name": "中国冶金科工集团"
+                }
+            ]
+        },
+        {
+            "org__id": 439,
+            "org__name": "国电置业有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gdzygs-wh",
+                    "first_name": "吴昊"
+                },
+                {
+                    "username": "gdzygs-crf",
+                    "first_name": "陈如福"
+                },
+                {
+                    "username": "gdzygs",
+                    "first_name": "国电置业有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 413,
+            "org__name": "国家能源集团新朔铁路公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "nyxstl-why",
+                    "first_name": "王宏宇"
+                },
+                {
+                    "username": "nyxstl-hw",
+                    "first_name": "郝伟"
+                },
+                {
+                    "username": "nyxstl",
+                    "first_name": "国家能源集团新朔铁路公司"
+                }
+            ]
+        },
+        {
+            "org__id": 379,
+            "org__name": "招商港口集团股份有限公司",
+            "user_sum": 5,
+            "user_list": [
+                {
+                    "username": "zsgk-xqq",
+                    "first_name": "徐青青"
+                },
+                {
+                    "username": "zsgk-dhy",
+                    "first_name": "邓贺赢"
+                },
+                {
+                    "username": "zsgk-zjj",
+                    "first_name": "朱俊杰"
+                },
+                {
+                    "username": "zsgk-zxl",
+                    "first_name": "左晓露"
+                },
+                {
+                    "username": "zsgk",
+                    "first_name": "招商港口"
+                }
+            ]
+        },
+        {
+            "org__id": 162,
+            "org__name": "中国工业经济联合会",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "zggjl",
+                    "first_name": "中国工业经济联合会"
+                }
+            ]
+        },
+        {
+            "org__id": 11,
+            "org__name": "中国宝武钢铁集团有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "zgbw",
+                    "first_name": " 中国宝武"
+                },
+                {
+                    "username": "zgbw-fah",
+                    "first_name": "冯爱华"
+                },
+                {
+                    "username": "zgbw-wbz",
+                    "first_name": "吴蓓珠"
+                },
+                {
+                    "username": "zgbw-fmf",
+                    "first_name": "冯茂芬"
+                }
+            ]
+        },
+        {
+            "org__id": 219,
+            "org__name": "中国诚通控股集团有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "zgct",
+                    "first_name": "中国诚通"
+                },
+                {
+                    "username": "zgct-sj",
+                    "first_name": "索嘉"
+                },
+                {
+                    "username": "zgct-sx",
+                    "first_name": "隋莘"
+                },
+                {
+                    "username": "zgct-lj",
+                    "first_name": "罗骥"
+                }
+            ]
+        },
+        {
+            "org__id": 237,
+            "org__name": "山东省国资委",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "sdsgzw",
+                    "first_name": "山东省国资委"
+                }
+            ]
+        },
+        {
+            "org__id": 391,
+            "org__name": "国网英大集团",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "gwyd-wj",
+                    "first_name": "吴洁"
+                },
+                {
+                    "username": "gwyd-lz",
+                    "first_name": "刘真"
+                }
+            ]
+        },
+        {
+            "org__id": 392,
+            "org__name": "国网党校（管理学院）知识中心",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "gwdx-lyt",
+                    "first_name": "娄雅婷"
+                },
+                {
+                    "username": "gwdx",
+                    "first_name": "国网党校"
+                }
+            ]
+        },
+        {
+            "org__id": 223,
+            "org__name": "中国冶金地质总局",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "yjdzzj",
+                    "first_name": "冶金地质总局"
+                },
+                {
+                    "username": "yjdzzj-cw",
+                    "first_name": "陈伟"
+                },
+                {
+                    "username": "yjdzzj-sjp",
+                    "first_name": "孙京平"
+                }
+            ]
+        },
+        {
+            "org__id": 447,
+            "org__name": "新能源技术研究院",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "xnyjyy-fyc",
+                    "first_name": "付延春"
+                },
+                {
+                    "username": "xnyjyy-qzk",
+                    "first_name": "曲宗凯"
+                },
+                {
+                    "username": "xnyjyy",
+                    "first_name": "新能源技术研究院"
+                }
+            ]
+        },
+        {
+            "org__id": 421,
+            "org__name": "国电广西电力有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "gdgxgs-tyl",
+                    "first_name": "唐有亮"
+                },
+                {
+                    "username": "gdgxgs-jwx",
+                    "first_name": "金万鑫"
+                },
+                {
+                    "username": "gdgxgs-ws",
+                    "first_name": "韦诗"
+                },
+                {
+                    "username": "gdgxgs",
+                    "first_name": "国电广西电力有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 233,
+            "org__name": "中国社科院大学经济学院",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "jjxy-gws",
+                    "first_name": "高文书"
+                },
+                {
+                    "username": "jjxy-zds",
+                    "first_name": "钟德寿"
+                },
+                {
+                    "username": "jjxy-lsq",
+                    "first_name": "李石强"
+                },
+                {
+                    "username": "jjxy-hh",
+                    "first_name": "何辉"
+                },
+                {
+                    "username": "jjxy-dzc",
+                    "first_name": "杜振财"
+                },
+                {
+                    "username": "jjxy-www",
+                    "first_name": "王微微"
+                }
+            ]
+        },
+        {
+            "org__id": 452,
+            "org__name": "河南省企业管理研究所",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "hnqgs-gyj",
+                    "first_name": "郜永军"
+                },
+                {
+                    "username": "hnqgs-wyl",
+                    "first_name": "王彦利"
+                },
+                {
+                    "username": "hnqgs",
+                    "first_name": "河南省企管所"
+                }
+            ]
+        },
+        {
+            "org__id": 19,
+            "org__name": "中国建材集团有限公司",
+            "user_sum": 10,
+            "user_list": [
+                {
+                    "username": "zgjc",
+                    "first_name": "中国建材"
+                },
+                {
+                    "username": "zgjc-gzp",
+                    "first_name": "干志平"
+                },
+                {
+                    "username": "zgjc-jx",
+                    "first_name": "金星"
+                },
+                {
+                    "username": "zgjc-nzh",
+                    "first_name": "牛振华"
+                },
+                {
+                    "username": "zgjc-syj",
+                    "first_name": "司艳杰"
+                },
+                {
+                    "username": "zgjc-dq",
+                    "first_name": "丁泉"
+                },
+                {
+                    "username": "zgjc-tzx",
+                    "first_name": "田子骁"
+                },
+                {
+                    "username": "zgjc-wy",
+                    "first_name": "王宇"
+                },
+                {
+                    "username": "zgjc-rzc",
+                    "first_name": "任振城"
+                },
+                {
+                    "username": "zgjc-whx",
+                    "first_name": "汪慧珣"
+                }
+            ]
+        },
+        {
+            "org__id": 399,
+            "org__name": "国华电力公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ghdl-zdz",
+                    "first_name": "张德珍"
+                },
+                {
+                    "username": "ghdl-jc",
+                    "first_name": "贾超"
+                },
+                {
+                    "username": "ghdl",
+                    "first_name": "国华电力公司"
+                }
+            ]
+        },
+        {
+            "org__id": 408,
+            "org__name": "国家能源集团江苏电力有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "nyjsgs-pys",
+                    "first_name": "潘玉松"
+                },
+                {
+                    "username": "nyjsgs-qy",
+                    "first_name": "秦宇"
+                },
+                {
+                    "username": "nyjsgs",
+                    "first_name": "国家能源集团江苏电力有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 163,
+            "org__name": "上海市国资委",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "shgzw",
+                    "first_name": "上海市国资委"
+                },
+                {
+                    "username": "shgzw-wy",
+                    "first_name": "汪莹"
+                },
+                {
+                    "username": "shgzw-wj",
+                    "first_name": "吴佳"
+                },
+                {
+                    "username": "shgzw-cxq",
+                    "first_name": "陈谐晴"
+                },
+                {
+                    "username": "shgzw-qq",
+                    "first_name": "漆琪"
+                },
+                {
+                    "username": "shgzw-zc",
+                    "first_name": "赵晨"
+                }
+            ]
+        },
+        {
+            "org__id": 280,
+            "org__name": "山西杏花村汾酒集团有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "sxfj",
+                    "first_name": "汾酒集团"
+                },
+                {
+                    "username": "sxfj-fbl",
+                    "first_name": "樊宝玲"
+                },
+                {
+                    "username": "sxfj-wxx",
+                    "first_name": "王笑笑"
+                }
+            ]
+        },
+        {
+            "org__id": 345,
+            "org__name": "五矿资产经营管理有限公司",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "wkzc-wz",
+                    "first_name": "王峥"
+                },
+                {
+                    "username": "wkzc",
+                    "first_name": "五矿资产经营管理有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 395,
+            "org__name": "国电电力发展股份有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "gddl-cmj",
+                    "first_name": "崔明军"
+                },
+                {
+                    "username": "gddl-zsw",
+                    "first_name": "张思文"
+                },
+                {
+                    "username": "gddl",
+                    "first_name": "国电电力发展股份有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 427,
+            "org__name": "中国国电集团有限公司湖南分公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "gdhngs-td",
+                    "first_name": "佟丹"
+                },
+                {
+                    "username": "gdhngs-lzy",
+                    "first_name": "李志勇"
+                },
+                {
+                    "username": "gdhngs-hql",
+                    "first_name": "胡倩琳"
+                },
+                {
+                    "username": "gdhngs",
+                    "first_name": "中国国电集团有限公司湖南分公司"
+                }
+            ]
+        },
+        {
+            "org__id": 311,
+            "org__name": "福建省国资学会",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "fjgzxh-gjp",
+                    "first_name": "郭江平"
+                },
+                {
+                    "username": "fjgzxh-cyr",
+                    "first_name": "陈雅蓉"
+                },
+                {
+                    "username": "fjgzxh",
+                    "first_name": "福建省国资学会"
+                }
+            ]
+        },
+        {
+            "org__id": 372,
+            "org__name": "安徽淮海实业发展集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahhhsy-ldh",
+                    "first_name": "卢殿华"
+                },
+                {
+                    "username": "ahhhsy-zdw",
+                    "first_name": "张大伟"
+                },
+                {
+                    "username": "ahhhsy",
+                    "first_name": "安徽淮海实业发展集团"
+                }
+            ]
+        },
+        {
+            "org__id": 305,
+            "org__name": "北京水木现代国有企业研究院",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "smxd",
+                    "first_name": "北京国有企业研究院"
+                }
+            ]
+        },
+        {
+            "org__id": 455,
+            "org__name": "航天科工二院",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "htkg2-wxw",
+                    "first_name": "王希望"
+                },
+                {
+                    "username": "htkg2-wfc",
+                    "first_name": "王丰潮"
+                },
+                {
+                    "username": "htkg2-lch",
+                    "first_name": "罗朝晖"
+                },
+                {
+                    "username": "htkg2",
+                    "first_name": "航天科工二院"
+                }
+            ]
+        },
+        {
+            "org__id": 457,
+            "org__name": "中国航天科工三院",
+            "user_sum": 8,
+            "user_list": [
+                {
+                    "username": "htkg3-jcy",
+                    "first_name": "焦成洋"
+                },
+                {
+                    "username": "htkg3-zzh",
+                    "first_name": "章芝红"
+                },
+                {
+                    "username": "htkg3-cwh",
+                    "first_name": "柴伟恒"
+                },
+                {
+                    "username": "htkg3-wyj",
+                    "first_name": "王元吉"
+                },
+                {
+                    "username": "htkg3-lm",
+                    "first_name": "刘铭"
+                },
+                {
+                    "username": "htkg3-wsm",
+                    "first_name": "王绍旻"
+                },
+                {
+                    "username": "htkg3-lhy",
+                    "first_name": "刘华英"
+                },
+                {
+                    "username": "htkg3",
+                    "first_name": "航天科工三院"
+                }
+            ]
+        },
+        {
+            "org__id": 3,
+            "org__name": "国资委综合研究局",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "cszh",
+                    "first_name": "测试专用"
+                },
+                {
+                    "username": "gzwyjj",
+                    "first_name": "国资委综合研究局"
+                },
+                {
+                    "username": "gzwgly",
+                    "first_name": "国资委管理员"
+                }
+            ]
+        },
+        {
+            "org__id": 207,
+            "org__name": "中国石化集团经济技术研究院有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "zshjjjsy",
+                    "first_name": "中石化经济技术院"
+                },
+                {
+                    "username": "zgshjyy-lzn",
+                    "first_name": "罗佐县"
+                },
+                {
+                    "username": "zgshjyy-cdn",
+                    "first_name": "陈丹妮"
+                }
+            ]
+        },
+        {
+            "org__id": 229,
+            "org__name": "福建省国资委",
+            "user_sum": 5,
+            "user_list": [
+                {
+                    "username": "fjgzw",
+                    "first_name": "福建省国资委"
+                },
+                {
+                    "username": "fjgzw-hyk",
+                    "first_name": "何炎坤"
+                },
+                {
+                    "username": "fjgzw-mh",
+                    "first_name": "孟虹"
+                },
+                {
+                    "username": "fjgzw-xyf",
+                    "first_name": "肖云飞"
+                },
+                {
+                    "username": "fjgzw-wjd",
+                    "first_name": "吴竞东"
+                }
+            ]
+        },
+        {
+            "org__id": 329,
+            "org__name": "五矿有色股份有限公司",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "wkys-zhe",
+                    "first_name": "左豪恩"
+                },
+                {
+                    "username": "wkys",
+                    "first_name": "五矿有色股份有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 437,
+            "org__name": "神华财务有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "shcwgs-wy",
+                    "first_name": "王颖"
+                },
+                {
+                    "username": "shcwgs-jh",
+                    "first_name": "姜华"
+                },
+                {
+                    "username": "shcwgs",
+                    "first_name": "神华财务有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 422,
+            "org__name": "国电内蒙古电力有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "nmgdl-zyh",
+                    "first_name": "赵玉河"
+                },
+                {
+                    "username": "nmgdl-lw",
+                    "first_name": "李伟"
+                },
+                {
+                    "username": "nmgdl",
+                    "first_name": "国电内蒙古电力有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 390,
+            "org__name": "招商租赁",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "zszl-cc",
+                    "first_name": "陈诚"
+                },
+                {
+                    "username": "zszl-by",
+                    "first_name": "毕杨"
+                },
+                {
+                    "username": "zszl-lr",
+                    "first_name": "李睿"
+                },
+                {
+                    "username": "zszl",
+                    "first_name": "招商租赁"
+                }
+            ]
+        },
+        {
+            "org__id": 61,
+            "org__name": "中国大连高级经理学院",
+            "user_sum": 36,
+            "user_list": [
+                {
+                    "username": "dljlxy",
+                    "first_name": "大连经理学院"
+                },
+                {
+                    "username": "dljlxy-ddh",
+                    "first_name": "董大海"
+                },
+                {
+                    "username": "dljlxy-zp",
+                    "first_name": "张攀"
+                },
+                {
+                    "username": "dljlxy-czd",
+                    "first_name": "陈占夺"
+                },
+                {
+                    "username": "dljlxy-yzw",
+                    "first_name": "杨智伟"
+                },
+                {
+                    "username": "dljlxy-zq",
+                    "first_name": "赵庆"
+                },
+                {
+                    "username": "dljlxy-lyj",
+                    "first_name": "刘雅娇"
+                },
+                {
+                    "username": "dljlxy-zx",
+                    "first_name": "张欣"
+                },
+                {
+                    "username": "dljlxy-wx",
+                    "first_name": "王晓"
+                },
+                {
+                    "username": "dljlxy-jxx",
+                    "first_name": "季晓旭"
+                },
+                {
+                    "username": "dljlxy-fxf",
+                    "first_name": "冯雪飞"
+                },
+                {
+                    "username": "dljlxy-hrb",
+                    "first_name": "胡润波"
+                },
+                {
+                    "username": "dljlxy-kyh",
+                    "first_name": "康宇航"
+                },
+                {
+                    "username": "dljlxy-xq",
+                    "first_name": "徐茜"
+                },
+                {
+                    "username": "dljlxy-mdm",
+                    "first_name": "马大明"
+                },
+                {
+                    "username": "dljlxy-gss",
+                    "first_name": "桂树森"
+                },
+                {
+                    "username": "dljlxy-ych",
+                    "first_name": "于长宏"
+                },
+                {
+                    "username": "dljlxy-dn",
+                    "first_name": "杜楠"
+                },
+                {
+                    "username": "dljlxy-syy",
+                    "first_name": "孙源远"
+                },
+                {
+                    "username": "dljlxy-gjj",
+                    "first_name": "葛晶晶"
+                },
+                {
+                    "username": "dljlxy-bq",
+                    "first_name": "步琼"
+                },
+                {
+                    "username": "dljlxy-raj",
+                    "first_name": "冉爱晶"
+                },
+                {
+                    "username": "dljlxy-wc",
+                    "first_name": "王闯"
+                },
+                {
+                    "username": "dljlxy-my",
+                    "first_name": " 门宇 "
+                },
+                {
+                    "username": "dljlxy-lzp",
+                    "first_name": "李作鹏"
+                },
+                {
+                    "username": "dljlxy-lz",
+                    "first_name": "林芝"
+                },
+                {
+                    "username": "dljlxy-lh",
+                    "first_name": "李弘"
+                },
+                {
+                    "username": "dljlxy-yf",
+                    "first_name": "袁帆"
+                },
+                {
+                    "username": "dljlxy-xxw",
+                    "first_name": "徐秀文"
+                },
+                {
+                    "username": "dljlxy-zb",
+                    "first_name": "张博"
+                },
+                {
+                    "username": "dljlxy-wdg",
+                    "first_name": "王大刚"
+                },
+                {
+                    "username": "dljlxy-lxj",
+                    "first_name": "刘晓军"
+                },
+                {
+                    "username": "dljlxy-yl",
+                    "first_name": "杨玲"
+                },
+                {
+                    "username": "dljlxy-yhy",
+                    "first_name": "于浩洋"
+                },
+                {
+                    "username": "dljlxy-whj",
+                    "first_name": "王慧军"
+                },
+                {
+                    "username": "dljlxy-ym",
+                    "first_name": "于米"
+                }
+            ]
+        },
+        {
+            "org__id": 220,
+            "org__name": "中国化学工程集团有限公司",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "zghxgc",
+                    "first_name": "中国化学工程"
+                },
+                {
+                    "username": "zghxgc-lc",
+                    "first_name": "李超"
+                },
+                {
+                    "username": "zghxgc-dxl",
+                    "first_name": "杜习录"
+                },
+                {
+                    "username": "zghxgc-ljz",
+                    "first_name": "李纪朝"
+                },
+                {
+                    "username": "zghxgc-www",
+                    "first_name": "王文武"
+                },
+                {
+                    "username": "zghxgc-ldm",
+                    "first_name": "赖达鸣"
+                }
+            ]
+        },
+        {
+            "org__id": 453,
+            "org__name": "航天系统公司",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "htkg1",
+                    "first_name": "航天系统公司"
+                },
+                {
+                    "username": "htkg1-yxt",
+                    "first_name": "杨学涛"
+                }
+            ]
+        },
+        {
+            "org__id": 414,
+            "org__name": "国家能源集团煤炭经营分公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "nymtjy-xy",
+                    "first_name": "西媛"
+                },
+                {
+                    "username": "nymtjy-glw",
+                    "first_name": "郭令文"
+                },
+                {
+                    "username": "nymtjy",
+                    "first_name": "国家能源集团煤炭经营分公司"
+                }
+            ]
+        },
+        {
+            "org__id": 389,
+            "org__name": "招商证券研究发展中心",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "zszjzx-lmm",
+                    "first_name": "李明明"
+                },
+                {
+                    "username": "zszjzx-wy",
+                    "first_name": "王宇"
+                },
+                {
+                    "username": "zszjzx",
+                    "first_name": "招商证券中心"
+                }
+            ]
+        },
+        {
+            "org__id": 210,
+            "org__name": "国有经济研究智库",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "zkmsc",
+                    "first_name": "智库秘书处"
+                }
+            ]
+        },
+        {
+            "org__id": 363,
+            "org__name": "安徽省农垦集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahnk-slc",
+                    "first_name": "孙良仓"
+                },
+                {
+                    "username": "ahnk-cl",
+                    "first_name": "陈璐"
+                },
+                {
+                    "username": "ahnk",
+                    "first_name": "安徽农垦集团"
+                }
+            ]
+        },
+        {
+            "org__id": 346,
+            "org__name": "安徽海螺集团有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahhl-zjg",
+                    "first_name": "詹家干"
+                },
+                {
+                    "username": "ahhl-qjg",
+                    "first_name": "钱继光"
+                },
+                {
+                    "username": "ahhl",
+                    "first_name": "安徽海螺集团"
+                }
+            ]
+        },
+        {
+            "org__id": 359,
+            "org__name": "安徽叉车集团有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahcc-sh",
+                    "first_name": "沈辉"
+                },
+                {
+                    "username": "ahcc-byy",
+                    "first_name": "鲍云云"
+                },
+                {
+                    "username": "ahcc",
+                    "first_name": "安徽叉车集团"
+                }
+            ]
+        },
+        {
+            "org__id": 321,
+            "org__name": "深圳市投资控股有限公司",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "sztzkg-gwb",
+                    "first_name": "甘卫斌"
+                },
+                {
+                    "username": "sztzkg-jt",
+                    "first_name": "季彤"
+                },
+                {
+                    "username": "sztzkg-wjf",
+                    "first_name": "魏俊峰"
+                },
+                {
+                    "username": "sztzkg-ww",
+                    "first_name": "吴畏"
+                }
+            ]
+        },
+        {
+            "org__id": 206,
+            "org__name": "中国科学院科技战略咨询研究院",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "zkyzlzxy",
+                    "first_name": "中科院战略咨询院"
+                }
+            ]
+        },
+        {
+            "org__id": 352,
+            "org__name": "安徽省交通控股集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "sxjt-dhp",
+                    "first_name": "段海澎"
+                },
+                {
+                    "username": "sxjt-whc",
+                    "first_name": "王洪春"
+                },
+                {
+                    "username": "sxjt",
+                    "first_name": "安徽交通控股集团"
+                }
+            ]
+        },
+        {
+            "org__id": 448,
+            "org__name": "煤制油化工",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "mtyhg-xj",
+                    "first_name": "肖建"
+                },
+                {
+                    "username": "mtyhg-zjq",
+                    "first_name": " 朱嘉琦 "
+                },
+                {
+                    "username": "mtyhg",
+                    "first_name": "煤制油化工"
+                }
+            ]
+        },
+        {
+            "org__id": 366,
+            "org__name": "安徽皖维集团有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "ahww-ycb",
+                    "first_name": "闫昌斌"
+                },
+                {
+                    "username": "ahww-gs",
+                    "first_name": "高尚"
+                },
+                {
+                    "username": "ahww",
+                    "first_name": "安徽皖维集团"
+                }
+            ]
+        },
+        {
+            "org__id": 434,
+            "org__name": "神华天津煤炭码头有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "shtjmt-zq",
+                    "first_name": "郑强"
+                },
+                {
+                    "username": "shtjmt-tb",
+                    "first_name": "汤渤"
+                },
+                {
+                    "username": "shtjmt",
+                    "first_name": "神华天津煤炭码头有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 119,
+            "org__name": "国家开发投资集团有限公司",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "gtgs",
+                    "first_name": "国投"
+                },
+                {
+                    "username": "gtgs-wpp",
+                    "first_name": "卫鹏鹏"
+                },
+                {
+                    "username": "gtgs-rx",
+                    "first_name": "任潇"
+                },
+                {
+                    "username": "gtgs-ymz",
+                    "first_name": "杨明珠"
+                },
+                {
+                    "username": "gtgs-ts",
+                    "first_name": "唐帅"
+                },
+                {
+                    "username": "gtgs-wrj",
+                    "first_name": "王瑞晶"
+                }
+            ]
+        },
+        {
+            "org__id": 285,
+            "org__name": "阳泉煤业（集团）有限责任公司",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "yqmy-pdw",
+                    "first_name": "庞栋巍"
+                },
+                {
+                    "username": "yqmy",
+                    "first_name": "阳泉煤业"
+                }
+            ]
+        },
+        {
+            "org__id": 409,
+            "org__name": "国家能源集团山东电力有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "nysdgs-wzg",
+                    "first_name": "王作广"
+                },
+                {
+                    "username": "nysdgs-lxh",
+                    "first_name": "李晓辉"
+                },
+                {
+                    "username": "nysdgs",
+                    "first_name": "国家能源集团山东电力有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 216,
+            "org__name": "国家能源投资集团有限责任公司",
+            "user_sum": 6,
+            "user_list": [
+                {
+                    "username": "gjnyjt",
+                    "first_name": "国家能源集团"
+                },
+                {
+                    "username": "gjnyjt-ghz",
+                    "first_name": "苟慧智"
+                },
+                {
+                    "username": "gjnyjt-wx",
+                    "first_name": "王曦"
+                },
+                {
+                    "username": "gjnyjt-xt",
+                    "first_name": "熊图"
+                },
+                {
+                    "username": "gjnyjt-wd",
+                    "first_name": "王冬"
+                },
+                {
+                    "username": "gjnyjt-zxr",
+                    "first_name": "朱锡仁"
+                }
+            ]
+        },
+        {
+            "org__id": 338,
+            "org__name": "长沙矿冶研究院有限责任公司分析测试研究所",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "fxcs-yl",
+                    "first_name": "杨林"
+                },
+                {
+                    "username": "fxcs-xlp",
+                    "first_name": "肖露萍"
+                },
+                {
+                    "username": "fxcs-gq",
+                    "first_name": "高群"
+                },
+                {
+                    "username": "fxcs",
+                    "first_name": "长沙矿冶研究院有限责任公司分析测试研究所"
+                }
+            ]
+        },
+        {
+            "org__id": 88,
+            "org__name": "中国船舶综合技术经济研究院",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "zgcbjjy",
+                    "first_name": "中国船舶综合技术经济院"
+                },
+                {
+                    "username": "zgcbjjy-gwj",
+                    "first_name": "郭文杰"
+                }
+            ]
+        },
+        {
+            "org__id": 387,
+            "org__name": "招商局漳州开发区有限公司",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "zsjzz-yjj",
+                    "first_name": "杨俊杰"
+                },
+                {
+                    "username": "zsjzz",
+                    "first_name": "招商局漳州"
+                }
+            ]
+        },
+        {
+            "org__id": 235,
+            "org__name": "中国社会科学评价研究院",
+            "user_sum": 1,
+            "user_list": [
+                {
+                    "username": "pjyjy-wb",
+                    "first_name": "吴波"
+                }
+            ]
+        },
+        {
+            "org__id": 433,
+            "org__name": "神华包神铁路集团有限责任公司",
+            "user_sum": 2,
+            "user_list": [
+                {
+                    "username": "shbstl-wlj",
+                    "first_name": "王龙江"
+                },
+                {
+                    "username": "shbstl",
+                    "first_name": "神华包神铁路集团有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 107,
+            "org__name": "中国广核集团有限公司",
+            "user_sum": 12,
+            "user_list": [
+                {
+                    "username": "zggh",
+                    "first_name": "中广核"
+                },
+                {
+                    "username": "zggh-ly",
+                    "first_name": "李勇"
+                },
+                {
+                    "username": "zggh-cgq",
+                    "first_name": "陈公全"
+                },
+                {
+                    "username": "zggh-cht",
+                    "first_name": "陈红涛"
+                },
+                {
+                    "username": "zggh-yxy",
+                    "first_name": "尹向勇"
+                },
+                {
+                    "username": "zggh-cj",
+                    "first_name": "陈洁"
+                },
+                {
+                    "username": "zggh-sdf",
+                    "first_name": "宋东风"
+                },
+                {
+                    "username": "zggh-wz",
+                    "first_name": "王震"
+                },
+                {
+                    "username": "zggh-wsj",
+                    "first_name": "王少杰"
+                },
+                {
+                    "username": "zggh-xh",
+                    "first_name": "徐浩"
+                },
+                {
+                    "username": "zggh-yl",
+                    "first_name": "杨柳"
+                },
+                {
+                    "username": "zggh-wc",
+                    "first_name": "汪灿"
+                }
+            ]
+        },
+        {
+            "org__id": 425,
+            "org__name": "神华四川能源有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "shscny-lj",
+                    "first_name": "李洁"
+                },
+                {
+                    "username": "shscny-jzl",
+                    "first_name": "江智林"
+                },
+                {
+                    "username": "shscny",
+                    "first_name": "神华四川能源有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 438,
+            "org__name": "神华物资集团有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "shwzgs-zws",
+                    "first_name": "张万水"
+                },
+                {
+                    "username": "shwzgs-wll",
+                    "first_name": "王路路"
+                },
+                {
+                    "username": "shwzgs",
+                    "first_name": "神华物资集团有限公司"
+                }
+            ]
+        },
+        {
+            "org__id": 356,
+            "org__name": "华安证券股份有限公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "hazq-zj",
+                    "first_name": "张俊"
+                },
+                {
+                    "username": "hazq-wm",
+                    "first_name": "王淼"
+                },
+                {
+                    "username": "hazq",
+                    "first_name": "安徽华安证券"
+                }
+            ]
+        },
+        {
+            "org__id": 283,
+            "org__name": "山西潞安集团有限公司",
+            "user_sum": 8,
+            "user_list": [
+                {
+                    "username": "lajt-gcg",
+                    "first_name": "郭成刚"
+                },
+                {
+                    "username": "lajt-zlg",
+                    "first_name": "张路刚"
+                },
+                {
+                    "username": "lajt-lf",
+                    "first_name": "连峰"
+                },
+                {
+                    "username": "lajt-nwf",
+                    "first_name": "牛王芳"
+                },
+                {
+                    "username": "lajt-zhj",
+                    "first_name": "张绘锦"
+                },
+                {
+                    "username": "lajt-twx",
+                    "first_name": "田文香"
+                },
+                {
+                    "username": "lajt-fmj",
+                    "first_name": "冯敏捷"
+                },
+                {
+                    "username": "lajt",
+                    "first_name": "山西潞安"
+                }
+            ]
+        },
+        {
+            "org__id": 417,
+            "org__name": "神华包头能源有限责任公司",
+            "user_sum": 3,
+            "user_list": [
+                {
+                    "username": "shbtny-syf",
+                    "first_name": "石玉峰"
+                },
+                {
+                    "username": "shbtny-lhx",
+                    "first_name": "刘红霞"
+                },
+                {
+                    "username": "shbtny",
+                    "first_name": "神华包头能源有限责任公司"
+                }
+            ]
+        },
+        {
+            "org__id": 380,
+            "org__name": "招商蛇口",
+            "user_sum": 4,
+            "user_list": [
+                {
+                    "username": "zssk-cq",
+                    "first_name": "陈青"
+                },
+                {
+                    "username": "zssk-zy",
+                    "first_name": "张颖"
+                },
+                {
+                    "username": "zssk-lx",
+                    "first_name": "李想"
+                },
+                {
+                    "username": "zssk",
+                    "first_name": "招商蛇口"
+                }
+            ]
+        }
+    ]

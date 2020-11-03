@@ -1,0 +1,13 @@
+1.安装索引
+（1）yum install postgresql11-contrib  [注意版本]
+（2）create extension pg_trgm
+（3）给title家模糊查询索引：
+        CREATE INDEX"title_index" ON"public"."tables_basicdata" USING gin (title gin_trgm_ops);[注意空格]
+2.给发文日期做索引
+CREATE INDEX "publish_date_index_desc" ON "public"."tables_basicdata" USING btree (
+  "publish_date" DESC NULLS LAST
+);
+
+REINDEX INDEX index_name;//重置单个索引
+ REINDEX TABLE table_name;//重置整个表的索引
+ REINDEX DATABASE db_name;//终止整个数据库的索引

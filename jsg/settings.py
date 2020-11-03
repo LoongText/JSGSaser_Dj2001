@@ -29,9 +29,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    # 'simplepro',
-    # 'simpleui',
-    # 'import_export',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,7 +41,6 @@ INSTALLED_APPS = [
     'query',
     'uploads',
     'corsheaders',
-    # 'guardian',
 ]
 
 MIDDLEWARE = [
@@ -56,7 +52,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'simplepro.middlewares.SimpleMiddleware'
 ]
 
 # AUTHENTICATION_BACKENDS = (
@@ -101,6 +96,13 @@ DATABASES = {
         'PASSWORD': 'cnki5722902',
         'HOST': '192.168.105.28',
         'PORT': '5432',
+
+        # 'NAME': 'cnki_gz',
+        # 'USER': 'postgres',
+        # 'PASSWORD': 'postgres',
+        # 'HOST': '101.200.126.33',
+        # 'PORT': '5432',
+
     }
 }
 
@@ -197,7 +199,6 @@ HOPE_KEYWORDS_LIST = [
     "希望", "我期待", "请省长", "请市长", "还希望", "能不能", "是否可以", "恳请领导", "希望领导", "希望",
 ]
 
-
 SIMPLEPRO_INFO = False
 # SIMPLEUI_HOME_PAGE = 'https://www.sunwu.zone'
 SIMPLEUI_ICON = {
@@ -227,11 +228,22 @@ BIDDER_CONCLUSION_STATUS = {0: '未开始', 1: '审批中', 2: '已通过', 3: '
 PRO_RELATIONS_ROLES = {1: '组长', 2: '副组长', 3: '组员'}
 
 ORG_NATURE_LOWER_LEVEL = 4
-ORG_NATURE_HIGHER_LEVEL = 1
-ORG_GROUP_LOWER_LEVEL = 4
-ORG_GROUP_SUPERUSER_LEVEL = 1
-ORG_GROUP_MANAGER_LEVEL = 2
+ORG_NATURE_HIGHER_LEVEL = 3
+ORG_NATURE_FORBIDDEN_LEVEL = 0
+# ORG_GROUP_LOWER_LEVEL = 4
+# ORG_GROUP_SUPERUSER_LEVEL = 1
+# ORG_GROUP_MANAGER_LEVEL = 2
 
 # 组长副组长组员三个角色分别对应的分数
 ROLES_NAME = {"组长": 1, "副组长": 2, "组员": 3}
 ROLES_SCORE = {1: 1.2, 2: 1.1, 3: 1}
+
+# 各分组权限
+SUPER_USER_GROUP = 1100  # 技术组
+PLANT_MANAGER_GROUP = 1200  # 平台管理员组
+FIRST_LEVEL_MANAGER_GROUP = 2100  # 机构管理员组
+# SECOND_LEVEL_MANAGER_GROUP = 2200  # 二级机构管理员组
+# THIRD_LEVEL_MANAGER_GROUP = 2300  # 三级机构管理员组
+GENERAL_ORG_GROUP = 3100  # 普通机构账号组
+EXPERT_PER_GROUP = 4100  # 专家个人账号组
+GENERAL_PER_GROUP = 4200  # 普通个人账号组

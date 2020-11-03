@@ -2,7 +2,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from tables.models import Projects, Research, ProRelations, UserDownloadBehavior
-from tables.models import User, Bid, Organization, Participant, UserBehavior
+from tables.models import User, Bid, Organization, Participant
+from django.contrib.auth .models import Group, AnonymousUser
 import os
 from jsg import settings
 from django.http import StreamingHttpResponse
@@ -12,12 +13,14 @@ from login.views import add_user_behavior
 from rest_framework.decorators import authentication_classes
 from login.auth import ExpiringTokenAuthentication
 import time
+from django.db.models import Count
 
 
 @api_view(['GET'])
+@authentication_classes([ExpiringTokenAuthentication])
 def projects_download(request):
     """
-    课题下载次数记录
+    课题下载
     :param request:
     :return:
     """
@@ -36,10 +39,10 @@ def projects_download(request):
                     UserDownloadBehavior.objects.create(pro=obj)  # 记录下载量数据
             # 显示在弹出对话框中的默认的下载文件名
             the_file_name = '{}.pdf'.format(obj.name)
-            print(the_file_name)
+            # print(the_file_name)
             # download_url_fin = os.path.join(os.path.join(settings.BASE_DIR, 'static'), str(obj.attached))
             download_url_fin = os.path.join(settings.MEDIA_ROOT, str(obj.attached))
-            print(download_url_fin)
+            # print(download_url_fin)
             # print(content_disposition)
             # 将汉字换成ascii码，否则下载名称不能正确显示
             the_file_name = urllib.parse.quote(the_file_name)
@@ -97,7 +100,7 @@ def set_pro_status(request):
     # 成果状态设置
     if request.method == 'POST':
         try:
-            print('set_pro_status', request.data)
+            # print('set_pro_status', request.data)
             param_dict = request.data
             uuid = param_dict.get('uuid', '')
             pro_status = int(param_dict.get('status', 0))
@@ -121,11 +124,14 @@ def set_pro_status(request):
                 # 对应人员成果数+1
                 for par_obj in par_pro_obj:
                     par_obj.par.pro_sum_add()
+            elif pro_status == 3:
+                current_date = time.strftime('%Y-%m-%d')
+                data.update(status=pro_status, release_date=current_date)
             else:
                 data.update(status=pro_status)
-                par_pro_obj = ProRelations.objects.filter(pro=pro_obj_id)
-                par_pro_obj.update(is_eft=False)
                 if is_cut_num:
+                    par_pro_obj = ProRelations.objects.filter(pro=pro_obj_id)
+                    par_pro_obj.update(is_eft=False)
                     # 减少人员和机构的成果量
                     for par_obj in par_pro_obj:
                         par_obj.par.pro_sum_cut()
@@ -138,10 +144,6 @@ def set_pro_status(request):
                     queryset_list = list(set(queryset_list))
                     for i in queryset_list:
                         i.pro_sum_cut()
-                    # for i in lead_org_obj:
-                    #     i.pro_sum_cut()
-                    # for j in research_obj:
-                    #     j.pro_sum_cut()
             add_user_behavior(keyword='', search_con='修改成果状态：{}'.format(uuid), user_obj=request.user)
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
@@ -164,11 +166,12 @@ def file_list(request):
 
 
 @api_view(['POST'])
+@authentication_classes([ExpiringTokenAuthentication])
 def set_research_status(request):
     # 招标状态设置
     if request.method == 'POST':
         try:
-            print(request.data)
+            # print(request.data)
             param_dict = request.data
             uuid = param_dict.get('uuid', '')
             re_status = int(param_dict.get('status', 0))
@@ -183,13 +186,15 @@ def set_research_status(request):
 
 
 @api_view(['POST'])
+@authentication_classes([ExpiringTokenAuthentication])
 def set_bid_status(request):
     # 投标状态设置
     if request.method == 'POST':
         try:
             # print(request.data)
             param_dict = request.data
-            id_list = param_dict.getlist('idlist', '')
+            id_list = param_dict.get('idlist', '')
+            # print(id_list, type(id_list))
             bid_status = int(param_dict.get('status', 0))
             tag = param_dict.get('tag', 'sq')  # sq：批量处理申请  jt：批量处理结题
             data = Bid.objects.filter(id__in=id_list)
@@ -207,6 +212,7 @@ def set_bid_status(request):
 
 
 @api_view(['POST'])
+@authentication_classes([ExpiringTokenAuthentication])
 def set_org_status(request):
     # 机构状态设置
     if request.method == 'POST':
@@ -224,20 +230,44 @@ def set_org_status(request):
 
 
 @api_view(['GET'])
+@authentication_classes([ExpiringTokenAuthentication])
 def get_org_name(request):
-    # 获得所有机构名称和id
+    # 获得所有机构名称和id:all/获得本机构以及下属机构名称和id:personal
     if request.method == 'GET':
-        try:
-            data = Organization.objects.values('id', 'name')
-            # data_list = [i['name'] for i in data]
-            return Response(data, status=status.HTTP_200_OK)
-        except Exception as e:
-            set_run_info(level='error', address='/status_operation/view.py/get_org_name',
-                         keyword='获取机构名称失败：{}'.format(e))
+        user = request.user
+        if user.is_active:
+            try:
+                group_id_obj = Group.objects.filter(user=user.id)
+                group_id_list = [i.id for i in group_id_obj]
+                print('--------', group_id_list)
+                if user.is_superuser or settings.SUPER_USER_GROUP in group_id_list or settings.PLANT_MANAGER_GROUP in group_id_list:
+                    data = Organization.objects.values('id', 'name', 'competent_dpt')
+                else:
+                    user_org = user.org
+                    if user_org:
+                        org_list = [user_org.id]
+                        for org_id in org_list:
+                            subordinate_unit_obj = Organization.objects.values('id').filter(
+                                superior_unit=org_id)
+                            subordinate_unit_id = [i['id'] for i in subordinate_unit_obj]
+                            org_list.extend(subordinate_unit_id)
+                        data = Organization.objects.values('id', 'name', 'competent_dpt').filter(id__in=org_list)
+                    else:
+                        # 不属于机构管理员用户
+                        return Response(status=status.HTTP_403_FORBIDDEN)
+                return Response(data, status=status.HTTP_200_OK)
+            except Exception as e:
+                set_run_info(level='error', address='/status_operation/view.py/get_org_name',
+                             keyword='获取机构名称失败：{}'.format(e))
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+        else:
+            # 用户账号不可用
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])
+@authentication_classes([ExpiringTokenAuthentication])
 def set_par_status(request):
     # 人员状态设置
     if request.method == 'POST':
@@ -297,16 +327,55 @@ def user_username_search(request):
 
 
 @api_view(['GET'])
-def get_daily_logins(request):
-    # 统计每日登录量
+def user_id_card_search(request):
+    """
+    新建用户-防止同一身份被用于同类型账号
+    :param request:
+    :return:
+    """
+    # print(request.GET)
+    id_card = request.GET.get('id_card', '')
+    roles = int(request.GET.get('roles', ''))
+    if roles in [settings.FIRST_LEVEL_MANAGER_GROUP, settings.GENERAL_ORG_GROUP]:
+        # 机构用户
+        data = User.objects.filter(id_card=id_card, org__id__isnull=False)
+    else:
+        data = User.objects.filter(id_card=id_card)
+    if data:
+        return Response(1)
+    else:
+        return Response(0)
+
+
+# @api_view(['GET'])
+# def get_daily_logins(request):
+#     # 统计每日登录量
+#     if request.method == 'GET':
+#         try:
+#             current_date = time.strftime('%Y-%m-%d')
+#             data = UserBehavior.objects.values('user_id').filter(
+#                 create_time__gte=current_date, user__isnull=False).distinct('user_id')
+#             data_count = data.count()
+#             return Response({"data": data, "count": data_count}, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             set_run_info(level='error', address='/status_operation/view.py/get_daily_logins',
+#                          keyword='统计每日登录量失败：{}'.format(e))
+#             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def get_user_org_groups(request):
+    # 一个机构下多少用户
     if request.method == 'GET':
         try:
-            current_date = time.strftime('%Y-%m-%d')
-            data = UserBehavior.objects.values('user_id').filter(
-                create_time__gte=current_date, user__isnull=False).distinct('user_id')
-            data_count = data.count()
-            return Response({"data": data, "count": data_count}, status=status.HTTP_200_OK)
+            data = User.objects.values('org__id', 'org__name').annotate(user_sum=Count('org')).filter(is_active=True, org__isnull=False)
+            # print(data.query)
+            for i in range(len(data)):
+                user_obj = User.objects.values('username', 'first_name').filter(org=data[i]['org__id']).filter(is_active=True, org__isnull=False)
+                data[i]['user_list'] = user_obj
+
+            return Response({"data": data}, status=status.HTTP_200_OK)
         except Exception as e:
-            set_run_info(level='error', address='/status_operation/view.py/get_daily_logins',
-                         keyword='统计每日登录量失败：{}'.format(e))
+            set_run_info(level='error', address='/status_operation/view.py/get_user_org_groups',
+                         keyword='统计一个机构下多少用户：{}'.format(e))
             return Response(status=status.HTTP_404_NOT_FOUND)

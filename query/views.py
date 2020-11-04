@@ -1577,35 +1577,6 @@ class MyUserView(viewsets.ViewSet):
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    @action(methods=['get'], detail=False)
-    @super_manager_auth
-    def get_pending_approval_user(self, request):
-        """
-        获得待审批的用户-注册来的,仅提供给管理员
-        :param request：
-        :return:
-        """
-        page = request.query_params.get('page', 1)
-        page_num = request.query_params.get('page_num', 10)
-        keyword = request.query_params.get('kw', '')
-        roles = request.query_params.get('roles', 0)
-
-        page = self.try_except(page, 1)  # 验证类型
-        page_num = self.try_except(page_num, 10)  # 验证返回数量
-
-        data = models.UserRegister.objects.values('username', 'first_name', 'roles', 'cell_phone', 'create_date'
-                                                  ).filter(info_status=0)
-        if keyword:
-            data = data.filter(Q(username__contains=keyword) | Q(first_name__contains=keyword))
-        if roles:
-            data = data.filter(roles=roles)
-        # -- 记录开始 --
-        add_user_behavior(keyword='', search_con='获得待审批的用户-注册来的', user_obj=request.user)
-        # -- 记录结束 --
-        sp = SplitPages(data, page, page_num)
-        res = sp.split_page()
-        return Response(res, status=status.HTTP_200_OK)
-
     @staticmethod
     def create(request):
         """

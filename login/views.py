@@ -1,25 +1,34 @@
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import logout, authenticate
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth .models import Group
+from django.contrib.auth.models import Group
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import authentication_classes
 from login.auth import ExpiringTokenAuthentication
 from django.views.decorators.csrf import csrf_exempt
-from jsg import settings
-from tables import models
 from login.LoginSerializer import UserRegisterListSerializer as urls
 from login.LoginSerializer import UserRegisterCreateSerializer as urcs
+from login.LoginSerializer import UserRegisterCreateSerializer as urrs
+from rest_framework.decorators import action
+from query.split_page import SplitPages
 from functools import wraps
 import rest_framework
+from jsg import settings
+from tables import models
+from django.db.models import Q
+from django.contrib.auth.hashers import make_password
+from django.http import StreamingHttpResponse
+import urllib.parse
+import os
 
 
 class LoginView(viewsets.ViewSet):
     """
     登录验证
     """
+
     @csrf_exempt
     def create(self, request):
         param_dict = request.data
@@ -27,7 +36,7 @@ class LoginView(viewsets.ViewSet):
         password = param_dict.get('password', '').strip()
         # print(param_dict)
         user = authenticate(username=username, password=password)
-        
+
         if user:
             if user.is_active:
                 group_id_obj = Group.objects.filter(user=user.id)
@@ -64,13 +73,15 @@ class LoginOutView(viewsets.ViewSet):
     """
     退出登录状态
     """
+
     @staticmethod
     def list(request):
         logout(request)
         return Response(status=status.HTTP_200_OK)
 
 
-class RegisterView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin):
+class RegisterView(viewsets.GenericViewSet, mixins.CreateModelMixin,
+                   mixins.ListModelMixin, mixins.RetrieveModelMixin):
     """
     注册管理
     """
@@ -82,27 +93,149 @@ class RegisterView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.List
             return urls
         elif self.action == 'create':
             return urcs
+        elif self.action == 'retrieve':
+            return urrs
 
-# def requires_auth(f):
-#     """
-#     登录验证装饰器
-#     """
-#     @wraps(f)
-#     def decorated(*args, **kwargs):
-#         auth = None
-#         if len(args) > 0:
-#             for i in args:
-#                 # print('--', type(i))
-#                 if type(i) == rest_framework.request.Request:
-#                     # print(i.headers)
-#                     auth = i.user.is_authenticated
-#                     # print(i.user)
-#                     # print(auth)
-#         if not auth:
-#             return Response(status=status.HTTP_403_FORBIDDEN)
-#             # print('验证去')
-#         return f(*args, **kwargs)
-#     return decorated
+    @action(methods=['get'], detail=False)
+    # @super_manager_auth
+    def get_register_user(self, request):
+        """
+        获得待审批的用户-注册来的,仅提供给平台管理员和超管
+        :param request：
+        :return:
+        """
+        page = request.query_params.get('page', 1)
+        page_num = request.query_params.get('page_num', 10)
+        keyword = request.query_params.get('kw', '')
+        roles = request.query_params.get('roles', 0)  # 1：机构管理员 2：个人用户
+
+        page = self.try_except(page, 1)  # 验证类型
+        page_num = self.try_except(page_num, 10)  # 验证返回数量
+
+        data = models.UserRegister.objects.values('name', 'roles', 'cell_phone', 'create_date').filter(info_status=0)
+        if keyword:
+            data = data.filter(Q(username__contains=keyword) | Q(first_name__contains=keyword))
+        if roles:
+            data = data.filter(roles=roles)
+        # -- 记录开始 --
+        add_user_behavior(keyword='', search_con='获得待审批的用户-注册来的', user_obj=request.user)
+        # -- 记录结束 --
+        sp = SplitPages(data, page, page_num)
+        res = sp.split_page()
+        return Response(res, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def try_except(param_key, param_default):
+        # 判断参数是否可以被是否是数字，不是的话，强转，强转不成功或者是负数，置为默认值
+        try:
+            param_key = int(param_key)
+            if param_key < 1:
+                param_key = param_default
+        except Exception as e:
+            param_key = param_default
+            set_run_info(level='error', address='/login/view.py/RegisterView',
+                         keyword='强转参数出错{}'.format(e))
+        return param_key
+
+    @action(methods=['POST'], detail=True)
+    def set_register_user(self, request, pk):
+        """
+        账号审批
+        :param request:
+        :return:
+        """
+        param_dict = request.data
+        info_status = param_dict.get('status')  # 1：通过 2：否决  0：未处理
+        roles = param_dict.get('roles')  # 1：机构管理员 2：个人
+        org_id = param_dict.get('org_id')  # 机构id，机构管理员需要挂机构
+        remarks = param_dict.get('remarks')  # 备注
+        try:
+            user_tmp = models.UserRegister.objects.filter(id=pk)
+            if int(info_status) == 1:
+                # 同意创建账号
+                if user_tmp:
+                    user_obj = user_tmp[0]
+                else:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                if int(roles) == 1:
+                    # 创建机构管理员账号
+                    new_user_obj = models.User.objects.create(
+                        first_name=user_obj.name,
+                        username=user_obj.username,
+                        password=make_password(user_obj.login_pwd),
+                        org=models.Organization.objects.get(id=org_id),
+                        id_card=user_obj.id_card_code,
+                        cell_phone=user_obj.cell_phone,
+                        email=user_obj.email
+                    )
+                    if new_user_obj:
+                        # 添加角色组
+                        groups_list_obj = Group.objects.filter(id=settings.FIRST_LEVEL_MANAGER_GROUP)
+                        new_user_obj.groups.add(*groups_list_obj)
+                else:
+                    # 创建个人账号
+                    new_user_obj = models.User.objects.create(
+                        first_name=user_obj.name,
+                        username=user_obj.username,
+                        password=make_password(user_obj.login_pwd),
+                        id_card=user_obj.id_card_code,
+                        cell_phone=user_obj.cell_phone,
+                        email=user_obj.email
+                    )
+                    if new_user_obj:
+                        # 添加角色组
+                        groups_list_obj = Group.objects.filter(id=settings.GENERAL_PER_GROUP)
+                        new_user_obj.groups.add(*groups_list_obj)
+                user_tmp.update(info_status=1, remarks=remarks)
+            else:
+                # 驳回账号
+                user_tmp.update(info_status=2)
+            add_user_behavior(keyword='', search_con='设置新闻不可见({})'.format(pk), user_obj=request.user)
+        except Exception as e:
+            set_run_info(level='error', address='/login/view.py/RegisterView-set_register_user',
+                         keyword='注册账号审批失败：{}'.format(e))
+        return Response(status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=True)
+    def get_verity_file(self, request, pk):
+        """
+        查看注册机构管理员证明材料
+        :param request:
+        :param pk:
+        :return:
+        """
+        try:
+            obj = models.News.objects.get(id=pk)
+            the_file_name = '{}.pdf'.format(obj.title)
+            download_url_fin = os.path.join(settings.MEDIA_ROOT, str(obj.text_attached))
+            # 将汉字换成ascii码，否则下载名称不能正确显示
+            the_file_name = urllib.parse.quote(the_file_name)
+            response = StreamingHttpResponse(self.file_iterator(download_url_fin))
+            response['Content-Type'] = 'application/octet-stream'
+            response['Content-Disposition'] = 'attachment;filename="{}"'.format(the_file_name)
+
+            return response
+        except Exception as e:
+            set_run_info(level='error', address='/login/view.py/RegisterView-get_verity_file',
+                         keyword='查看注册机构管理员证明材料失败：{}'.format(e))
+            return Response({'msg': "查看注册机构管理员证明材料失败", "status": 404}, status=status.HTTP_200_OK)
+
+    # 读取文件
+    @staticmethod
+    def file_iterator(file_name, chunk_size=512):
+        """
+        下载文件时读取文件的方法
+        :param file_name: 文件绝对路径
+        :param chunk_size: 每次循环大小
+        :return:
+        """
+        with open(file_name, 'rb') as f:
+            while True:
+                c = f.read(chunk_size)
+                if c:
+                    yield c
+                else:
+                    break
 
 
 @api_view(['POST'])
@@ -110,7 +243,7 @@ def do_something(request):
     """权限验证类，仅用于自测"""
     receive = request.data
     # print(receive)
-    if request.user.is_authenticated:   # 验证Token是否正确
+    if request.user.is_authenticated:  # 验证Token是否正确
         print("Do something...")
         return Response({"msg": "验证通过"})
     else:
@@ -212,6 +345,7 @@ def super_manager_auth(f):
     """
     验证是否是超管和平台管理员
     """
+
     @wraps(f)
     def decorated(*args, **kwargs):
         auth = False
@@ -230,4 +364,5 @@ def super_manager_auth(f):
             return Response(status=status.HTTP_403_FORBIDDEN)
             # print('验证去')
         return f(*args, **kwargs)
+
     return decorated

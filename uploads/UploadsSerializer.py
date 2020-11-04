@@ -212,11 +212,11 @@ class ParUpdateSerializer(serializers.ModelSerializer):
         fields = ['name', 'gender', 'job', 'email', 'brief', 'photo']
 
 
-class NewsTextListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = News
-        fields = ['id', 'title', 'text_create_time']
+# class NewsTextListSerializer(serializers.ModelSerializer):
+#
+#     class Meta:
+#         model = News
+#         fields = ['id', 'title', 'text_create_time']
 
 
 class NewsTextList2Serializer(serializers.ModelSerializer):
@@ -226,11 +226,11 @@ class NewsTextList2Serializer(serializers.ModelSerializer):
         fields = ['id', 'title']
 
 
-class NewsImageListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = News
-        fields = ['title', 'image_create_time', 'image_attached']
+# class NewsImageListSerializer(serializers.ModelSerializer):
+#
+#     class Meta:
+#         model = News
+#         fields = ['id', 'title', 'image_attached', 'text_create_time']
 
 
 class NewsCreateSerializer(serializers.ModelSerializer):
@@ -244,7 +244,7 @@ class NewsUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        fields = ['image_create_time', 'image_attached']
+        fields = ['image_attached']
 
 
 class NewsRetrieveSerializer(serializers.ModelSerializer):

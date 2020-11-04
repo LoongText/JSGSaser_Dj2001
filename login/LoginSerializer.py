@@ -6,7 +6,7 @@ class UserRegisterListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserRegister
-        fields = ['__all__']
+        fields = ['username']
 
 
 class UserRegisterCreateSerializer(serializers.ModelSerializer):
@@ -14,8 +14,14 @@ class UserRegisterCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserRegister
         fields = ['roles', 'username', 'id_card_code', 'name', 'cell_phone', 'login_pwd', 'email',
-                  'certification_materials', 'verification_code']
+                  'certification_materials']
 
+
+class UserRegisterRetriveSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserRegister
+        fields = ['roles', 'username', 'id_card_code', 'name', 'cell_phone', 'login_pwd', 'email', 'create_date']
 
 # class ParRetriveSerializer(serializers.ModelSerializer):
 #     unit_name = serializers.ReadOnlyField(source='unit.name')

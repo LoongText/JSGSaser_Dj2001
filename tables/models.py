@@ -404,8 +404,7 @@ class User(AbstractUser):
     par = models.ForeignKey(Participant, verbose_name="人员关联", on_delete=models.CASCADE, null=True)
     id_card = models.CharField(verbose_name="社会信用码/身份证号", max_length=18, null=True)
     cell_phone = models.CharField(max_length=11, verbose_name="手机号", null=True)
-    # certification_materials = models.FileField(verbose_name="证明材料", null=True,
-    #                                            upload_to='register/certification_materials/%Y/%m')
+    certification_materials = models.CharField(max_length=100, verbose_name="证明材料", null=True)  # 从注册表拷贝路径过来
     # business_license = models.FileField(verbose_name="营业执照", null=True, upload_to='register/business_license/%Y/%m')
     # back_is_login = models.BooleanField(default=0, verbose_name="判断后台是否登录")
 
@@ -415,7 +414,7 @@ class User(AbstractUser):
 
 class UserRegister(models.Model):
     id = models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, editable=False)
-    roles = models.IntegerField(verbose_name="角色", null=False)
+    roles = models.IntegerField(verbose_name="角色", null=False)  # 1：机构管理员用户 2：个人用户
     username = models.CharField(max_length=20, verbose_name="用户名", null=False)
     id_card_code = models.CharField(max_length=18, verbose_name="社会信用码/身份证号", null=True)
     name = models.CharField(max_length=100, verbose_name="名称", null=True)
@@ -429,6 +428,7 @@ class UserRegister(models.Model):
     email = models.CharField(max_length=100, verbose_name="邮箱", null=True)
     create_date = models.DateField(auto_now_add=True, verbose_name="创建时间", editable=False)
     info_status = models.IntegerField(verbose_name="状态", null=False, default=0)  # 1：通过 2：否决  0：未处理
+    remarks = models.CharField(max_length=200, verbose_name="备注", null=True)  # 备注
 
     class Meta:
         verbose_name = "注册表"

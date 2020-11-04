@@ -1,8 +1,9 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from tables.models import Projects, Research, ProRelations, UserDownloadBehavior
-from tables.models import User, Bid, Organization, Participant
+# from tables.models import Projects, Research, ProRelations, UserDownloadBehavior
+# from tables.models import User, Bid, Organization, Participant
+from tables import models
 from django.contrib.auth .models import Group, AnonymousUser
 import os
 from jsg import settings
@@ -29,14 +30,14 @@ def projects_download(request):
         user_id = request.query_params.get('userid', 0)
         ways = request.query_params.get('d', 'v')  # 区分查看还是下载
         try:
-            obj = Projects.objects.filter(uuid=uuid)[0]
+            obj = models.Projects.objects.filter(uuid=uuid)[0]
             if ways == 'd':
                 obj.download_num_update()  # 下载量+1
                 if user_id and user_id != 'undefined' and user_id != 'null':
-                    user_obj = User.objects.get(id=user_id)
-                    UserDownloadBehavior.objects.create(user=user_obj, pro=obj)  # 记录下载量数据
+                    user_obj = models.User.objects.get(id=user_id)
+                    models.UserDownloadBehavior.objects.create(user=user_obj, pro=obj)  # 记录下载量数据
                 else:
-                    UserDownloadBehavior.objects.create(pro=obj)  # 记录下载量数据
+                    models.UserDownloadBehavior.objects.create(pro=obj)  # 记录下载量数据
             # 显示在弹出对话框中的默认的下载文件名
             the_file_name = '{}.pdf'.format(obj.name)
             # print(the_file_name)
@@ -86,7 +87,7 @@ def get_compare_status(request):
     if request.method == 'GET':
         try:
             uuid = request.query_params.get('uuid', '')
-            compare_status = Projects.objects.get(uuid=uuid).status
+            compare_status = models.Projects.objects.get(uuid=uuid).status
             return Response({"compare_status": compare_status, }, status=status.HTTP_200_OK)
         except Exception as e:
             set_run_info(level='error', address='/status_operation/view.py/get_compare_status',
@@ -105,7 +106,7 @@ def set_pro_status(request):
             uuid = param_dict.get('uuid', '')
             pro_status = int(param_dict.get('status', 0))
             is_cut_num = int(param_dict.get('is_cut_num', 0))  # 主要区分成果是否发布(目前管理员的删除和撤回都是发布状态，个人发布后不能删除)
-            data = Projects.objects.filter(uuid=uuid)
+            data = models.Projects.objects.filter(uuid=uuid)
             pro_obj_id = data[0].id
             if pro_status == 1:
                 data.update(status=pro_status)
@@ -119,7 +120,7 @@ def set_pro_status(request):
                 for i in queryset_list:
                     i.pro_sum_add()
                 # 将关系置为可用
-                par_pro_obj = ProRelations.objects.filter(pro=pro_obj_id)
+                par_pro_obj = models.ProRelations.objects.filter(pro=pro_obj_id)
                 par_pro_obj.update(is_eft=True)
                 # 对应人员成果数+1
                 for par_obj in par_pro_obj:
@@ -130,7 +131,7 @@ def set_pro_status(request):
             else:
                 data.update(status=pro_status)
                 if is_cut_num:
-                    par_pro_obj = ProRelations.objects.filter(pro=pro_obj_id)
+                    par_pro_obj = models.ProRelations.objects.filter(pro=pro_obj_id)
                     par_pro_obj.update(is_eft=False)
                     # 减少人员和机构的成果量
                     for par_obj in par_pro_obj:
@@ -175,7 +176,7 @@ def set_research_status(request):
             param_dict = request.data
             uuid = param_dict.get('uuid', '')
             re_status = int(param_dict.get('status', 0))
-            data = Research.objects.filter(uuid=uuid)
+            data = models.Research.objects.filter(uuid=uuid)
             if re_status in [0, 1, 2, 3, 4]:
                 data.update(status=re_status)
             return Response(status=status.HTTP_200_OK)
@@ -197,7 +198,7 @@ def set_bid_status(request):
             # print(id_list, type(id_list))
             bid_status = int(param_dict.get('status', 0))
             tag = param_dict.get('tag', 'sq')  # sq：批量处理申请  jt：批量处理结题
-            data = Bid.objects.filter(id__in=id_list)
+            data = models.Bid.objects.filter(id__in=id_list)
             if tag == 'sq':
                 if bid_status in [0, 1, 2, 3, 4]:
                     data.update(bidder_status=bid_status)
@@ -221,7 +222,7 @@ def set_org_status(request):
             param_dict = request.data
             uuid_list = param_dict.getlist('uuidlist', '')
             org_status = int(param_dict.get('status', 0))
-            Organization.objects.filter(uuid__in=uuid_list).update(is_show=org_status)
+            models.Organization.objects.filter(uuid__in=uuid_list).update(is_show=org_status)
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
             set_run_info(level='error', address='/status_operation/view.py/set_org_status',
@@ -241,17 +242,17 @@ def get_org_name(request):
                 group_id_list = [i.id for i in group_id_obj]
                 print('--------', group_id_list)
                 if user.is_superuser or settings.SUPER_USER_GROUP in group_id_list or settings.PLANT_MANAGER_GROUP in group_id_list:
-                    data = Organization.objects.values('id', 'name', 'competent_dpt')
+                    data = models.Organization.objects.values('id', 'name', 'competent_dpt')
                 else:
                     user_org = user.org
                     if user_org:
                         org_list = [user_org.id]
                         for org_id in org_list:
-                            subordinate_unit_obj = Organization.objects.values('id').filter(
+                            subordinate_unit_obj = models.Organization.objects.values('id').filter(
                                 superior_unit=org_id)
                             subordinate_unit_id = [i['id'] for i in subordinate_unit_obj]
                             org_list.extend(subordinate_unit_id)
-                        data = Organization.objects.values('id', 'name', 'competent_dpt').filter(id__in=org_list)
+                        data = models.Organization.objects.values('id', 'name', 'competent_dpt').filter(id__in=org_list)
                     else:
                         # 不属于机构管理员用户
                         return Response(status=status.HTTP_403_FORBIDDEN)
@@ -276,7 +277,7 @@ def set_par_status(request):
             param_dict = request.data
             uuid_list = param_dict.getlist('uuidlist', '')
             par_status = int(param_dict.get('status', 0))
-            Participant.objects.filter(uuid__in=uuid_list).update(is_show=par_status)
+            models.Participant.objects.filter(uuid__in=uuid_list).update(is_show=par_status)
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
             set_run_info(level='error', address='/status_operation/view.py/set_par_status',
@@ -297,9 +298,9 @@ def set_user_status(request):
     tag = int(request.POST.get('tag'))
     try:
         if tag == 1:
-            User.objects.filter(id=user_id).update(is_active=True)
+            models.User.objects.filter(id=user_id).update(is_active=True)
         else:
-            User.objects.filter(id=user_id).update(is_active=False)
+            models.User.objects.filter(id=user_id).update(is_active=False)
         # -- 记录开始 --
         add_user_behavior(keyword='', search_con='禁用/开启用户({}):{}'.format(user_id, tag), user_obj=request.user)
         # -- 记录结束 --
@@ -319,7 +320,7 @@ def user_username_search(request):
     """
     username = request.GET.get('username', '')
     # print(username)
-    data = User.objects.filter(username=username)
+    data = models.User.objects.filter(username=username)
     if data:
         return Response(1)
     else:
@@ -331,21 +332,50 @@ def user_id_card_search(request):
     """
     新建用户-防止同一身份被用于同类型账号
     :param request:
-    :return:
+    :return:1:已存在 0：不存在
     """
     # print(request.GET)
     id_card = request.GET.get('id_card', '')
     roles = int(request.GET.get('roles', ''))
     if roles in [settings.FIRST_LEVEL_MANAGER_GROUP, settings.GENERAL_ORG_GROUP]:
         # 机构用户
-        data = User.objects.filter(id_card=id_card, org__id__isnull=False)
+        data = models.User.objects.filter(id_card=id_card, org__id__isnull=False)
     else:
-        data = User.objects.filter(id_card=id_card)
+        data = models.User.objects.filter(id_card=id_card)
     if data:
         return Response(1)
     else:
         return Response(0)
 
+
+@api_view(['GET'])
+def verify_org_manager_exist(request):
+    """
+    验证机构管理员是否存在
+    :param request:
+    :return:1:已存在 0：不存在  404:报错
+    """
+    org_id = request.query_params.get('org_id', -1)
+    try:
+        org_obj_list = models.Organization.objects.filter(id=org_id)
+        if org_obj_list:
+            org_obj = org_obj_list[0]
+            # 验证机构和机构管理员是否存在
+            user_obj = models.User.objects.filter(org=org_obj)
+            user_id_list = [j.id for j in user_obj]
+            group_id_obj = Group.objects.filter(user__in=user_id_list, id=settings.FIRST_LEVEL_MANAGER_GROUP)
+            if group_id_obj:
+                # 本机构管理员已存在
+                return Response(1)
+            else:
+                return Response(0)
+        else:
+            return Response(0)
+
+    except Exception as e:
+        set_run_info(level='error', address='/status_operation/view.py/verify_org_manager_exist',
+                     keyword='验证机构管理员是否存在：{}'.format(e))
+        return Response(404)
 
 # @api_view(['GET'])
 # def get_daily_logins(request):
@@ -368,10 +398,10 @@ def get_user_org_groups(request):
     # 一个机构下多少用户
     if request.method == 'GET':
         try:
-            data = User.objects.values('org__id', 'org__name').annotate(user_sum=Count('org')).filter(is_active=True, org__isnull=False)
+            data = models.User.objects.values('org__id', 'org__name').annotate(user_sum=Count('org')).filter(is_active=True, org__isnull=False)
             # print(data.query)
             for i in range(len(data)):
-                user_obj = User.objects.values('username', 'first_name').filter(org=data[i]['org__id']).filter(is_active=True, org__isnull=False)
+                user_obj = models.User.objects.values('username', 'first_name').filter(org=data[i]['org__id']).filter(is_active=True, org__isnull=False)
                 data[i]['user_list'] = user_obj
 
             return Response({"data": data}, status=status.HTTP_200_OK)

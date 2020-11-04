@@ -19,8 +19,8 @@ from uploads.UploadsSerializer import OrgUpdateSerializer as Ous
 from uploads.UploadsSerializer import ParCreateSerializer as Par_cs
 from uploads.UploadsSerializer import ParRetriveSerializer as Par_rs
 from uploads.UploadsSerializer import ParUpdateSerializer as Par_us
-from uploads.UploadsSerializer import NewsTextListSerializer as New_t
-from uploads.UploadsSerializer import NewsImageListSerializer as New_i
+# from uploads.UploadsSerializer import NewsTextListSerializer as New_t
+# from uploads.UploadsSerializer import NewsImageListSerializer as New_i
 from uploads.UploadsSerializer import NewsTextList2Serializer as New_ti
 from uploads.UploadsSerializer import NewsCreateSerializer as New_c
 from uploads.UploadsSerializer import NewsUpdateSerializer as New_u
@@ -487,15 +487,18 @@ class NewsManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Up
         keyword = request.query_params.get('kw', '')
         tag = request.query_params.get('tag', 't')  # t:正文 i:图片 ti:没有图片的正文
 
+        page = self.try_except(page, 1)  # 验证类型
+        page_num = self.try_except(page_num, 10)  # 验证返回数量
+
         if tag == 't':
-            data = NewsManageView.queryset.order_by('-text_create_time')
-            data_serilizer = New_t
+            data = NewsManageView.queryset.values('id', 'title', 'text_create_time').order_by('-text_create_time')
         elif tag == 'i':
-            data = NewsManageView.queryset.order_by('-image_create_time')
-            data_serilizer = New_i
+            data = NewsManageView.queryset.values('id', 'title', 'image_attached', 'text_create_time').filter(image_attached__isnull=False).exclude(image_attached='').order_by('-text_create_time')
         else:
+            # 没有图片的正文，返回全部
             data = NewsManageView.queryset.filter(Q(image_attached__isnull=True) | Q(image_attached='')).order_by('-id')
-            data_serilizer = New_ti
+            res = New_ti(instance=data, many=True)
+            return Response(res.data, status=status.HTTP_200_OK)
         if keyword:
             data = data.filter(title__contains=keyword)
 
@@ -505,8 +508,6 @@ class NewsManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Up
 
         sp = SplitPages(data, page, page_num)
         res = sp.split_page()
-        result = data_serilizer(instance=res['res'], many=True)
-        res['res'] = result.data
         return Response(res, status=status.HTTP_200_OK)
 
     @action(methods=['PUT'], detail=True)
@@ -523,7 +524,7 @@ class NewsManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Up
                          keyword='设置新闻不可见失败：{}'.format(e))
         return Response(status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], detail=True)
+    @action(methods=['GET'], detail=True)
     def get_news_file(self, request, pk):
         """
         查看新闻正文pdf
@@ -566,3 +567,16 @@ class NewsManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Up
                     yield c
                 else:
                     break
+
+    @staticmethod
+    def try_except(param_key, param_default):
+        # 判断参数是否可以被是否是数字，不是的话，强转，强转不成功或者是负数，置为默认值
+        try:
+            param_key = int(param_key)
+            if param_key < 1:
+                param_key = param_default
+        except Exception as e:
+            set_run_info(level='error', address='/upload/view.py/NewsManageView',
+                         keyword='强转参数出错{}'.format(e))
+            param_key = param_default
+        return param_key

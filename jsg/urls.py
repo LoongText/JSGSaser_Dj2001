@@ -97,12 +97,10 @@ urlpatterns = [
     path(r'username_search/', user_username_search),
     # 查询同一身份是否被用于同类型账号
     path(r'id_card_search/', user_id_card_search),
+    # 验证机构管理员是否存在
+    path(r'verify_org_manager/', verify_org_manager_exist),
     # 获得所有机构名称
     path(r'get_org_name/', get_org_name),
-    # 成果上传2-添加基本信息--修改
-    # path(r'pro_update_base_info/', pro_update_base_info),
-    # 成果上传3-添加课题小组--修改
-    # path(r'pro_update_pars/', pro_update_pars),
     # 测试接口
     path(r'do_something/', do_something),
     # 对内接口-获得所有成果列表
@@ -115,10 +113,5 @@ urlpatterns = [
     # path(r'get_daily_logins/', get_daily_logins),
     # 每个机构下挂多少用户
     path(r'get_user_org_groups/', get_user_org_groups),
-    # 后台；
-    # path('admin/', admin.site.urls),
-    # 自定义后台
-    # path('back/', include('backstage.urls')),
-    # path('admin/', xadmin.site.urls),
     re_path(r'media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]

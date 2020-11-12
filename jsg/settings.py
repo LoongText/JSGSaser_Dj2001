@@ -247,3 +247,8 @@ FIRST_LEVEL_MANAGER_GROUP = 2100  # 机构管理员组
 GENERAL_ORG_GROUP = 3100  # 普通机构账号组
 EXPERT_PER_GROUP = 4100  # 专家个人账号组
 GENERAL_PER_GROUP = 4200  # 普通个人账号组
+
+ROLES_DICT = {1100: "技术", 1200: "平台管理员", 2100: "机构管理员",
+              3100: "普通机构账号", 4100: "专家个人账号", 4200: "普通个人账号"}
+
+REGISTER_APPROVAL_RESULT = {0: "待审批", 1: "通过", 2: "驳回"}

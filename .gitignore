@@ -122,3 +122,4 @@ venv.bak/
 
 settings.json
 .vscode/launch.json
+media/*

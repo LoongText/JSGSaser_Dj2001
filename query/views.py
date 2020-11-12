@@ -126,9 +126,10 @@ class ExportExcel(viewsets.ViewSet):
         res_obj = self.get_pro_info(uuid_list, user_id)
         records = [[a['name'], a['lead_org'], a['research'], a['key_word'], a['release_date'], a['views'], a['downloads']] for a in res_obj]
         head_data = ['成果名称', '委托单位名称', '研究单位名称', '关键词', '发表时间', '本库浏览量', '本库下载量']
-        download_url = r'C:\Users\XIAO\Desktop\sjdc'
+        # download_url = r'C:\Users\XIAO\Desktop\sjdc'
+        download_url = os.path.join(settings.MEDIA_ROOT, 'tmp')
         download_url_fin = write2excel(n, head_data, records, download_url)
-        the_file_name = '数据导出.xls'
+        the_file_name = 'sjdc.xls'
         # print(the_file_name, download_url_fin)
         # 将汉字换成ascii码，否则下载名称不能正确显示
         the_file_name = urllib.parse.quote(the_file_name)
@@ -234,7 +235,8 @@ class ProjectsQueryView(viewsets.ViewSet):
         par_id = self.try_except(par_id, 0)  # 验证人员id
 
         data = models.Projects.objects.values(
-            'id', 'uuid', 'name', 'key_word', 'release_date', 'views', 'downloads').filter(status=1)
+            'id', 'uuid', 'name', 'key_word', 'release_date', 'views', 'downloads', 'org_str', 'pro_source'
+        ).filter(status=1)
 
         if keyword:
             data = self.filter_keyword(data, keyword, column, user_id)
@@ -258,7 +260,8 @@ class ProjectsQueryView(viewsets.ViewSet):
 
         else:
             # 根据成果按机构统计数量
-            pass
+            data = data.values('id', 'uuid', 'name', 'key_word', 'release_date',
+                               'views', 'downloads', 'org_str', 'pro_source', 'abstract')
             # org_obj = data.values('research', 'research__name').annotate(pro_sum=Count('id', distinct=True)).filter(
             #     research__isnull=False).order_by('-pro_sum')[:5]
 
@@ -437,6 +440,7 @@ class ProjectsManageView(viewsets.ViewSet):
         pro_status = request.query_params.get('status', 0)
         page = request.query_params.get('page', 1)
         page_num = request.query_params.get('page_num', 30)
+        org = request.query_params.get('org_id', 0)  # 所属机构筛选
 
         cls_t = self.try_except(cls_t, 100)  # 验证分类
         page = self.try_except(page, 1)  # 验证页码
@@ -444,7 +448,8 @@ class ProjectsManageView(viewsets.ViewSet):
 
         # status=5 删除状态 0:不显示
         data = models.Projects.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'key_word', 'user',
-                                              'user__first_name', 'status', 'downloads', 'release_date', 'views'
+                                              'user__org', 'user__org__name', 'status', 'downloads',
+                                              'release_date', 'views'
                                               ).exclude(status__in=[0, 5]).order_by('-id')
         if keyword:
             data = data.filter(Q(name__contains=keyword) | Q(key_word__contains=keyword))
@@ -456,10 +461,16 @@ class ProjectsManageView(viewsets.ViewSet):
             # -- 记录结束 --
 
         if cls_t != 100:
+            # 类型筛选
             data = data.filter(classify=cls_t)
 
         if pro_status:
+            # 状态筛选
             data = data.filter(status=pro_status)
+
+        if org:
+            # 所属机构筛选
+            data = data.filter(user__org=org)
 
         # -- 权限开始 --
         user = request.user
@@ -509,9 +520,12 @@ class ProjectsManageView(viewsets.ViewSet):
                 return Response(res, status=status.HTTP_404_NOT_FOUND)
             # print(obj)
             lead_org_obj = obj.lead_org.all()
-            research_org_obj = obj.research.all()
             lead_org_list = self.filter_show_org(lead_org_obj)
-            research_org_list = self.filter_show_org(research_org_obj)
+            if obj.pro_source == 'iser':
+                research_org_obj = obj.research.all()
+                research_org_list = self.filter_show_org(research_org_obj)
+            else:
+                research_org_list = obj.org_str
 
             par_id_obj = models.ProRelations.objects.values(
                 'par__name', 'roles', 'speciality', 'job', 'task', 'org__name', 'par__id').filter(
@@ -524,8 +538,8 @@ class ProjectsManageView(viewsets.ViewSet):
             obj.views_num_update()  # 浏览量+1
 
             obj_dict = {"lead_org": lead_org_list, "research": research_org_list, "key_word": obj.key_word,
-                        "release_date": obj.release_date, "abstract": obj.abstract,
-                        "attached": str(obj.attached), "classify": cls_t,
+                        "release_date": obj.release_date, "abstract": obj.abstract, "pro_source":obj.pro_source,
+                        "attached": str(obj.attached), "classify": cls_t, "uuid": obj.uuid,
                         "reference": str(obj.reference).split(';'), "par": par_id_obj, 'name': obj.name
                         }
             # print(obj_dict)
@@ -534,12 +548,13 @@ class ProjectsManageView(viewsets.ViewSet):
                 submitter_org = obj.user
                 if bid_re_title:
                     bid_re_title = bid_re_title.re_title
+                submitter_org_name = ''
                 if submitter_org:
-                    submitter_org = submitter_org.first_name
+                    submitter_org_name = submitter_org.org.name if submitter_org.org else ''
                 back_append_dict = {'status': settings.PROJECTS_STATUS_CHOICE[obj.status],
                                     'bid_re_title': bid_re_title,
                                     'downloads': obj.downloads, 'views': obj.views,
-                                    'submitter_org': submitter_org
+                                    'submitter_org': submitter_org_name
                                     }
                 # 与前段一致，将人员的par__id值命名为id
                 for i in range(len(par_id_obj)):
@@ -860,7 +875,7 @@ class GoodProjectsManageView(viewsets.ViewSet):
         """
         # print(request.data)
         param_dict = request.data
-        uuid_list = param_dict.getlist('uuid')  # uuid组成的数组
+        uuid_list = param_dict.get('uuid')  # uuid组成的数组
         mark_id = param_dict.get('mark_id', None)  # 若能获取到mark_id,则代表选中，若没有则代表撤销
         try:
             pro_obj = models.Projects.objects.filter(uuid__in=uuid_list)
@@ -957,18 +972,19 @@ class ResearchManageView(viewsets.ViewSet):
         page_num = request.query_params.get('page_num', 8)
         column = request.query_params.get('column', 'name')
         tag = request.query_params.get('tag', 'all')  # 区分公共查看(all)还是个人后台查看(personal)
+        org = request.query_params.get('org_id', 0)  # 所属单位筛选
         # print(request.query_params)
         page = self.try_except(page, 1)  # 验证页码
         page_num = self.try_except(page_num, 8)  # 验证每页数量
 
         data = models.Research.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'start_date', 'end_date',
-                                              'user', 'guidelines', 'user__org__name', 'contacts', 'phone',
+                                              'user', 'guidelines', 'user__org__name', 'contacts', 'phone', 'user__org',
                                               'status', 'funds').filter(status__in=[0, 1, 2, 3])
 
         if keyword:
             keyword = str(keyword).replace(' ', '')
             # cls_t不作为检索条件
-            if column not in ['name', 'contacts', 'user__first_name']:
+            if column not in ['name', 'contacts', 'user__org__name']:
                 column = 'name'
             cond = {'{}__contains'.format(column): keyword}
             data = data.filter(**cond)
@@ -978,6 +994,9 @@ class ResearchManageView(viewsets.ViewSet):
             # 前方页面显示未发布中状态的招标
             data = data.filter(status=1).order_by('-start_date')
         elif tag == 'personal':
+            if org:
+                # 所属单位筛选
+                data = data.filter(user__org=org)
             # -- 权限开始 --
             user = request.user
             data = permission_filter_data(user, data, 'user__org', status__in=[1, 2, 3])
@@ -985,27 +1004,6 @@ class ResearchManageView(viewsets.ViewSet):
             # -- 权限结束 --
             # 排序
             data = data.order_by('-id')
-
-            # for i in range(len(data)):
-            #     if data[i]['status'] == 0:
-            #         data[i]['edit'] = 1
-            #     else:
-            #         data[i]['edit'] = 0
-            #     # 统计投标数量
-            #     bid_count = models.Bid.objects.filter(bidder_status=1, bidding=data[i]['id']).count()
-            #     data[i]['bid_count'] = bid_count
-            #     # 统计已审批投标数量
-            #     bid_ed_count = models.Bid.objects.filter(bidder_status__in=[2, 3], bidding=data[i]['id']).count()
-            #     data[i]['bid_ed_count'] = bid_ed_count
-            #     # 统计申请结题数量
-            #     bid_conclusion = models.Bid.objects.filter(conclusion_status=1, bidding=data[i]['id']).count()
-            #     data[i]['bid_conclusion'] = bid_conclusion
-            #     # 统计已审批申请结题数量
-            #     bid_ed_conclusion = models.Bid.objects.filter(
-            #         conclusion_status__in=[2, 3], bidding=data[i]['id']).count()
-            #     data[i]['bid_ed_conclusion'] = bid_ed_conclusion
-            #     # 将状态改为对应含义
-            #     data[i]['status'] = settings.RESEARCH_STATUS_CHOICE[data[i]['status']]
 
         sp = SplitPages(data, page, page_num)
         res = sp.split_page()
@@ -1174,6 +1172,7 @@ class BidManageView(viewsets.ViewSet):
         page_num = request.query_params.get('page_num', 10)
         keyword = request.query_params.get('kd', '')
         bid_status = request.query_params.get('status', 100)  # 100代表未输入
+        org = request.query_params.get('org_id', 0)  # 所属单位筛选
         user = request.user
         # print(user)
         page = self.try_except(page, 1)  # 验证页码
@@ -1194,7 +1193,12 @@ class BidManageView(viewsets.ViewSet):
             # -- 记录结束 --
 
         if bid_status != 100:
+            # 状态筛选
             data = data.filter(bidder_status=bid_status)
+
+        if org:
+            # 所属单位筛选
+            data = data.filter(submitter__org=org)
 
         # -- 权限开始 --
         data = permission_filter_data(user, data, 'submitter__org', bidder_status__in=[1, 2, 3])
@@ -1519,9 +1523,6 @@ class MyUserView(viewsets.ViewSet):
 
         # -- 权限开始 --
         user = request.user
-        # group_obj = user.groups.all().first()
-        # group_id = group_obj.id if group_obj else None
-        # if group_id in [settings.PLANT_MANAGER_GROUP, settings.SUPER_USER_GROUP, settings.FIRST_LEVEL_MANAGER_GROUP]:
         data = permission_filter_data(user, data, 'org', module="user_manage")
         if not data:
             return Response(status=status.HTTP_200_OK)
@@ -1589,17 +1590,18 @@ class MyUserView(viewsets.ViewSet):
         first_name = param_dict.get('first_name')  # 真实姓名
         username = param_dict.get('username')  # 用户名
         password = param_dict.get('password')
-        org_id = param_dict.get('org_id')
+        org_id = param_dict.get('org_id', 0)
         org_name = param_dict.get('org')
         par_id = param_dict.get('par_id')
         roles = int(param_dict.get('roles', 0))  # 角色
         phone = param_dict.get('phone')  # 手机号
         email = param_dict.get('email')  # 邮箱
-        print(param_dict)
+        # print(param_dict)
         org_obj = None
         par_obj = None
         if roles in [settings.FIRST_LEVEL_MANAGER_GROUP, settings.GENERAL_ORG_GROUP]:
             org_name = org_name.replace(' ', '')
+            org_id = org_id if org_id else 0
             org_obj_list = models.Organization.objects.filter(id=org_id, name=org_name)
             if org_obj_list:
                 org_obj = org_obj_list[0]
@@ -1613,7 +1615,6 @@ class MyUserView(viewsets.ViewSet):
                         return Response({"msg": "本机构管理员已存在", "status": 403}, status=status.HTTP_200_OK)
             else:
                 # 机构不存在
-                # return Response(status=status.HTTP_404_NOT_FOUND)
                 return Response({"msg": "找不到机构", "status": 404}, status=status.HTTP_200_OK)
         elif roles in [settings.EXPERT_PER_GROUP]:
             # 验证人员存在
@@ -1622,7 +1623,6 @@ class MyUserView(viewsets.ViewSet):
                 par_obj = par_obj_list[0]
             else:
                 # 人员不存在
-                # return Response(status=status.HTTP_404_NOT_FOUND)
                 return Response({"msg": "找不到人员", "status": 404}, status=status.HTTP_200_OK)
 
         password_end = make_password(password, None, 'pbkdf2_sha256')  # 源字符串，固定字符串，加密方式
@@ -1641,7 +1641,6 @@ class MyUserView(viewsets.ViewSet):
             if roles:
                 # 添加角色组
                 groups_list = [roles]
-                # groups_list.append(roles)
                 groups_list_obj = Group.objects.filter(id__in=groups_list)
                 user_obj.groups.add(*groups_list_obj)
 
@@ -1649,13 +1648,11 @@ class MyUserView(viewsets.ViewSet):
             add_user_behavior(keyword='', search_con='新增用户信息({})'.format(user_obj.id), user_obj=request.user)
             # -- 记录结束 --
 
-            # return Response(status=status.HTTP_201_CREATED)
             return Response({"msg": "创建成功", "status": 201}, status=status.HTTP_201_CREATED)
         except Exception as e:
             # 创建失败
             set_run_info(level='error', address='/query/view.py/MyUserView-create',
                          user=request.user.id, keyword='新增用户信息失败：{}'.format(e))
-            # return Response(status=status.HTTP_400_BAD_REQUEST)
             return Response({"msg": "创建失败", "status": 500}, status=status.HTTP_200_OK)
 
     @staticmethod
@@ -1670,15 +1667,27 @@ class MyUserView(viewsets.ViewSet):
         is_active = param_dict.get('is_active')
         phone = param_dict.get('phone')  # 手机号
         email = param_dict.get('email')  # 邮箱
+        photo = request.FILES.get('photo')  # 头像
         # print(param_dict)
 
         try:
+            if photo:
+                photo_save_path_dirs = os.path.join(os.path.join(settings.MEDIA_ROOT, 'user'), 'portrait')
+                file_obj = UploadFile(photo_save_path_dirs, photo)
+                photo_name_fin = file_obj.handle()
 
-            models.User.objects.filter(id=user_id).update(
-                cell_phone=phone,
-                is_active=is_active,
-                email=email
-            )
+                models.User.objects.filter(id=user_id).update(
+                    cell_phone=phone,
+                    is_active=is_active,
+                    email=email,
+                    photo='user/portrait/{}'.format(photo_name_fin)
+                )
+            else:
+                models.User.objects.filter(id=user_id).update(
+                    cell_phone=phone,
+                    is_active=is_active,
+                    email=email,
+                )
             # -- 记录开始 --
             add_user_behavior(keyword='', search_con='编辑用户信息({}):{}'.format(user_id, str(param_dict)),
                               user_obj=request.user)
@@ -1688,6 +1697,108 @@ class MyUserView(viewsets.ViewSet):
             set_run_info(level='error', address='/query/view.py/MyUserView-update',
                          user=request.user.id, keyword='编辑用户信息失败：{}'.format(e))
             return Response({"msg": "编辑失败", "status": 500}, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=False)
+    def apply_user_to_par(self, request):
+        """
+        研究人员认证
+        :param request:
+        :return:
+        """
+        param_dict = request.data
+        user = request.user
+        user_id = user.id if type(user) != AnonymousUser else 0
+        param_dict['user'] = user_id
+        print('--11', param_dict)
+        try:
+            serialier_param = QuerySerializer.UserToParCreateSerializer(data=param_dict)
+            serialier_param.is_valid(raise_exception=True)
+            serialier_param.save()
+        except AttributeError as e:
+            set_run_info(level='error', address='/query/view.py/MyUserView-set_user_to_participant',
+                         user=user_id, keyword='研究人员认证：{}'.format(e))
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_201_CREATED)
+
+    @action(methods=['get'], detail=False)
+    def get_user_to_par_list(self, request):
+        """
+        研究人员认证列表--平台管理员和超管可见
+        :param request:
+        :return:
+        """
+        param_dict = request.query_params
+        page = param_dict.get('page', 1)
+        page_num = param_dict.get('page_num', 10)
+        keyword = param_dict.get('kw', '')
+        up_status = param_dict.get('up_status', 0)
+
+        page = self.try_except(page, 1)  # 验证类型
+        page_num = self.try_except(page_num, 10)  # 验证返回数量
+
+        data = models.UserToParticipant.objects.filter(up_status=up_status)
+
+        if keyword:
+            data = data.filter(Q(user__username__contains=keyword) | Q(user__first_name__contains=keyword))
+
+        sp = SplitPages(data, page, page_num)
+        res = sp.split_page()
+
+        result = QuerySerializer.UserToParListSerializer(instance=res['res'], many=True)
+        res['res'] = result.data
+
+        return Response(res, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True)
+    def set_user_to_par(self, request, pk):
+        """
+        审批-研究人员认证--平台管理员和超管可见
+        :param request:
+        :param pk:
+        :return:
+        """
+        param_dict = request.data
+        up_status = param_dict.get('status')  # 1：通过 2：否决  0：未处理
+        remarks = param_dict.get('remarks')  # 备注
+        try:
+            item_tmp = models.UserToParticipant.objects.filter(id=pk)
+            if int(up_status) == 1:
+                # 同意
+                if item_tmp:
+                    item_obj = item_tmp[0]
+                else:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                # 获取关联人员id
+                user_obj = item_obj.user
+                par_info = self.choose_or_create_par(user_obj)
+
+                par_id = par_info.get("par_id")
+                if par_id == '-1':
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                # 更新用户信息（挂人员）
+                par_obj = models.Participant.objects.get(id=par_id)
+                user_obj.par = par_obj
+                user_obj.save()
+
+                # 更换角色组（普通个人换为专家个人）
+                groups_list_obj = Group.objects.filter(id=settings.EXPERT_PER_GROUP)
+                user_obj.groups.clear()
+                user_obj.groups.add(*groups_list_obj)
+
+                # 更新研究人员信息
+                self.update_par_info(par_obj, item_obj)
+
+                item_tmp.update(up_status=1, remarks=remarks)
+            else:
+                # 驳回账号
+                item_tmp.update(up_status=2, remarks=remarks)
+            add_user_behavior(keyword='', search_con='认证研究人员审批({}:{})'.format(pk, up_status),
+                              user_obj=request.user)
+        except Exception as e:
+            set_run_info(level='error', address='/query/view.py/MyUserView-set_user_to_par',
+                         keyword='认证研究人员审批失败：{}'.format(e))
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_200_OK)
 
     @staticmethod
     def try_except(param_key, param_default):
@@ -1701,6 +1812,61 @@ class MyUserView(viewsets.ViewSet):
                          keyword='强转参数出错{}'.format(e))
             param_key = param_default
         return param_key
+
+    @staticmethod
+    def choose_or_create_par(user_obj):
+        """
+        选择或者创建人员。并返回人员id
+        :param user_obj: 申请用户对象
+        :return:{"msg": 成功标志, "par_id": par对应id}
+        """
+        par_id_card_code = user_obj.id_card
+        par_info = {"msg": 0, "par_id": -1}
+        if par_id_card_code:
+            par_obj = models.Participant.objects.filter(id_card=par_id_card_code)
+            if par_obj:
+                # 人员库里面有直接挂
+                par_id = par_obj.first().id
+            else:
+                # 人员库里面没有啧创建
+                par_obj_tmp = models.Participant.objects.create(id_card=par_id_card_code, name=user_obj.first_name)
+                par_id = par_obj_tmp.id
+            par_info["msg"] = 1
+            par_info["par_id"] = par_id
+        else:
+            set_run_info(level='error', address='/login/view.py/RegisterView-set_register_user',
+                         keyword='注册账号审批失败：{}'.format('注册信息中没有机构信用码'))
+        return par_info
+
+    @staticmethod
+    def update_par_info(par_obj, item_obj):
+        """
+        同步更新人员信息--有则更新，无则不变
+        :param par_obj: 研究人员对象
+        :param item_obj:待审批对象
+        :return:
+        """
+        update_dict = dict()
+        update_dict["cell_phone"] = item_obj.user.cell_phone
+        update_dict["email"] = item_obj.user.email
+        update_dict["gender"] = item_obj.gender
+        update_dict["birth"] = item_obj.birth
+        update_dict["education"] = item_obj.education
+        update_dict["academic_degree"] = item_obj.academic_degree
+        update_dict["address"] = item_obj.address
+        update_dict["postcode"] = item_obj.postcode
+        update_dict["brief"] = item_obj.brief
+        update_dict["research_direction"] = item_obj.research_direction
+        update_dict["photo"] = item_obj.photo
+        update_dict["id_card_photo_positive"] = item_obj.id_card_photo_positive
+        update_dict["id_card_photo_reverse"] = item_obj.id_card_photo_reverse
+        # 清除字典中值为空的键值对
+        for k in list(update_dict.keys()):  # 对字典update_dict中的keys，相当于形成列表list
+            if not update_dict[k]:
+                del update_dict[k]
+        # print(update_dict)
+        par_obj.__dict__.update(**update_dict)
+        par_obj.save()
 
 
 class HotWordsView(viewsets.ViewSet):

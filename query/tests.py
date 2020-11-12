@@ -22,6 +22,11 @@ def is_valid_date(str_date):
 
 
 if __name__ == "__main__":
-    a_date = '2020/10/12'
-    is_valid_date(a_date)
+    # a_date = '2020/10/12'
+    # is_valid_date(a_date)
+    a = {1: 0, 2: 1, 3: 0, 4: 1}
+    for k in list(a.keys()):  # 对字典a中的keys，相当于形成列表list
+        if a[k] == 0:
+            del a[k]
+    print(a)
 

@@ -194,7 +194,9 @@ class ParCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Participant
-        fields = ['name', 'gender', 'unit', 'job', 'email', 'brief', 'photo']
+        fields = ['name', 'id_card', 'cell_phone', 'gender', 'unit', 'job', 'email', 'brief', 'photo', 'birth',
+                  'education', 'academic_degree', 'address', 'postcode', 'research_direction',
+                  'id_card_photo_positive', 'id_card_photo_reverse']
 
 
 class ParRetriveSerializer(serializers.ModelSerializer):
@@ -202,14 +204,17 @@ class ParRetriveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Participant
-        fields = ['name', 'gender', 'unit_name', 'job', 'email', 'brief', 'photo', 'pro_sum']
+        fields = ['name', 'gender', 'unit_name', 'job', 'email', 'brief', 'photo', 'pro_sum', 'id_card', 'cell_phone',
+                  'birth', 'education', 'academic_degree', 'address', 'postcode', 'research_direction',
+                  'id_card_photo_positive', 'id_card_photo_reverse']
 
 
 class ParUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Participant
-        fields = ['name', 'gender', 'job', 'email', 'brief', 'photo']
+        fields = ['gender', 'unit', 'job', 'email', 'brief', 'photo', 'cell_phone',
+                  'birth', 'education', 'academic_degree', 'address', 'postcode', 'research_direction']
 
 
 # class NewsTextListSerializer(serializers.ModelSerializer):

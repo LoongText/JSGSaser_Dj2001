@@ -331,7 +331,7 @@ class BidderUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
             return Bdrs
 
     def create(self, request, *args, **kwargs):
-        print('投标data', request.data)
+        # print('投标data', request.data)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         obj = self.perform_create(serializer)
@@ -491,7 +491,7 @@ class NewsManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Up
         page_num = self.try_except(page_num, 10)  # 验证返回数量
 
         if tag == 't':
-            data = NewsManageView.queryset.values('id', 'title', 'text_create_time').order_by('-text_create_time')
+            data = NewsManageView.queryset.values('id', 'title', 'text_create_time', 'text_attached').order_by('-text_create_time')
         elif tag == 'i':
             data = NewsManageView.queryset.values('id', 'title', 'image_attached', 'text_create_time').filter(image_attached__isnull=False).exclude(image_attached='').order_by('-text_create_time')
         else:
@@ -534,10 +534,11 @@ class NewsManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Up
         """
         try:
             obj = models.News.objects.get(id=pk)
-            the_file_name = '{}.pdf'.format(obj.title)
-            # print(the_file_name)
+            # the_file_name = '{}.pdf'.format(obj.title)
+            the_file_name = str(obj.text_attached).split('/')[-1]
+            print(the_file_name)
             download_url_fin = os.path.join(settings.MEDIA_ROOT, str(obj.text_attached))
-            # print(download_url_fin)
+            print(download_url_fin)
             # print(content_disposition)
             # 将汉字换成ascii码，否则下载名称不能正确显示
             the_file_name = urllib.parse.quote(the_file_name)

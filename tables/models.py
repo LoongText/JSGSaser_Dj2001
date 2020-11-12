@@ -105,7 +105,7 @@ class Organization(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ID')
     uuid = models.CharField(max_length=32, verbose_name='唯一标识', null=False, unique=True)
     id_card_code = models.CharField(max_length=18, verbose_name="社会信用码", null=True)
-    name = models.CharField(max_length=50, null=False, verbose_name='机构名称')
+    name = models.CharField(max_length=100, null=False, verbose_name='机构名称')
     competent_dpt = models.IntegerField(verbose_name='主管部门', default=0)
     superior_unit = models.IntegerField(verbose_name='上级单位', default=0)
     nature = models.ForeignKey(OrgNature, verbose_name='机构性质', null=True, on_delete=models.CASCADE)
@@ -117,7 +117,7 @@ class Organization(models.Model):
     register_type = models.CharField(max_length=100, verbose_name="注册类型", null=True)
     register_capital = models.FloatField(verbose_name="注册资本", null=True)
     register_date = models.DateField(verbose_name="注册时间", null=True)
-    address = models.CharField(max_length=300, verbose_name="地址", null=True)
+    address = models.TextField(verbose_name="地址", null=True)
     postcode = models.IntegerField(verbose_name="邮政编码", null=True)
     unit_tel = models.CharField(max_length=20, verbose_name="单位电话", null=True)
     unit_fax = models.CharField(max_length=20, verbose_name="单位传真", null=True)
@@ -204,6 +204,8 @@ class Projects(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="提交用户", null=True)
     bid = models.ForeignKey(Bid, on_delete=models.CASCADE, verbose_name="对应投标", null=True)
     good_mark = models.ForeignKey(ProjectsMark, on_delete=models.CASCADE, verbose_name="优秀成果标志", null=True)
+    pro_source = models.CharField(max_length=10, verbose_name='来源', default='iser')  # iser,cnki
+    org_str = models.CharField(max_length=300, verbose_name='研究机构', null=True)  # 来源是cnki数据的研究机构字符串
 
     class Meta:
         verbose_name_plural = '成果信息表'
@@ -239,13 +241,13 @@ class Participant(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ID')
     uuid = models.CharField(max_length=32, verbose_name='唯一标识', null=False, unique=True)
     id_card = models.CharField(max_length=18, verbose_name="身份证号", null=True)
-    name = models.CharField(max_length=10, null=False, verbose_name='姓名')
+    name = models.CharField(max_length=30, null=False, verbose_name='姓名')
     cell_phone = models.CharField(max_length=18, null=True, verbose_name="手机号")
     gender = models.IntegerField(choices=GENDER_CHOICES, verbose_name='性别', default=1)
     birth = models.DateField(null=True, verbose_name='出生日期')
-    education = models.CharField(max_length=10, null=True, verbose_name="本人最高学历")
-    academic_degree = models.CharField(max_length=10, null=True, verbose_name="本人学位")
-    address = models.CharField(max_length=300, null=True, verbose_name="地址")
+    education = models.CharField(max_length=100, null=True, verbose_name="本人最高学历")
+    academic_degree = models.CharField(max_length=100, null=True, verbose_name="本人学位")
+    address = models.TextField(null=True, verbose_name="地址")
     postcode = models.IntegerField(null=True, verbose_name="邮编")
     unit = models.ForeignKey(Organization, null=True, verbose_name='现所属单位',
                              on_delete=models.CASCADE, related_name='pts')
@@ -253,7 +255,9 @@ class Participant(models.Model):
     job = models.CharField(max_length=100, verbose_name='现职务职称', null=True)
     research_direction = models.CharField(max_length=100, verbose_name='研究方向', null=True)
     email = models.EmailField(verbose_name='邮箱', null=True)
-    photo = models.ImageField(upload_to='participants/', verbose_name='头像', null=True)
+    photo = models.ImageField(upload_to='participants/portrait/', verbose_name='头像', null=True)
+    id_card_photo_positive = models.ImageField(upload_to='participants/id_card/', verbose_name='身份证正面', null=True)
+    id_card_photo_reverse = models.ImageField(upload_to='participants/id_card/', verbose_name='身份证反面', null=True)
     created_date = models.DateField(auto_now_add=True, verbose_name='创建时间', null=True)
     pro_sum = models.IntegerField(verbose_name='成果总数', default=0)
     is_show = models.BooleanField(verbose_name='是否展示', default=1)
@@ -405,6 +409,8 @@ class User(AbstractUser):
     id_card = models.CharField(verbose_name="社会信用码/身份证号", max_length=18, null=True)
     cell_phone = models.CharField(max_length=11, verbose_name="手机号", null=True)
     certification_materials = models.CharField(max_length=100, verbose_name="证明材料", null=True)  # 从注册表拷贝路径过来
+    photo = models.ImageField(upload_to='user/portrait/', verbose_name='头像', null=True)
+
     # business_license = models.FileField(verbose_name="营业执照", null=True, upload_to='register/business_license/%Y/%m')
     # back_is_login = models.BooleanField(default=0, verbose_name="判断后台是否登录")
 
@@ -414,7 +420,7 @@ class User(AbstractUser):
 
 class UserRegister(models.Model):
     id = models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, editable=False)
-    roles = models.IntegerField(verbose_name="角色", null=False)  # 1：机构管理员用户 2：个人用户
+    roles = models.IntegerField(verbose_name="角色", null=False)  # 2100：机构管理员用户 4200：个人用户
     username = models.CharField(max_length=20, verbose_name="用户名", null=False)
     id_card_code = models.CharField(max_length=18, verbose_name="社会信用码/身份证号", null=True)
     name = models.CharField(max_length=100, verbose_name="名称", null=True)
@@ -428,7 +434,7 @@ class UserRegister(models.Model):
     email = models.CharField(max_length=100, verbose_name="邮箱", null=True)
     create_date = models.DateField(auto_now_add=True, verbose_name="创建时间", editable=False)
     info_status = models.IntegerField(verbose_name="状态", null=False, default=0)  # 1：通过 2：否决  0：未处理
-    remarks = models.CharField(max_length=200, verbose_name="备注", null=True)  # 备注
+    remarks = models.TextField(verbose_name="备注", null=True)  # 备注
 
     class Meta:
         verbose_name = "注册表"
@@ -461,3 +467,38 @@ class News(models.Model):
 
     class Meta:
         verbose_name = "新闻管理"
+
+
+class UserToParticipant(models.Model):
+    """
+    研究人员验证表
+    """
+    GENDER_CHOICES = ((1, '男'), (2, '女'))
+    id = models.AutoField(primary_key=True, verbose_name='ID')
+    # id_card = models.CharField(max_length=18, verbose_name="身份证号", null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="用户", null=False)
+    # name = models.CharField(max_length=30, null=False, verbose_name='姓名')
+    # cell_phone = models.CharField(max_length=18, null=True, verbose_name="手机号")
+    gender = models.IntegerField(choices=GENDER_CHOICES, verbose_name='性别', default=1)
+    birth = models.DateField(null=True, verbose_name='出生日期')
+    education = models.CharField(max_length=100, null=True, verbose_name="本人最高学历")
+    academic_degree = models.CharField(max_length=100, null=True, verbose_name="本人学位")
+    address = models.TextField(null=True, verbose_name="地址")
+    postcode = models.IntegerField(null=True, verbose_name="邮编")
+    # unit = models.ForeignKey(Organization, null=True, verbose_name='现所属单位', on_delete=models.CASCADE)
+    brief = models.TextField(null=True, verbose_name='简介')
+    # job = models.CharField(max_length=100, verbose_name='现职务职称', null=True)
+    research_direction = models.CharField(max_length=100, verbose_name='专长', null=True)
+    # email = models.EmailField(verbose_name='邮箱', null=True)
+    photo = models.ImageField(upload_to='participants/portrait/', verbose_name='头像', null=True)
+    id_card_photo_positive = models.ImageField(upload_to='participants/id_card/', verbose_name='身份证正面', null=True)
+    id_card_photo_reverse = models.ImageField(upload_to='participants/id_card/', verbose_name='身份证反面', null=True)
+    job_certi = models.FileField(upload_to='participants/job_certi/', verbose_name='在职证明', null=True)
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', null=True)
+    approval_date = models.DateTimeField(verbose_name='审批时间', null=True)
+    up_status = models.IntegerField(verbose_name='状态', default=0)  # 0:待审批 1：通过 2：驳回
+    remarks = models.TextField(verbose_name='审批备注', null=True)
+
+    class Meta:
+        verbose_name_plural = '研究人员验证表'
+

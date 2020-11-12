@@ -10,7 +10,7 @@ from login.auth import ExpiringTokenAuthentication
 from django.views.decorators.csrf import csrf_exempt
 from login.LoginSerializer import UserRegisterListSerializer as urls
 from login.LoginSerializer import UserRegisterCreateSerializer as urcs
-from login.LoginSerializer import UserRegisterCreateSerializer as urrs
+from login.LoginSerializer import UserRegisterRetriveSerializer as urrs
 from rest_framework.decorators import action
 from query.split_page import SplitPages
 from functools import wraps
@@ -45,6 +45,9 @@ class LoginView(viewsets.ViewSet):
                 user_org = user.org
                 if user_org:
                     user_org = str(user_org)
+                # user_par = user.par
+                # if user_par:
+                #     user_par = user_par
                 old_token = Token.objects.filter(user=user)
                 old_token.delete()
                 # 创建新的Token
@@ -56,7 +59,8 @@ class LoginView(viewsets.ViewSet):
                     nickname = user.username
                 # roles = get_user_org_roles(user.id)
                 res = {"status": 200, "username": user.username, "token": token.key, "userid": user.id,
-                       "groupid_list": group_id_list, "user_org": user_org, "user_nickname": nickname}
+                       "groupid_list": group_id_list, "user_org": user_org, "user_nickname": nickname,
+                       }
                 # add_user_behavior(keyword='', search_con='用户登录', user_obj=user)
             else:
                 res = {'status': 403}
@@ -107,21 +111,24 @@ class RegisterView(viewsets.GenericViewSet, mixins.CreateModelMixin,
         page = request.query_params.get('page', 1)
         page_num = request.query_params.get('page_num', 10)
         keyword = request.query_params.get('kw', '')
-        roles = request.query_params.get('roles', 0)  # 1：机构管理员 2：个人用户
+        roles = request.query_params.get('roles', 0)  # 2100：机构管理员 4200：个人用户  -- 筛选用
+        info_status = request.query_params.get('info_status', 0)  # 状态筛选
 
         page = self.try_except(page, 1)  # 验证类型
         page_num = self.try_except(page_num, 10)  # 验证返回数量
 
-        data = models.UserRegister.objects.values('name', 'roles', 'cell_phone', 'create_date').filter(info_status=0)
+        data = models.UserRegister.objects.values('id', 'name', 'roles', 'cell_phone', 'create_date', 'info_status'
+                                                  ).filter(info_status=info_status)
         if keyword:
             data = data.filter(Q(username__contains=keyword) | Q(first_name__contains=keyword))
         if roles:
             data = data.filter(roles=roles)
-        # -- 记录开始 --
-        add_user_behavior(keyword='', search_con='获得待审批的用户-注册来的', user_obj=request.user)
-        # -- 记录结束 --
+
         sp = SplitPages(data, page, page_num)
         res = sp.split_page()
+        for i in range(len(res['res'])):
+            res['res'][i]['roles'] = settings.ROLES_DICT.get(res['res'][i]['roles'])
+            res['res'][i]['info_status'] = settings.REGISTER_APPROVAL_RESULT.get(res['res'][i]['info_status'])
         return Response(res, status=status.HTTP_200_OK)
 
     @staticmethod
@@ -146,8 +153,6 @@ class RegisterView(viewsets.GenericViewSet, mixins.CreateModelMixin,
         """
         param_dict = request.data
         info_status = param_dict.get('status')  # 1：通过 2：否决  0：未处理
-        roles = param_dict.get('roles')  # 1：机构管理员 2：个人
-        org_id = param_dict.get('org_id')  # 机构id，机构管理员需要挂机构
         remarks = param_dict.get('remarks')  # 备注
         try:
             user_tmp = models.UserRegister.objects.filter(id=pk)
@@ -157,40 +162,35 @@ class RegisterView(viewsets.GenericViewSet, mixins.CreateModelMixin,
                     user_obj = user_tmp[0]
                 else:
                     return Response(status=status.HTTP_404_NOT_FOUND)
-                if int(roles) == 1:
-                    # 创建机构管理员账号
-                    new_user_obj = models.User.objects.create(
-                        first_name=user_obj.name,
-                        username=user_obj.username,
-                        password=make_password(user_obj.login_pwd),
-                        org=models.Organization.objects.get(id=org_id),
-                        id_card=user_obj.id_card_code,
-                        cell_phone=user_obj.cell_phone,
-                        email=user_obj.email
-                    )
-                    if new_user_obj:
-                        # 添加角色组
-                        groups_list_obj = Group.objects.filter(id=settings.FIRST_LEVEL_MANAGER_GROUP)
-                        new_user_obj.groups.add(*groups_list_obj)
-                else:
-                    # 创建个人账号
-                    new_user_obj = models.User.objects.create(
-                        first_name=user_obj.name,
-                        username=user_obj.username,
-                        password=make_password(user_obj.login_pwd),
-                        id_card=user_obj.id_card_code,
-                        cell_phone=user_obj.cell_phone,
-                        email=user_obj.email
-                    )
-                    if new_user_obj:
-                        # 添加角色组
-                        groups_list_obj = Group.objects.filter(id=settings.GENERAL_PER_GROUP)
-                        new_user_obj.groups.add(*groups_list_obj)
+
+                new_user_obj = models.User.objects.create(
+                    first_name=user_obj.name,
+                    username=user_obj.username,
+                    password=make_password(user_obj.login_pwd),
+                    id_card=user_obj.id_card_code,
+                    cell_phone=user_obj.cell_phone,
+                    email=user_obj.email
+                )
+                if new_user_obj:
+                    # 添加角色组
+                    groups_list_obj = Group.objects.filter(id=user_obj.roles)
+                    new_user_obj.groups.add(*groups_list_obj)
+
+                if user_obj.roles == settings.FIRST_LEVEL_MANAGER_GROUP:
+                    # 获取关联机构id
+                    org_info = self.choose_or_create_org(user_obj)
+                    org_id = org_info.get("org_id")
+                    if org_id == '-1':
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+
+                    new_user_obj.org = models.Organization.objects.get(id=org_id)
+                    new_user_obj.save()
+
                 user_tmp.update(info_status=1, remarks=remarks)
             else:
                 # 驳回账号
-                user_tmp.update(info_status=2)
-            add_user_behavior(keyword='', search_con='设置新闻不可见({})'.format(pk), user_obj=request.user)
+                user_tmp.update(info_status=2, remarks=remarks)
+            add_user_behavior(keyword='', search_con='账号审批({}:{})'.format(pk, info_status), user_obj=request.user)
         except Exception as e:
             set_run_info(level='error', address='/login/view.py/RegisterView-set_register_user',
                          keyword='注册账号审批失败：{}'.format(e))
@@ -205,15 +205,14 @@ class RegisterView(viewsets.GenericViewSet, mixins.CreateModelMixin,
         :return:
         """
         try:
-            obj = models.News.objects.get(id=pk)
-            the_file_name = '{}.pdf'.format(obj.title)
-            download_url_fin = os.path.join(settings.MEDIA_ROOT, str(obj.text_attached))
+            obj = models.UserRegister.objects.get(id=pk)
+            the_file_name = '{}.pdf'.format(obj.username)
+            download_url_fin = os.path.join(settings.MEDIA_ROOT, str(obj.certification_materials))
             # 将汉字换成ascii码，否则下载名称不能正确显示
             the_file_name = urllib.parse.quote(the_file_name)
             response = StreamingHttpResponse(self.file_iterator(download_url_fin))
             response['Content-Type'] = 'application/octet-stream'
             response['Content-Disposition'] = 'attachment;filename="{}"'.format(the_file_name)
-
             return response
         except Exception as e:
             set_run_info(level='error', address='/login/view.py/RegisterView-get_verity_file',
@@ -236,6 +235,32 @@ class RegisterView(viewsets.GenericViewSet, mixins.CreateModelMixin,
                     yield c
                 else:
                     break
+
+    @staticmethod
+    def choose_or_create_org(user_obj):
+        """
+        选择或者创建机构。并返回机构id
+        :param user_obj: 注册用户对象
+        :return:{"msg": 成功标志, "org_id": org对应id}
+        """
+        org_id_card_code = user_obj.id_card_code
+        org_info = {"msg": 0, "org_id": -1}
+        if org_id_card_code:
+            org_obj = models.Organization.objects.filter(id_card_code=org_id_card_code)
+            if org_obj:
+                # 机构库里面有直接挂
+                org_id = org_obj.first().id
+            else:
+                # 机构库里面没有啧创建
+                org_obj_tmp = models.Organization.objects.create(id_card_code=org_id_card_code,
+                                                                 name=user_obj.name)
+                org_id = org_obj_tmp.id
+            org_info["msg"] = 1
+            org_info["org_id"] = org_id
+        else:
+            set_run_info(level='error', address='/login/view.py/RegisterView-set_register_user',
+                         keyword='注册账号审批失败：{}'.format('注册信息中没有机构信用码'))
+        return org_info
 
 
 @api_view(['POST'])

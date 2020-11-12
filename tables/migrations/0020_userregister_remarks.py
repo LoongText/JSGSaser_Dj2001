@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userregister',
             name='remarks',
-            field=models.CharField(max_length=200, null=True, verbose_name='备注'),
+            field=models.TextField(null=True, verbose_name='备注'),
         ),
     ]

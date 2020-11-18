@@ -59,9 +59,8 @@ class LoginView(viewsets.ViewSet):
                     nickname = user.username
                 # roles = get_user_org_roles(user.id)
                 res = {"status": 200, "username": user.username, "token": token.key, "userid": user.id,
-                       "groupid_list": group_id_list, "user_org": user_org, "user_nickname": nickname,
-                       }
-                # add_user_behavior(keyword='', search_con='用户登录', user_obj=user)
+                       "groupid_list": group_id_list, "user_org": user_org, "user_nickname": nickname}
+                add_user_behavior(keyword='', search_con='用户登录', user_obj=user)
             else:
                 res = {'status': 403}
 

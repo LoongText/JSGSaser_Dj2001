@@ -79,13 +79,12 @@ class BidderRetirveSerializer(serializers.ModelSerializer):
 
 class OrgPersonalListSerializer(serializers.ModelSerializer):
 
-    competent_dpt = serializers.SerializerMethodField()
     superior_unit = serializers.SerializerMethodField()
     nature__remarks = serializers.SerializerMethodField()
 
     class Meta:
         model = Organization
-        fields = ['id', 'uuid', 'name', 'competent_dpt', 'superior_unit', 'nature__remarks']
+        fields = ['id', 'uuid', 'name', 'superior_unit', 'nature__remarks']
 
     @staticmethod
     def get_nature__remarks(obj):
@@ -97,29 +96,12 @@ class OrgPersonalListSerializer(serializers.ModelSerializer):
         return obj.nature.remarks if obj.nature else None
 
     @staticmethod
-    def get_competent_dpt(obj):
-        """
-        主管部门
-        :param obj:
-        :return:
-        """
-        org_id = obj.competent_dpt
-        competent_dpt_obj = Organization.objects.values('name').filter(pk=org_id)
-        if competent_dpt_obj:
-            competent_dpt_org = competent_dpt_obj[0]['name']
-        else:
-            competent_dpt_org = ''
-        return competent_dpt_org
-
-    @staticmethod
     def get_superior_unit(obj):
         """
         上级单位--不与主管部门同时显示
         :param obj:
         :return:
         """
-        if obj.competent_dpt:
-            return None
         org_id = obj.superior_unit
         superior_unit_obj = Organization.objects.values('name').filter(pk=org_id)
         if superior_unit_obj:
@@ -133,7 +115,7 @@ class OrgCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Organization
-        fields = ['name', 'nature', 'competent_dpt', 'superior_unit', 'brief', 'is_show', 'photo']
+        fields = ['name', 'nature', 'superior_unit', 'brief', 'is_show', 'photo']
 
 
 class OrgRetriveSerializer(serializers.ModelSerializer):
@@ -143,7 +125,7 @@ class OrgRetriveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Organization
-        fields = ['name', 'competent_dpt', 'superior_unit', 'brief', 'pro_sum', 'par_sum', 'nature_remarks', 'photo',
+        fields = ['name', 'superior_unit', 'brief', 'pro_sum', 'par_sum', 'nature_remarks', 'photo',
                   'subordinate_unit']
 
     @staticmethod
@@ -170,17 +152,14 @@ class OrgRetriveSerializer(serializers.ModelSerializer):
         :param obj:
         :return:
         """
-        if obj.competent_dpt:
-            return 0
-        else:
-            return obj.superior_unit
+        return obj.superior_unit
 
 
 class OrgUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Organization
-        fields = ['nature', 'competent_dpt', 'superior_unit', 'brief', 'photo']
+        fields = ['nature', 'superior_unit', 'brief', 'photo']
 
 
 class ParListPersonalSerializer(serializers.ModelSerializer):

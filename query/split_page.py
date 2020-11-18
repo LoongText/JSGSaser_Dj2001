@@ -12,6 +12,8 @@ class SplitPages(object):
         self.per_page_num = per_page_num
 
     def _data_sum(self):
+        if isinstance(self.data, list):
+            return len(self.data)
         return self.data.count()
 
     def _data_page_num(self, data_sum):

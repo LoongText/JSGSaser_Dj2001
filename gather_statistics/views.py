@@ -384,52 +384,29 @@ class ProOrgCountView(viewsets.ViewSet):
         if nature:
             # 有机构分类
             data = data.filter(nature=nature)
+        data_sum = data.count()
+
+        for i in range(len(data)):
+            org_id_list = self.get_relative_org_list(data[i]['id'])  # 获得本机构和下属机构的id
+            pro_data = models.Projects.objects.values('id').filter(status=1).filter(
+                Q(lead_org__id__in=org_id_list) | Q(research__id__in=org_id_list))
+            data[i]['pro_sum'] = pro_data.count()  # 成果总量
+            if data[i]['pro_sum'] == 0:
+                data[i]['view_sum'] = 0
+            else:
+                data[i]['view_sum'] = pro_data.aggregate(Sum('views'))['views__sum']  # 成果总浏览量
+                if data[i]['view_sum'] is None:
+                    data[i]['view_sum'] = 0
 
         if order == 'p':
             # 成果总数排序
-            data = data.order_by('-pro_sum', '-id')
-            for i in range(len(data)):
-                if data[i]['pro_sum'] == 0:
-                    data[i]['view_sum'] = 0
-                else:
-                    data[i]['view_sum'] = models.Projects.objects.filter(status=1).filter(
-                        Q(lead_org__id=data[i]['id']) | Q(research__id=data[i]['id'])).aggregate(Sum('views'))[
-                        'views__sum']  # 成果总浏览量
-                    if data[i]['view_sum'] is None:
-                        data[i]['view_sum'] = 0
-            data_sum = data.count()
+            data = sorted(data, key=lambda x: x['pro_sum'], reverse=True)
         elif order == 'v':
             # 根据点击量排序
-            data_obj_list = []
-            for i in range(len(data)):
-                if data[i]['pro_sum'] == 0:
-                    data[i]['view_sum'] = 0
-                else:
-                    # 成果总浏览量
-                    data[i]['view_sum'] = models.Projects.objects.filter(status=1).filter(
-                        Q(lead_org__id=data[i]['id']) | Q(research__id=data[i]['id'])).aggregate(Sum('views'))[
-                        'views__sum']
-
-                    if data[i]['view_sum'] is None:
-                        data[i]['view_sum'] = 0
-                data_obj_list.append(data[i])
-
-            data = sorted(data_obj_list, key=lambda x: x['view_sum'], reverse=True)
-            data_sum = len(data)
+            data = sorted(data, key=lambda x: x['view_sum'], reverse=True)
         else:
             # 根据学者量排序
-            data = data.order_by('-par_sum', '-id')
-            for i in range(len(data)):
-                if data[i]['pro_sum'] == 0:
-                    data[i]['view_sum'] = 0
-                else:
-                    # 成果总浏览量
-                    data[i]['view_sum'] = models.Projects.objects.filter(status=1).filter(
-                        Q(lead_org__id=data[i]['id']) | Q(research__id=data[i]['id'])).aggregate(Sum('views'))[
-                        'views__sum']
-                    if data[i]['view_sum'] is None:
-                        data[i]['view_sum'] = 0
-            data_sum = data.count()
+            data = sorted(data, key=lambda x: x['par_sum'], reverse=True)
 
         data_page_sum = data_sum // page_num + 1
 
@@ -450,6 +427,22 @@ class ProOrgCountView(viewsets.ViewSet):
             set_run_info(level='error', address='/gather_statistics/view.py/ProOrgCountView',
                          keyword='按机构统计成果-参数强转失败：{}'.format(e))
         return param_key
+
+    @staticmethod
+    def get_relative_org_list(ori_org_id):
+        """
+        获得本机构和所有下级机构
+        :param ori_org_id: 初始机构id
+        :return:
+        """
+        org_id_list = [ori_org_id]
+        if org_id_list:
+            for org_id in org_id_list:
+                org_id_list_tmp = models.Organization.objects.values('id').filter(superior_unit=org_id, is_show=True)
+                org_id_list_tmp_list = [j['id'] for j in org_id_list_tmp]
+                if org_id_list_tmp_list:
+                    org_id_list.extend(org_id_list_tmp_list)
+        return org_id_list
 
 
 class ProParCountView(viewsets.ViewSet):

@@ -20,15 +20,16 @@ class UserRegisterCreateSerializer(serializers.ModelSerializer):
 
 class UserRegisterRetriveSerializer(serializers.ModelSerializer):
 
-    # roles = serializers.SerializerMethodField()
+    info_status = serializers.SerializerMethodField()
 
     class Meta:
         model = UserRegister
-        fields = ['roles', 'username', 'id_card_code', 'name', 'cell_phone', 'login_pwd', 'email', 'create_date']
+        fields = ['roles', 'username', 'id_card_code', 'name', 'cell_phone', 'login_pwd', 'email',
+                  'create_date', 'info_status', 'remarks']
 
-    # @staticmethod
-    # def get_roles(obj):
-    #     return settings.ROLES_DICT.get(obj.roles)
+    @staticmethod
+    def get_info_status(obj):
+        return settings.REGISTER_APPROVAL_RESULT.get(obj.info_status)
 
 # class ParRetriveSerializer(serializers.ModelSerializer):
 #     unit_name = serializers.ReadOnlyField(source='unit.name')

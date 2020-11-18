@@ -27,14 +27,16 @@ def projects_download(request):
     """
     if request.method == 'GET':
         uuid = request.query_params.get('uuid', '')
-        user_id = request.query_params.get('userid', 0)
-        ways = request.query_params.get('d', 'v')  # 区分查看还是下载
+        # user_id = request.query_params.get('userid', 0)
+        ways = request.query_params.get('ways', 'v')  # 区分查看还是下载
+        user = request.user
         try:
             obj = models.Projects.objects.filter(uuid=uuid)[0]
             if ways == 'd':
                 obj.download_num_update()  # 下载量+1
-                if user_id and user_id != 'undefined' and user_id != 'null':
-                    user_obj = models.User.objects.get(id=user_id)
+                # if user_id and user_id != 'undefined' and user_id != 'null':
+                if type(user) != AnonymousUser:
+                    user_obj = models.User.objects.get(id=user.id)
                     models.UserDownloadBehavior.objects.create(user=user_obj, pro=obj)  # 记录下载量数据
                 else:
                     models.UserDownloadBehavior.objects.create(pro=obj)  # 记录下载量数据
@@ -242,7 +244,7 @@ def get_org_name(request):
                 group_id_list = [i.id for i in group_id_obj]
                 print('--------', group_id_list)
                 if user.is_superuser or settings.SUPER_USER_GROUP in group_id_list or settings.PLANT_MANAGER_GROUP in group_id_list:
-                    data = models.Organization.objects.values('id', 'name', 'competent_dpt')
+                    data = models.Organization.objects.values('id', 'name', 'superior_unit')
                 else:
                     user_org = user.org
                     if user_org:
@@ -252,7 +254,7 @@ def get_org_name(request):
                                 superior_unit=org_id)
                             subordinate_unit_id = [i['id'] for i in subordinate_unit_obj]
                             org_list.extend(subordinate_unit_id)
-                        data = models.Organization.objects.values('id', 'name', 'competent_dpt').filter(id__in=org_list)
+                        data = models.Organization.objects.values('id', 'name', 'superior_unit').filter(id__in=org_list)
                     else:
                         # 不属于机构管理员用户
                         return Response(status=status.HTTP_403_FORBIDDEN)
@@ -409,3 +411,20 @@ def get_user_org_groups(request):
             set_run_info(level='error', address='/status_operation/view.py/get_user_org_groups',
                          keyword='统计一个机构下多少用户：{}'.format(e))
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@authentication_classes([ExpiringTokenAuthentication])
+def get_user_to_par_status(request):
+    """针对普通个人用户-获取研究人员认证审批状态 404：未申请 0:审批中 1：已通过 2：已驳回"""
+    user = request.user
+    if type(user) == AnonymousUser:
+        set_run_info(level='error', address='/status_operation/view.py/get_is_par_ing',
+                     keyword='获取研究人员认证审批状态失败：获取不到user')
+        return Response({'result': 400}, status=status.HTTP_400_BAD_REQUEST)
+
+    obj_tmp = models.UserToParticipant.objects.values('up_status').filter(user=user.id)
+    if obj_tmp:
+        return Response({'result': obj_tmp[0]['up_status']}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({"result": 404}, status=status.HTTP_400_BAD_REQUEST)

@@ -15,7 +15,7 @@ from query.upload_file import UploadFile
 from query.export_data import write2excel
 from django.http import StreamingHttpResponse
 import urllib.parse
-from login.views import super_manager_auth
+# from login.views import super_manager_auth
 from query import QuerySerializer
 from uploads import UploadsSerializer
 import os
@@ -60,7 +60,7 @@ def permission_filter_data(user, data, args, **kwargs):
                 org_id_list = [org_id]
                 if org_id_list:
                     for i in org_id_list:
-                        org_id_list_tmp = models.Organization.objects.values('id').filter(superior_unit=i)
+                        org_id_list_tmp = models.Organization.objects.values('id').filter(superior_unit=i, is_show=True)
                         org_id_list_tmp_list = [j['id'] for j in org_id_list_tmp]
                         if org_id_list_tmp_list:
                             org_id_list.extend(org_id_list_tmp_list)
@@ -74,7 +74,7 @@ def permission_filter_data(user, data, args, **kwargs):
                 org_id_list = [org_id]
                 if org_id_list:
                     for i in org_id_list:
-                        org_id_list_tmp = models.Organization.objects.values('id').filter(superior_unit=i)
+                        org_id_list_tmp = models.Organization.objects.values('id').filter(superior_unit=i, is_show=True)
                         # print('11', org_id_list_tmp)
                         org_id_list_tmp_list = [j['id'] for j in org_id_list_tmp]
                         if org_id_list_tmp_list:
@@ -437,7 +437,7 @@ class ProjectsManageView(viewsets.ViewSet):
         # 分类（1：发展，2：监管，3：党建，4：改革，5：其他，100：全部）
         cls_t = request.query_params.get('cls', 100)
         keyword = request.query_params.get('kw', '')  # 搜索关键字
-        pro_status = request.query_params.get('status', 0)
+        pro_status = request.query_params.get('status', -1)  # 默认返回全部
         page = request.query_params.get('page', 1)
         page_num = request.query_params.get('page_num', 30)
         org = request.query_params.get('org_id', 0)  # 所属机构筛选
@@ -464,7 +464,7 @@ class ProjectsManageView(viewsets.ViewSet):
             # 类型筛选
             data = data.filter(classify=cls_t)
 
-        if pro_status:
+        if pro_status in [1, 2, 3, 4]:
             # 状态筛选
             data = data.filter(status=pro_status)
 
@@ -538,7 +538,7 @@ class ProjectsManageView(viewsets.ViewSet):
             obj.views_num_update()  # 浏览量+1
 
             obj_dict = {"lead_org": lead_org_list, "research": research_org_list, "key_word": obj.key_word,
-                        "release_date": obj.release_date, "abstract": obj.abstract, "pro_source":obj.pro_source,
+                        "release_date": obj.release_date, "abstract": obj.abstract, "pro_source": obj.pro_source,
                         "attached": str(obj.attached), "classify": cls_t, "uuid": obj.uuid,
                         "reference": str(obj.reference).split(';'), "par": par_id_obj, 'name': obj.name
                         }
@@ -1292,6 +1292,11 @@ class ParQueryView(viewsets.ViewSet):
 
     @action(methods=['get'], detail=False)
     def get_personal_par(self, request):
+        """
+        获得本机构以及下级机构的研究人员
+        :param request:
+        :return:
+        """
         page = request.query_params.get('page', 1)
         page_num = request.query_params.get('page_num', 10)
         keyword = request.query_params.get('kw', '')
@@ -1378,6 +1383,153 @@ class ParQueryView(viewsets.ViewSet):
                     'downloads__sum']
         return Response(res, status=status.HTTP_200_OK)
 
+    # --- 升级专家开始--
+    @action(methods=['post'], detail=False)
+    def set_par_re_pro(self, request):
+        """
+        研究人员认证成果
+        :return:
+        """
+        param_dict = request.data
+        user = request.user
+        user_id = user.id if type(user) != AnonymousUser else 0
+        par_id = user.par.id if user.par else None
+        param_dict['par'] = par_id
+        # print('--11', param_dict)
+        try:
+            serialier_param = QuerySerializer.ParReProCreateSerializer(data=param_dict)
+            serialier_param.is_valid(raise_exception=True)
+            serialier_param.save()
+        except AttributeError as e:
+            set_run_info(level='error', address='/query/view.py/ParQueryView-set_par_re_pro',
+                         user=user_id, keyword='研究人员认证成果：{}'.format(e))
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_201_CREATED)
+
+    @action(methods=['get'], detail=False)
+    def get_par_pro_list(self, request):
+        """
+        个人参与的成果展示、包括认证的
+        :return:
+        """
+        page = request.query_params.get('page', 1)
+        page_num = request.query_params.get('page_num', 10)
+        # kw = request.query_params.get('kw')
+        user = request.user
+
+        if type(user) == AnonymousUser:
+            set_run_info(level='error', address='/query/view.py/ParQueryView-get_par_to_vip_list',
+                         keyword='获取个人参与的成果展示失败：获取不到user')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        if user.par:
+            par_id = user.par.id
+        else:
+            set_run_info(level='error', address='/query/view.py/ParQueryView-get_par_to_vip_list',
+                         keyword='获取个人参与的成果展示失败：获取不到par')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        page = self.try_except(page, 1)  # 验证页码
+        page_num = self.try_except(page_num, 10)  # 验证每页的数量
+
+        data1 = models.ProRelations.objects.values(
+            'pro__uuid', 'pro__name', 'pro__key_word', 'pro_source').filter(par=par_id, is_eft=True)
+        data2 = models.ParRePro.objects.values(
+            'id', 'pro__uuid', 'pro__name', 'pro__key_word', 'support_materials').filter(par=par_id)
+        data = []
+        data.extend(data1)
+        data.extend(data2)
+
+        sp = SplitPages(data, page, page_num)
+        res = sp.split_page()
+        return Response(res, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=False)
+    def apply_par_to_vip(self, request):
+        """
+        研究人员升级大V申请
+        :param request:
+        :return:
+        """
+        user = request.user
+        if type(user) == AnonymousUser:
+            set_run_info(level='error', address='/query/view.py/ParQueryView-apply_par_to_vip',
+                         keyword='研究人员升级大V申请失败：获取不到user')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        if user.par:
+            par_obj = user.par
+        else:
+            set_run_info(level='error', address='/query/view.py/ParQueryView-apply_par_to_vip',
+                         keyword='研究人员升级大V申请失败：获取不到par')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            models.ParToVIP.objects.create(par=par_obj)
+            return Response(status=status.HTTP_201_CREATED)
+        except AttributeError as e:
+            set_run_info(level='error', address='/query/view.py/ParQueryView-apply_par_to_vip',
+                         user=user.id, keyword='研究人员升级大V申请：{}'.format(e))
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['get'], detail=False)
+    def get_par_to_vip_list(self, request):
+        """
+        获得研究人员升级大V审批列表
+        :param request:
+        :return:
+        """
+        page = request.query_params.get('page', 1)
+        page_num = request.query_params.get('page_num', 10)
+        result = request.query_params.get('result', 0)  # 状态
+
+        page = self.try_except(page, 1)  # 验证页码
+        page_num = self.try_except(page_num, 10)  # 验证每页的数量
+
+        data = models.ParToVIP.objects.values('id', 'par__name', 'created_date').filter(result=result)
+
+        sp = SplitPages(data, page, page_num)
+        res = sp.split_page()
+        return Response(res, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True)
+    def set_par_to_vip(self, request, pk):
+        """
+        研究人员升级大V审批
+        :param request:
+        :param pk:
+        :return:
+        """
+        param_dict = request.data
+        result = param_dict.get('status')  # 1：通过 2：否决  0：未处理
+        remarks = param_dict.get('remarks')  # 备注
+        try:
+            current_time = time.strftime('%Y-%m-%d %H:%M:%S')
+            item_tmp = models.ParToVIP.objects.filter(id=pk)
+            if int(result) == 1:
+                # 同意
+                if item_tmp:
+                    item_obj = item_tmp[0]
+                else:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+
+                # 更新人员表信息
+                par_obj = item_obj.par
+                par_obj.level = item_obj.level
+                par_obj.save()
+
+                item_tmp.update(result=1, remarks=remarks, approval_date=current_time)
+            else:
+                # 驳回账号
+                item_tmp.update(result=2, remarks=remarks, approval_date=current_time)
+            add_user_behavior(keyword='', search_con='研究人员升级大V审批({}:{})'.format(pk, result),
+                              user_obj=request.user)
+        except Exception as e:
+            set_run_info(level='error', address='/query/view.py/ParQueryView-set_par_to_vip',
+                         keyword='研究人员升级大V审批失败：{}'.format(e))
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_200_OK)
+
     @staticmethod
     def try_except(param_key, param_default):
         # 判断参数是否可以被是否是数字，不是的话，强转，强转不成功或者是负数，置为默认值
@@ -1390,6 +1542,68 @@ class ParQueryView(viewsets.ViewSet):
                          keyword='强转参数出错{}'.format(e))
             param_key = param_default
         return param_key
+
+    @action(methods=['GET'], detail=True)
+    def get_verity_file(self, request, pk):
+        """
+        查看在职证明材料
+        :param request:
+        :param pk:
+        :return:
+        """
+        try:
+            obj = models.ParRePro.objects.get(id=pk)
+            the_file_name = 'a.pdf'
+            download_url_fin = os.path.join(settings.MEDIA_ROOT, str(obj.support_materials))
+            # 将汉字换成ascii码，否则下载名称不能正确显示
+            the_file_name = urllib.parse.quote(the_file_name)
+            response = StreamingHttpResponse(self.file_iterator(download_url_fin))
+            response['Content-Type'] = 'application/octet-stream'
+            response['Content-Disposition'] = 'attachment;filename="{}"'.format(the_file_name)
+            return response
+        except Exception as e:
+            set_run_info(level='error', address='/query/view.py/ParQueryView-get_verity_file',
+                         keyword='查看在职证明材料失败：{}'.format(e))
+            return Response({'msg': "查看在职证明材料失败", "status": 404}, status=status.HTTP_200_OK)
+
+    # 读取文件
+    @staticmethod
+    def file_iterator(file_name, chunk_size=512):
+        """
+        下载文件时读取文件的方法
+        :param file_name: 文件绝对路径
+        :param chunk_size: 每次循环大小
+        :return:
+        """
+        with open(file_name, 'rb') as f:
+            while True:
+                c = f.read(chunk_size)
+                if c:
+                    yield c
+                else:
+                    break
+
+    @action(methods=['get'], detail=False)
+    def get_pro_list(self, request):
+        """
+        获得所有成果列表
+        :param request:
+        :return:
+        """
+        page = request.query_params.get('page', 1)
+        page_num = request.query_params.get('page_num', 10)
+        kw = request.query_params.get('kw')
+
+        page = self.try_except(page, 1)  # 验证页码
+        page_num = self.try_except(page_num, 10)  # 验证每页的数量
+
+        data = models.Projects.objects.values('id', 'name').filter(status=1)
+        if kw:
+            data = data.filter(name__contains=kw)
+        sp = SplitPages(data, page, page_num)
+        res = sp.split_page()
+        return Response(res, status=status.HTTP_200_OK)
+    # --- 升级专家结束-
 
 
 class OrgQueryView(viewsets.ViewSet):
@@ -1447,14 +1661,25 @@ class OrgQueryView(viewsets.ViewSet):
         unit = request.query_params.get('unit', '')
         org_id = request.query_params.get('org_id', 0)
         # a_b = request.query_params.get('roles', 'b')
-
+        # print(request.query_params)
         page = self.try_except(page, 1)  # 验证页码
         page_num = self.try_except(page_num, 8)  # 验证每页的数量
         org_id = self.try_except(org_id, 0)  # 验证id
-
+        subordinate_org_obj = []
+        subordinate_org_count = 0
+        subordinate_org_pro_sum = 0
         if org_id:
             data = models.Organization.objects.values('id', 'name', 'brief', 'pro_sum', 'par_sum', 'photo'
                                                       ).filter(pk=org_id, is_show=True)
+            # print(data)
+            if data:
+                # 获得本机构及其下属机构id列表
+                subordinate_org_list = self.get_relative_org_list(data.first()['id'])
+                subordinate_org_obj = models.Organization.objects.values(
+                    'id', 'name', 'pro_sum').filter(pk__in=subordinate_org_list, is_show=True)
+                subordinate_org_count = len(subordinate_org_list)
+                for sub_org in subordinate_org_obj:
+                    subordinate_org_pro_sum = subordinate_org_pro_sum + sub_org['pro_sum']
         else:
             data = models.Organization.objects.values(
                 'id', 'name', 'pro_sum', 'par_sum', 'nature__remarks').filter(is_show=True).order_by('id')
@@ -1483,6 +1708,12 @@ class OrgQueryView(viewsets.ViewSet):
                 Q(lead_org__id=res['res'][i]['id']) | Q(research__id=res['res'][i]['id'])).aggregate(Sum('downloads'))[
                 'downloads__sum']
             # print(a)
+
+        if org_id:
+            res['subordinate_org_obj'] = subordinate_org_obj
+            res['subordinate_org_count'] = subordinate_org_count
+            res['subordinate_org_pro_sum'] = subordinate_org_pro_sum
+
         return Response(res, status=status.HTTP_200_OK)
 
     @staticmethod
@@ -1497,6 +1728,23 @@ class OrgQueryView(viewsets.ViewSet):
                          keyword='强转参数出错{}'.format(e))
             param_key = param_default
         return param_key
+
+    @staticmethod
+    def get_relative_org_list(ori_org_id):
+        """
+        获得本机构所有下级机构,不包括本机构
+        :param ori_org_id: 初始机构id
+        :return:
+        """
+        org_id_list = [ori_org_id]
+        if org_id_list:
+            for org_id in org_id_list:
+                org_id_list_tmp = models.Organization.objects.values('id').filter(superior_unit=org_id, is_show=True)
+                org_id_list_tmp_list = [j['id'] for j in org_id_list_tmp]
+                if org_id_list_tmp_list:
+                    org_id_list.extend(org_id_list_tmp_list)
+        org_id_list.remove(ori_org_id)
+        return org_id_list
 
 
 class MyUserView(viewsets.ViewSet):
@@ -1664,7 +1912,7 @@ class MyUserView(viewsets.ViewSet):
         """
         param_dict = request.data
         user_id = param_dict.get('user_id')
-        is_active = param_dict.get('is_active')
+        is_active = param_dict.get('is_active', 1)
         phone = param_dict.get('phone')  # 手机号
         email = param_dict.get('email')  # 邮箱
         photo = request.FILES.get('photo')  # 头像
@@ -1672,6 +1920,8 @@ class MyUserView(viewsets.ViewSet):
 
         try:
             if photo:
+                current_year = datetime.datetime.now().year
+                current_month = '{:02d}'.format(datetime.datetime.now().month)
                 photo_save_path_dirs = os.path.join(os.path.join(settings.MEDIA_ROOT, 'user'), 'portrait')
                 file_obj = UploadFile(photo_save_path_dirs, photo)
                 photo_name_fin = file_obj.handle()
@@ -1680,7 +1930,7 @@ class MyUserView(viewsets.ViewSet):
                     cell_phone=phone,
                     is_active=is_active,
                     email=email,
-                    photo='user/portrait/{}'.format(photo_name_fin)
+                    photo='user/portrait/{}/{}/{}'.format(current_year, current_month, photo_name_fin)
                 )
             else:
                 models.User.objects.filter(id=user_id).update(
@@ -1709,7 +1959,7 @@ class MyUserView(viewsets.ViewSet):
         user = request.user
         user_id = user.id if type(user) != AnonymousUser else 0
         param_dict['user'] = user_id
-        print('--11', param_dict)
+        # print('--11', param_dict)
         try:
             serialier_param = QuerySerializer.UserToParCreateSerializer(data=param_dict)
             serialier_param.is_valid(raise_exception=True)
@@ -1761,6 +2011,7 @@ class MyUserView(viewsets.ViewSet):
         up_status = param_dict.get('status')  # 1：通过 2：否决  0：未处理
         remarks = param_dict.get('remarks')  # 备注
         try:
+            current_time = time.strftime('%Y-%m-%d %H:%M:%S')
             item_tmp = models.UserToParticipant.objects.filter(id=pk)
             if int(up_status) == 1:
                 # 同意
@@ -1788,10 +2039,10 @@ class MyUserView(viewsets.ViewSet):
                 # 更新研究人员信息
                 self.update_par_info(par_obj, item_obj)
 
-                item_tmp.update(up_status=1, remarks=remarks)
+                item_tmp.update(up_status=1, remarks=remarks, approval_date=current_time)
             else:
                 # 驳回账号
-                item_tmp.update(up_status=2, remarks=remarks)
+                item_tmp.update(up_status=2, remarks=remarks, approval_date=current_time)
             add_user_behavior(keyword='', search_con='认证研究人员审批({}:{})'.format(pk, up_status),
                               user_obj=request.user)
         except Exception as e:
@@ -1799,6 +2050,29 @@ class MyUserView(viewsets.ViewSet):
                          keyword='认证研究人员审批失败：{}'.format(e))
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=False)
+    def get_user_to_par_detail(self, request):
+        """
+        用户认证研究人员详情
+        :param request:
+        :return:
+        """
+        pk_id = request.query_params.get('pk_id', 0)
+        tag = request.query_params.get('tag', 'utp')  # utp:认证研究人员  user:用户
+        if tag == 'utp':
+            data = models.UserToParticipant.objects.filter(id=pk_id)
+        else:
+            data = models.UserToParticipant.objects.filter(user=pk_id).order_by('-id')  # 取多次的最新结果
+        if data:
+            data_fin = QuerySerializer.UserToParRetrieveSerializer(instance=data[0])
+            # -- 记录开始 --
+            add_user_behavior(keyword='', search_con='查看用户认证研究人员详情({}:{})'.format(tag, pk_id),
+                              user_obj=request.user)
+            # -- 记录结束 --
+            return Response(data_fin.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     @staticmethod
     def try_except(param_key, param_default):
@@ -1867,6 +2141,46 @@ class MyUserView(viewsets.ViewSet):
         # print(update_dict)
         par_obj.__dict__.update(**update_dict)
         par_obj.save()
+
+    @action(methods=['GET'], detail=True)
+    def get_verity_file(self, request, pk):
+        """
+        查看在职证明材料
+        :param request:
+        :param pk:
+        :return:
+        """
+        try:
+            obj = models.UserToParticipant.objects.get(id=pk)
+            the_file_name = 'a.pdf'
+            download_url_fin = os.path.join(settings.MEDIA_ROOT, str(obj.job_certi))
+            # 将汉字换成ascii码，否则下载名称不能正确显示
+            the_file_name = urllib.parse.quote(the_file_name)
+            response = StreamingHttpResponse(self.file_iterator(download_url_fin))
+            response['Content-Type'] = 'application/octet-stream'
+            response['Content-Disposition'] = 'attachment;filename="{}"'.format(the_file_name)
+            return response
+        except Exception as e:
+            set_run_info(level='error', address='/query/view.py/MyUserView-get_verity_file',
+                         keyword='查看在职证明材料失败：{}'.format(e))
+            return Response({'msg': "查看在职证明材料失败", "status": 404}, status=status.HTTP_200_OK)
+
+    # 读取文件
+    @staticmethod
+    def file_iterator(file_name, chunk_size=512):
+        """
+        下载文件时读取文件的方法
+        :param file_name: 文件绝对路径
+        :param chunk_size: 每次循环大小
+        :return:
+        """
+        with open(file_name, 'rb') as f:
+            while True:
+                c = f.read(chunk_size)
+                if c:
+                    yield c
+                else:
+                    break
 
 
 class HotWordsView(viewsets.ViewSet):

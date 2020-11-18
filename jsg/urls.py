@@ -109,6 +109,8 @@ urlpatterns = [
     path(r'set_passwd/', set_password),
     # 按照机构属性分别统计有多少所属机构和人员
     path(r'get_ab_org/', get_ab_org),
+    # 获取研究人员认证审批状态
+    path(r'get_utp_status/', get_user_to_par_status),
     # 统计每日操作量
     # path(r'get_daily_logins/', get_daily_logins),
     # 每个机构下挂多少用户

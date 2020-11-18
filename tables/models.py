@@ -106,7 +106,6 @@ class Organization(models.Model):
     uuid = models.CharField(max_length=32, verbose_name='唯一标识', null=False, unique=True)
     id_card_code = models.CharField(max_length=18, verbose_name="社会信用码", null=True)
     name = models.CharField(max_length=100, null=False, verbose_name='机构名称')
-    competent_dpt = models.IntegerField(verbose_name='主管部门', default=0)
     superior_unit = models.IntegerField(verbose_name='上级单位', default=0)
     nature = models.ForeignKey(OrgNature, verbose_name='机构性质', null=True, on_delete=models.CASCADE)
     brief = models.TextField(verbose_name='机构简介', null=True)
@@ -121,10 +120,10 @@ class Organization(models.Model):
     postcode = models.IntegerField(verbose_name="邮政编码", null=True)
     unit_tel = models.CharField(max_length=20, verbose_name="单位电话", null=True)
     unit_fax = models.CharField(max_length=20, verbose_name="单位传真", null=True)
-    photo = models.ImageField(upload_to='organizations/logo/', verbose_name='单位logo', null=True)
+    photo = models.ImageField(upload_to='organizations/logo/%Y/%m', verbose_name='单位logo', null=True)
     certification_materials = models.FileField(verbose_name="证明材料", null=True,
-                                               upload_to='organizations/materials/')
-    business_license = models.FileField(verbose_name="营业执照", null=True, upload_to='organizations/license/')
+                                               upload_to='organizations/materials/%Y/%m')
+    business_license = models.FileField(verbose_name="营业执照", null=True, upload_to='organizations/license/%Y/%m')
 
     class Meta:
         verbose_name_plural = '机构信息表'
@@ -255,13 +254,14 @@ class Participant(models.Model):
     job = models.CharField(max_length=100, verbose_name='现职务职称', null=True)
     research_direction = models.CharField(max_length=100, verbose_name='研究方向', null=True)
     email = models.EmailField(verbose_name='邮箱', null=True)
-    photo = models.ImageField(upload_to='participants/portrait/', verbose_name='头像', null=True)
-    id_card_photo_positive = models.ImageField(upload_to='participants/id_card/', verbose_name='身份证正面', null=True)
-    id_card_photo_reverse = models.ImageField(upload_to='participants/id_card/', verbose_name='身份证反面', null=True)
+    photo = models.ImageField(upload_to='participants/portrait/%Y/%m', verbose_name='头像', null=True)
+    id_card_photo_positive = models.ImageField(upload_to='participants/id_card/%Y/%m', verbose_name='身份证正面', null=True)
+    id_card_photo_reverse = models.ImageField(upload_to='participants/id_card/%Y/%m', verbose_name='身份证反面', null=True)
     created_date = models.DateField(auto_now_add=True, verbose_name='创建时间', null=True)
     pro_sum = models.IntegerField(verbose_name='成果总数', default=0)
     is_show = models.BooleanField(verbose_name='是否展示', default=1)
     name_pinyin = models.CharField(max_length=100, verbose_name='姓名的全拼', null=True)
+    level = models.IntegerField(verbose_name="vip级别", default=1)
 
     class Meta:
         verbose_name_plural = '研究人员信息表'
@@ -409,10 +409,7 @@ class User(AbstractUser):
     id_card = models.CharField(verbose_name="社会信用码/身份证号", max_length=18, null=True)
     cell_phone = models.CharField(max_length=11, verbose_name="手机号", null=True)
     certification_materials = models.CharField(max_length=100, verbose_name="证明材料", null=True)  # 从注册表拷贝路径过来
-    photo = models.ImageField(upload_to='user/portrait/', verbose_name='头像', null=True)
-
-    # business_license = models.FileField(verbose_name="营业执照", null=True, upload_to='register/business_license/%Y/%m')
-    # back_is_login = models.BooleanField(default=0, verbose_name="判断后台是否登录")
+    photo = models.ImageField(upload_to='user/portrait/%Y/%m', verbose_name='头像', null=True)
 
     class Meta:
         verbose_name_plural = '用户信息表'
@@ -475,25 +472,19 @@ class UserToParticipant(models.Model):
     """
     GENDER_CHOICES = ((1, '男'), (2, '女'))
     id = models.AutoField(primary_key=True, verbose_name='ID')
-    # id_card = models.CharField(max_length=18, verbose_name="身份证号", null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="用户", null=False)
-    # name = models.CharField(max_length=30, null=False, verbose_name='姓名')
-    # cell_phone = models.CharField(max_length=18, null=True, verbose_name="手机号")
     gender = models.IntegerField(choices=GENDER_CHOICES, verbose_name='性别', default=1)
     birth = models.DateField(null=True, verbose_name='出生日期')
     education = models.CharField(max_length=100, null=True, verbose_name="本人最高学历")
     academic_degree = models.CharField(max_length=100, null=True, verbose_name="本人学位")
     address = models.TextField(null=True, verbose_name="地址")
     postcode = models.IntegerField(null=True, verbose_name="邮编")
-    # unit = models.ForeignKey(Organization, null=True, verbose_name='现所属单位', on_delete=models.CASCADE)
     brief = models.TextField(null=True, verbose_name='简介')
-    # job = models.CharField(max_length=100, verbose_name='现职务职称', null=True)
     research_direction = models.CharField(max_length=100, verbose_name='专长', null=True)
-    # email = models.EmailField(verbose_name='邮箱', null=True)
-    photo = models.ImageField(upload_to='participants/portrait/', verbose_name='头像', null=True)
-    id_card_photo_positive = models.ImageField(upload_to='participants/id_card/', verbose_name='身份证正面', null=True)
-    id_card_photo_reverse = models.ImageField(upload_to='participants/id_card/', verbose_name='身份证反面', null=True)
-    job_certi = models.FileField(upload_to='participants/job_certi/', verbose_name='在职证明', null=True)
+    photo = models.ImageField(upload_to='participants/portrait/%Y/%m', verbose_name='头像', null=True)
+    id_card_photo_positive = models.ImageField(upload_to='participants/id_card/%Y/%m', verbose_name='身份证正面', null=True)
+    id_card_photo_reverse = models.ImageField(upload_to='participants/id_card/%Y/%m', verbose_name='身份证反面', null=True)
+    job_certi = models.FileField(upload_to='participants/job_certi/%Y/%m', verbose_name='在职证明', null=True)
     created_date = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', null=True)
     approval_date = models.DateTimeField(verbose_name='审批时间', null=True)
     up_status = models.IntegerField(verbose_name='状态', default=0)  # 0:待审批 1：通过 2：驳回
@@ -502,3 +493,32 @@ class UserToParticipant(models.Model):
     class Meta:
         verbose_name_plural = '研究人员验证表'
 
+
+class ParRePro(models.Model):
+    """
+    研究人员认证成果表
+    """
+    id = models.AutoField(primary_key=True, verbose_name='ID')
+    par = models.ForeignKey(Participant, on_delete=models.CASCADE, verbose_name="研究人员", null=False)
+    pro = models.ForeignKey(Projects, on_delete=models.CASCADE, verbose_name="成果", null=False)
+    support_materials = models.FileField(upload_to='participants/tovip/%Y/%m', verbose_name='证明材料', null=True)
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+
+    class Meta:
+        verbose_name_plural = '研究人员认证成果表'
+
+
+class ParToVIP(models.Model):
+    """
+    研究人员升级专家vip认证表
+    """
+    id = models.AutoField(primary_key=True, verbose_name='ID')
+    par = models.ForeignKey(Participant, on_delete=models.CASCADE, verbose_name="研究人员", null=False)
+    level = models.IntegerField(verbose_name="vip级别", default=2)
+    result = models.IntegerField(verbose_name='结果', default=0)  # 0：待审批 1：通过 2：驳回
+    remarks = models.TextField(null=True, verbose_name='备注')
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', null=True)
+    approval_date = models.DateTimeField(verbose_name='审批时间', null=True)
+
+    class Meta:
+        verbose_name_plural = '研究人员升级专家vip认证表'

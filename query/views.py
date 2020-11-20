@@ -446,6 +446,12 @@ class ProjectsManageView(viewsets.ViewSet):
         page = self.try_except(page, 1)  # 验证页码
         page_num = self.try_except(page_num, 30)  # 验证每页的数量
 
+        try:
+            pro_status = int(pro_status)
+        except Exception as e:
+            print(e)
+            pro_status = -1
+
         # status=5 删除状态 0:不显示
         data = models.Projects.objects.values('id', 'uuid', 'name', 'classify__cls_name', 'key_word', 'user',
                                               'user__org', 'user__org__name', 'status', 'downloads',
@@ -1418,14 +1424,14 @@ class ParQueryView(viewsets.ViewSet):
         user = request.user
 
         if type(user) == AnonymousUser:
-            set_run_info(level='error', address='/query/view.py/ParQueryView-get_par_to_vip_list',
+            set_run_info(level='error', address='/query/view.py/ParQueryView-get_par_pro_list',
                          keyword='获取个人参与的成果展示失败：获取不到user')
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         if user.par:
             par_id = user.par.id
         else:
-            set_run_info(level='error', address='/query/view.py/ParQueryView-get_par_to_vip_list',
+            set_run_info(level='error', address='/query/view.py/ParQueryView-get_par_pro_list',
                          keyword='获取个人参与的成果展示失败：获取不到par')
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -1922,7 +1928,8 @@ class MyUserView(viewsets.ViewSet):
             if photo:
                 current_year = datetime.datetime.now().year
                 current_month = '{:02d}'.format(datetime.datetime.now().month)
-                photo_save_path_dirs = os.path.join(os.path.join(settings.MEDIA_ROOT, 'user'), 'portrait')
+                photo_save_path_dirs = os.path.join(settings.MEDIA_ROOT, 'user/', 'portrait/',
+                                                    '{}/'.format(current_year), '{}/'.format(current_month))
                 file_obj = UploadFile(photo_save_path_dirs, photo)
                 photo_name_fin = file_obj.handle()
 

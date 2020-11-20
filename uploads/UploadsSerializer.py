@@ -159,7 +159,9 @@ class OrgUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Organization
-        fields = ['nature', 'superior_unit', 'brief', 'photo']
+        fields = ['id_card_code', 'name', 'nature', 'superior_unit', 'brief', 'photo', 'par_sum', 'pro_sum', 'is_show',
+                  'register_type', 'register_capital', 'register_date', 'address', 'postcode', 'unit_tel', 'unit_fax',
+                  'certification_materials', 'business_license']
 
 
 class ParListPersonalSerializer(serializers.ModelSerializer):

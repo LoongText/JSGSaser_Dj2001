@@ -43,10 +43,7 @@ def projects_download(request):
             # 显示在弹出对话框中的默认的下载文件名
             the_file_name = '{}.pdf'.format(obj.name)
             # print(the_file_name)
-            # download_url_fin = os.path.join(os.path.join(settings.BASE_DIR, 'static'), str(obj.attached))
             download_url_fin = os.path.join(settings.MEDIA_ROOT, str(obj.attached))
-            # print(download_url_fin)
-            # print(content_disposition)
             # 将汉字换成ascii码，否则下载名称不能正确显示
             the_file_name = urllib.parse.quote(the_file_name)
             response = StreamingHttpResponse(file_iterator(download_url_fin))
@@ -58,7 +55,7 @@ def projects_download(request):
             # return Response(status=status.HTTP_200_OK)
         except Exception as e:
             set_run_info(level='error', address='/status_operation/view.py/projects_download',
-                         user=user_id, keyword='成果下载失败：{}'.format(e))
+                         user=user.id, keyword='成果下载失败：{}'.format(e))
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
@@ -195,18 +192,45 @@ def set_bid_status(request):
     if request.method == 'POST':
         try:
             # print(request.data)
+            user = request.user
+            if type(user) == AnonymousUser:
+                set_run_info(level='error', address='/status_operation/view.py/set_bid_status',
+                             keyword='投标状态设置失败：获取不到user')
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            else:
+                user_id = user.id
             param_dict = request.data
             id_list = param_dict.get('idlist', '')
-            # print(id_list, type(id_list))
             bid_status = int(param_dict.get('status', 0))
-            tag = param_dict.get('tag', 'sq')  # sq：批量处理申请  jt：批量处理结题
+            tag = param_dict.get('tag', 'sq')  # sq：批量处理申请  jt：批量处理结题  zq:中期
             data = models.Bid.objects.filter(id__in=id_list)
             if tag == 'sq':
-                if bid_status in [0, 1, 2, 3, 4]:
-                    data.update(bidder_status=bid_status)
+                if bid_status in [0, 1, 2, 3, 4, 5, 6]:
+                    current_time = time.strftime('%Y-%m-%d %H:%M:%S')
+                    if bid_status in [2, 3]:
+                        # 记录初审通过时间和审批人
+                        data.update(bidder_status=bid_status, bid_trial_date=current_time, bid_trial_user=user_id)
+                    elif bid_status in [5, 6]:
+                        # 记录立项通过时间
+                        data.update(bidder_status=bid_status, bid_lix_date=current_time)
+                    else:
+                        data.update(bidder_status=bid_status)
+            elif tag == 'zq':
+                if bid_status in [0, 1, 2, 3]:
+                    if bid_status in [2, 3]:
+                        # 记录中期通过时间
+                        current_time = time.strftime('%Y-%m-%d %H:%M:%S')
+                        data.update(interim_status=bid_status, bid_interim_date=current_time)
+                    else:
+                        data.update(interim_status=bid_status)
             else:
                 if bid_status in [0, 1, 2, 3]:
-                    data.update(conclusion_status=bid_status)
+                    if bid_status in [2, 3]:
+                        # 记录结题通过时间
+                        current_time = time.strftime('%Y-%m-%d %H:%M:%S')
+                        data.update(conclusion_status=bid_status, bid_con_date=current_time)
+                    else:
+                        data.update(conclusion_status=bid_status)
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
             set_run_info(level='error', address='/status_operation/view.py/set_bid_status',
@@ -421,10 +445,35 @@ def get_user_to_par_status(request):
     if type(user) == AnonymousUser:
         set_run_info(level='error', address='/status_operation/view.py/get_is_par_ing',
                      keyword='获取研究人员认证审批状态失败：获取不到user')
-        return Response({'result': 400}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'result': 400}, status=status.HTTP_200_OK)
 
     obj_tmp = models.UserToParticipant.objects.values('up_status').filter(user=user.id)
+    roles = user.groups.all().first()
     if obj_tmp:
-        return Response({'result': obj_tmp[0]['up_status']}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'result': obj_tmp[0]['up_status'], 'roles': roles.id}, status=status.HTTP_200_OK)
     else:
-        return Response({"result": 404}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"result": 404, 'roles': roles.id}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@authentication_classes([ExpiringTokenAuthentication])
+def get_pending_approval_count(request):
+    """
+    获得待审批数量--超级管理员
+    """
+    user = request.user
+
+    if type(user) == AnonymousUser:
+        set_run_info(level='error', address='/status_operation/view.py/get_pending_approval_count',
+                     keyword='获得待审批数量失败：获取不到user')
+        return Response({'result': 400}, status=status.HTTP_200_OK)
+    group_id_obj = Group.objects.filter(user=user.id)
+    group_id_list = [i.id for i in group_id_obj]
+    res = dict()
+    if user.is_superuser or settings.SUPER_USER_GROUP in group_id_list or settings.PLANT_MANAGER_GROUP in group_id_list:
+        res['register'] = models.UserRegister.objects.values('id').filter(info_status=0)
+        res['topar'] = models.UserToParticipant.objects.values('id').filter(up_status=0)
+        res['tovip'] = models.ParToVIP.objects.values('id').filter(result=0)
+        return Response({'result': 200, 'res': res}, status=status.HTTP_200_OK)
+    else:
+        return Response({"result": 403}, status=status.HTTP_200_OK)

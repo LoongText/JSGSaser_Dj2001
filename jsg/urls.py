@@ -7,6 +7,7 @@ from login.views import *
 from gather_statistics.views import *
 from check.views import *
 from status_operation.views import *
+from evaluate_bid.views import *
 from django.urls import re_path
 from django.views.static import serve
 
@@ -71,6 +72,8 @@ router.register(r'user_click_sts', UserClickStsView, basename='user_click_sts')
 router.register(r'user_dwn_sts', UserDownloadStsView, basename='user_dwn_sts')
 # 新闻管理
 router.register(r'news', NewsManageView, basename='news')
+# 课题评审
+router.register(r'evaluate', EvaluateBidView, basename='evaluate')
 
 urlpatterns = [
     # 全部注册接口列表
@@ -111,6 +114,8 @@ urlpatterns = [
     path(r'get_ab_org/', get_ab_org),
     # 获取研究人员认证审批状态
     path(r'get_utp_status/', get_user_to_par_status),
+    # 获得待审批数量
+    path(r'get_pending_approval_count/', get_pending_approval_count),
     # 统计每日操作量
     # path(r'get_daily_logins/', get_daily_logins),
     # 每个机构下挂多少用户

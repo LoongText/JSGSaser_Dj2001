@@ -357,13 +357,14 @@ class ProOrgCountView(viewsets.ViewSet):
         nature = request.query_params.get('nature', 0)
         user_id = request.query_params.get('userid', 0)
         choose_role = request.query_params.get('choose_role')  # 机构性质界别：a,b
-
+        # tag = request.query_params.get('tag', 'org_bar')  # 区分机构列表页和统计柱状图 org_list,org_bar
+        # print(request.query_params)
+        # print(tag)
         try:
             nature = int(nature)
         except Exception as e:
             print(e)
             nature = 0
-
         page = self.try_except(page, 1)  # 验证页码
         page_num = self.try_except(page_num, 10)  # 验证每页的数量
         if order not in ['p', 'v', 'r']:
@@ -371,26 +372,28 @@ class ProOrgCountView(viewsets.ViewSet):
             set_run_info(level='error', address='/gather_statistics/view.py/ProOrgCountView',
                          user=user_id, keyword='按机构统计成果-order参数传参不正确：{}'.format(order))
 
-        data = models.Organization.objects.values('id', 'name', 'pro_sum', 'par_sum').filter(is_show=True)
+        data = models.Organization.objects.values('id', 'name', 'pro_sum', 'par_sum').filter(is_show=True).exclude(
+            nature__level=settings.ORG_NATURE_FORBIDDEN_LEVEL)
+
         if choose_role == 'a':
             data = data.filter(nature__level=settings.ORG_NATURE_HIGHER_LEVEL)
-        else:
+        elif choose_role == 'b':
             data = data.filter(nature__level=settings.ORG_NATURE_LOWER_LEVEL)
 
         if keyword:
             # 有检索参数
             data = data.filter(name__contains=keyword)
-
         if nature:
             # 有机构分类
             data = data.filter(nature=nature)
         data_sum = data.count()
-
         for i in range(len(data)):
             org_id_list = self.get_relative_org_list(data[i]['id'])  # 获得本机构和下属机构的id
             pro_data = models.Projects.objects.values('id').filter(status=1).filter(
                 Q(lead_org__id__in=org_id_list) | Q(research__id__in=org_id_list))
-            data[i]['pro_sum'] = pro_data.count()  # 成果总量
+            pro_data_list = [i['id'] for i in pro_data]
+            data[i]['pro_sum'] = len(set(pro_data_list))  # 成果总量
+            # if tag == 'org_list':
             if data[i]['pro_sum'] == 0:
                 data[i]['view_sum'] = 0
             else:

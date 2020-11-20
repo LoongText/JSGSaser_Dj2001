@@ -35,7 +35,8 @@ class Research(models.Model):
     phone = models.CharField(max_length=50, verbose_name='业务咨询电话', null=True)
     guidelines = models.FileField(verbose_name='申报指南', null=True, upload_to='guide/%Y/%m')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="组织方", null=False)
-    created_date = models.DateField(auto_now_add=True, verbose_name='创建时间', null=True, editable=False)
+    created_date = models.DateField(auto_now_add=True, verbose_name='创建时间', null=True)
+    con_date = models.DateField(verbose_name='结题时间', null=True)
 
     class Meta:
         verbose_name_plural = '课题招标信息表'
@@ -58,7 +59,8 @@ class Bid(models.Model):
     """
     投标信息表
     """
-    BIDDER_STATUS_CHOICE = ((0, '暂存'), (1, '投标中'), (2, '初审通过'), (3, '初审驳回'), (4, '删除'), (5, '中标'), (6, '立项驳回'))
+    BIDDER_STATUS_CHOICE = ((0, '暂存'), (1, '投标中'), (2, '初审通过'), (3, '初审驳回'), (4, '删除'),
+                            (5, '立项中标'), (6, '立项驳回'))
     INTERIM_REVIEW_STATUS_CHOICE = ((0, '未开始'), (1, '审批中'), (2, '已通过'), (3, '已驳回'), (4, '待提交'))
     CONCLUSION_STATUS_CHOICE = ((0, '未开始'), (1, '审批中'), (2, '已通过'), (3, '已驳回'), (4, '待提交'))
     id = models.AutoField(primary_key=True, verbose_name='ID')
@@ -66,8 +68,14 @@ class Bid(models.Model):
     bidding = models.ForeignKey(Research, on_delete=models.CASCADE, verbose_name='课题招标id')
     bidder_date = models.DateField(verbose_name='投标时间', null=True)
     bidder_status = models.IntegerField(choices=BIDDER_STATUS_CHOICE, verbose_name='投标状态', default=0)
-    interim_status = models.IntegerField(choices=BIDDER_STATUS_CHOICE, verbose_name='中期评审状态', default=0)
+    interim_status = models.IntegerField(choices=INTERIM_REVIEW_STATUS_CHOICE, verbose_name='中期评审状态', default=0)
     conclusion_status = models.IntegerField(choices=CONCLUSION_STATUS_CHOICE, verbose_name='结题状态', default=0)
+    bid_trial_date = models.DateTimeField(verbose_name='初审时间', null=True)
+    bid_trial_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='初审用户',
+                                       related_name='bid_trial_user')
+    bid_lix_date = models.DateTimeField(verbose_name='立项时间', null=True)
+    bid_interim_date = models.DateTimeField(verbose_name='中期评审时间', null=True)
+    bid_con_date = models.DateTimeField(verbose_name='结题时间', null=True)
     funds = models.FloatField(verbose_name='申请经费/万元', null=True)
     re_title = models.CharField(max_length=100, verbose_name='课题名称', null=True)
     contacts = models.CharField(max_length=10, verbose_name='课题联系人', null=True)
@@ -183,7 +191,7 @@ class Projects(models.Model):
     """
     STATUS_CHOICE = ((0, '不显示'), (1, '合格'), (2, '待完善'), (3, '审批中'), (4, '不合格'), (5, '删除'))
     id = models.AutoField(primary_key=True, verbose_name='ID')
-    uuid = models.CharField(max_length=32, verbose_name='唯一标识', null=False, unique=True)
+    uuid = models.CharField(max_length=50, verbose_name='唯一标识', null=False, unique=True)
     name = models.CharField(max_length=200, null=False, verbose_name='题名')
     lead_org = models.ManyToManyField(Organization, verbose_name='牵头厅局', related_name='lead_org')
     research = models.ManyToManyField(Organization, verbose_name='研究机构', related_name='research_org')
@@ -444,10 +452,12 @@ class BidEvaluation(models.Model):
     designated_experts = models.ForeignKey(Participant, on_delete=models.CASCADE, null=True, verbose_name='指定专家')
     operate_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, verbose_name='操作账号')
     result = models.CharField(max_length=10, verbose_name="评审结果", null=False, default='无')  # 通过、否决、无
-    stage = models.CharField(max_length=10, verbose_name="阶段", null=False, default="初审")  # 初审、评审、中期、验收
+    stage = models.CharField(max_length=10, verbose_name="阶段", null=False, default="立项")  # 立项、立项终审、中期、验收、验收终审
     remarks = models.TextField(verbose_name="备注", null=True)
     evaluate_attached = models.FileField(verbose_name="附件", null=True, upload_to='bid_evaluation/%Y/%m')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    operate_time = models.DateTimeField(null=True, verbose_name="专家操作时间")
+    is_show = models.BooleanField(default=1, verbose_name="是否显示")
 
     class Meta:
         verbose_name = "课题评审表-针对投标小课题"

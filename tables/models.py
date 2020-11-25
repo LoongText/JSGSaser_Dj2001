@@ -72,7 +72,7 @@ class Bid(models.Model):
     conclusion_status = models.IntegerField(choices=CONCLUSION_STATUS_CHOICE, verbose_name='结题状态', default=0)
     bid_trial_date = models.DateTimeField(verbose_name='初审时间', null=True)
     bid_trial_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='初审用户',
-                                       related_name='bid_trial_user')
+                                       related_name='bid_trial_user', null=True)
     bid_lix_date = models.DateTimeField(verbose_name='立项时间', null=True)
     bid_interim_date = models.DateTimeField(verbose_name='中期评审时间', null=True)
     bid_con_date = models.DateTimeField(verbose_name='结题时间', null=True)
@@ -418,6 +418,7 @@ class User(AbstractUser):
     cell_phone = models.CharField(max_length=11, verbose_name="手机号", null=True)
     certification_materials = models.CharField(max_length=100, verbose_name="证明材料", null=True)  # 从注册表拷贝路径过来
     photo = models.ImageField(upload_to='user/portrait/%Y/%m', verbose_name='头像', null=True)
+    submitter = models.ForeignKey(to='self', verbose_name="提交用户", on_delete=models.CASCADE, null=True)  # 自关联记录是谁创建了这个用户
 
     class Meta:
         verbose_name_plural = '用户信息表'
@@ -451,7 +452,7 @@ class BidEvaluation(models.Model):
     relate_bid = models.ForeignKey(Bid, on_delete=models.CASCADE, null=False, verbose_name='对应投标')
     designated_experts = models.ForeignKey(Participant, on_delete=models.CASCADE, null=True, verbose_name='指定专家')
     operate_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, verbose_name='操作账号')
-    result = models.CharField(max_length=10, verbose_name="评审结果", null=False, default='无')  # 通过、否决、无
+    result = models.IntegerField(verbose_name="评审结果", null=False, default=0)  # 1通过、2否决、0无
     stage = models.CharField(max_length=10, verbose_name="阶段", null=False, default="立项")  # 立项、立项终审、中期、验收、验收终审
     remarks = models.TextField(verbose_name="备注", null=True)
     evaluate_attached = models.FileField(verbose_name="附件", null=True, upload_to='bid_evaluation/%Y/%m')

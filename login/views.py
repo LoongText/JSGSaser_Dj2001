@@ -44,7 +44,11 @@ class LoginView(viewsets.ViewSet):
                 # print('---', user, type(user))
                 user_org = user.org
                 if user_org:
+                    usr_org_id = user_org.id
                     user_org = str(user_org)
+                else:
+                    usr_org_id = 0
+                    user_org = ''
                 # user_par = user.par
                 # if user_par:
                 #     user_par = user_par
@@ -59,7 +63,8 @@ class LoginView(viewsets.ViewSet):
                     nickname = user.username
                 # roles = get_user_org_roles(user.id)
                 res = {"status": 200, "username": user.username, "token": token.key, "userid": user.id,
-                       "groupid_list": group_id_list, "user_org": user_org, "user_nickname": nickname}
+                       "groupid_list": group_id_list, "user_org": user_org, "user_nickname": nickname,
+                       "user_org_id": usr_org_id}
                 add_user_behavior(keyword='', search_con='用户登录', user_obj=user)
             else:
                 res = {'status': 403}
@@ -195,6 +200,27 @@ class RegisterView(viewsets.GenericViewSet, mixins.CreateModelMixin,
                          keyword='注册账号审批失败：{}'.format(e))
         return Response(status=status.HTTP_200_OK)
 
+    # @staticmethod
+    # def update_org_info(org_obj, item_obj):
+    #     """
+    #     同步更新机构信息--有则更新，无则不变
+    #     :param org_obj: 研究人员对象
+    #     :param item_obj:待审批对象
+    #     :return:
+    #     """
+    #     update_dict = dict()
+    #     update_dict["cell_phone"] = item_obj.user.cell_phone
+    #     update_dict["email"] = item_obj.user.email
+    #     update_dict["gender"] = item_obj.gender
+    #     update_dict["birth"] = item_obj.birth
+    #     # 清除字典中值为空的键值对
+    #     for k in list(update_dict.keys()):  # 对字典update_dict中的keys，相当于形成列表list
+    #         if not update_dict[k]:
+    #             del update_dict[k]
+    #     # print(update_dict)
+    #     org_obj.__dict__.update(**update_dict)
+    #     org_obj.save()
+
     @action(methods=['GET'], detail=True)
     def get_verity_file(self, request, pk):
         """
@@ -258,7 +284,7 @@ class RegisterView(viewsets.GenericViewSet, mixins.CreateModelMixin,
             org_info["org_id"] = org_id
         else:
             set_run_info(level='error', address='/login/view.py/RegisterView-set_register_user',
-                         keyword='注册账号审批失败：{}'.format('注册信息中没有机构信用码'))
+                         keyword='注册账号审批失败：注册信息中没有机构信用码')
         return org_info
 
 

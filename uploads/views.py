@@ -2,33 +2,11 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import status
 from tables import models
-from uploads.UploadsSerializer import BaseListSerializer as Bls
-from uploads.UploadsSerializer import BaseCreateSerializer as Cls
-from uploads.UploadsSerializer import BaseUpdateSerializer as Uls
-from uploads.UploadsSerializer import ProListSerializer as Pls
-from uploads.UploadsSerializer import ProRetrieveSerializer as Prs
-from uploads.UploadsSerializer import ProCreateSerializer as Pcs
-from uploads.UploadsSerializer import ProUpdateSerializer as Pus
-from uploads.UploadsSerializer import BidderListSerializer as Bdls
-from uploads.UploadsSerializer import BidderCreateSerializer as Bdcs
-from uploads.UploadsSerializer import BidderUpdateSerializer as Bdus
-from uploads.UploadsSerializer import BidderRetirveSerializer as Bdrs
-from uploads.UploadsSerializer import OrgCreateSerializer as Ocs
-from uploads.UploadsSerializer import OrgRetriveSerializer as Ors
-from uploads.UploadsSerializer import OrgUpdateSerializer as Ous
-from uploads.UploadsSerializer import ParCreateSerializer as Par_cs
-from uploads.UploadsSerializer import ParRetriveSerializer as Par_rs
-from uploads.UploadsSerializer import ParUpdateSerializer as Par_us
-# from uploads.UploadsSerializer import NewsTextListSerializer as New_t
-# from uploads.UploadsSerializer import NewsImageListSerializer as New_i
-from uploads.UploadsSerializer import NewsTextList2Serializer as New_ti
-from uploads.UploadsSerializer import NewsCreateSerializer as New_c
-from uploads.UploadsSerializer import NewsUpdateSerializer as New_u
-from uploads.UploadsSerializer import NewsCreateSerializer as New_r
+from uploads import UploadsSerializer
 from login.auth import ExpiringTokenAuthentication
 from login.views import add_user_behavior
 from uploads.read_pdf import pdf2txtmanager
-import json
+from query.views import get_user_group
 from jsg import settings
 from rest_framework.decorators import action
 from django.db.models import Q
@@ -36,6 +14,7 @@ from query.split_page import SplitPages
 from django.http import StreamingHttpResponse
 from login.views import set_run_info
 import urllib.parse
+import json
 import os
 
 
@@ -48,13 +27,13 @@ class ResearchUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixin
 
     def get_serializer_class(self):
         if self.action == "list":
-            return Bls
+            return UploadsSerializer.BaseListSerializer
         elif self.action == 'create':
-            return Cls
+            return UploadsSerializer.BaseCreateSerializer
         elif self.action == 'update':
-            return Uls
+            return UploadsSerializer.BaseUpdateSerializer
         else:
-            return Cls
+            return UploadsSerializer.BaseCreateSerializer
 
     def create(self, request, *args, **kwargs):
         print(request.data)
@@ -99,13 +78,13 @@ class ProjectsUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixin
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return Pls
+            return UploadsSerializer.ProListSerializer
         elif self.action == 'create':
-            return Pcs
+            return UploadsSerializer.ProCreateSerializer
         elif self.action == 'update':
-            return Pus
+            return UploadsSerializer.ProUpdateSerializer
         else:
-            return Prs
+            return UploadsSerializer.ProRetrieveSerializer
 
     # @requires_auth
     def create(self, request, *args, **kwargs):
@@ -122,13 +101,6 @@ class ProjectsUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixin
             except Exception as e:
                 print('读取文件出错：', e)
             headers = self.get_success_headers(serializer.data)
-            # if request.data.get('user') and request.data.get('user') != 'undefined':
-            #     # -- 记录开始 --
-            #     add_user_behavior(keyword='', search_con='上传成果信息-1：{}'.format(obj.id),
-            #     user_obj=request.data.get('user'))
-            #     # -- 记录结束 --
-            # else:
-            #     add_user_behavior(keyword='', search_con='上传成果信息-1：{}'.format(obj.id))
             return Response({'uuid': obj.uuid, 'id': obj.id}, status=status.HTTP_201_CREATED, headers=headers)
         else:
             headers = self.get_success_headers(serializer.data)
@@ -236,19 +208,13 @@ class ProjectsUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixin
         """
         # print(request.data)
         param_dict = request.data
-        print(param_dict)
+        # print(param_dict)
         uuid = param_dict.get('uuid', '')
-        pro_status = param_dict.get('status', 2)
         par_list = param_dict.get('par_list', [])
 
         # 在成果库中修改记录
         pro_obj = models.Projects.objects.filter(uuid=uuid)
         if pro_obj:
-            # 保存则不变，提交则状态变化和填写发布时间
-            # if pro_status == 3 or pro_status == '3':
-            #     current_date = time.strftime('%Y-%m-%d')
-            #     pro_obj.update(release_date=current_date)
-
             # 根据输入的小组成员信息在人员信息和机构库中创建记录,进而在关系表中创建数据
             if par_list:
                 # print(par_list)
@@ -284,25 +250,25 @@ class ProjectsUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixin
                         par_id = par_obj[0].id
 
                     # 在关系表中建立数据
-                    # roles = settings.ROLES_NAME[par_dict['roles']]
                     roles = par_dict['roles']
                     score = settings.ROLES_SCORE[roles]
                     pro_id = pro_obj[0].id
                     relation_obj = models.ProRelations.objects.filter(pro_id=pro_id, par_id=par_id, org_id=org_id)
 
                     if not relation_obj:
-                        models.ProRelations.objects.create(roles=roles, score=score, speciality=par_dict.get('speciality', ''),
-                                                    job=par_dict.get('job', ''), task=par_dict.get('task', ''),
-                                                    pro_id=pro_id, par_id=par_id, org_id=org_id, is_eft=False)
+                        models.ProRelations.objects.create(
+                            roles=roles,
+                            score=score,
+                            speciality=par_dict.get('speciality', ''),
+                            job=par_dict.get('job', ''),
+                            task=par_dict.get('task', ''),
+                            pro_id=pro_id,
+                            par_id=par_id,
+                            org_id=org_id,
+                            is_eft=False
+                        )
                     else:
                         pass
-                # # -- 记录开始 --
-                # if request.user.is_active:
-                #     add_user_behavior(keyword='',
-                #     search_con='上传成果信息-3：{},{}'.format(uuid, pro_status), user_obj=request.user)
-                # else:
-                #     add_user_behavior(keyword='', search_con='上传成果信息-3：{},{}'.format(uuid, pro_status))
-                # # -- 记录结束 --
                 return Response(status=status.HTTP_200_OK)
             else:
                 # 没有添加小组成员
@@ -322,13 +288,13 @@ class BidderUploadView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
 
     def get_serializer_class(self):
         if self.action == 'create':
-            return Bdcs
+            return UploadsSerializer.BidderCreateSerializer
         elif self.action == 'update':
-            return Bdus
+            return UploadsSerializer.BidderUpdateSerializer
         elif self.action == 'list':
-            return Bdls
+            return UploadsSerializer.BidderListSerializer
         else:
-            return Bdrs
+            return UploadsSerializer.BidderRetirveSerializer
 
     def create(self, request, *args, **kwargs):
         # print('投标data', request.data)
@@ -372,11 +338,11 @@ class OrgManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Upd
 
     def get_serializer_class(self):
         if self.action == 'create':
-            return Ocs
+            return UploadsSerializer.OrgCreateSerializer
         elif self.action == 'update':
-            return Ous
+            return UploadsSerializer.OrgUpdateSerializer
         else:
-            return Ors
+            return UploadsSerializer.OrgRetriveSerializer
 
     def create(self, request, *args, **kwargs):
         print(request.data)
@@ -395,20 +361,6 @@ class OrgManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Upd
         obj = serializer.save()
         return obj
 
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        if getattr(instance, '_prefetched_objects_cache', None):
-            # If 'prefetch_related' has been applied to a queryset, we need to
-            # forcibly invalidate the prefetch cache on the instance.
-            instance._prefetched_objects_cache = {}
-
-        return Response(serializer.data)
-
 
 class ParManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin,
                     mixins.RetrieveModelMixin):
@@ -421,13 +373,13 @@ class ParManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Upd
 
     def get_serializer_class(self):
         if self.action == 'create':
-            return Par_cs
+            return UploadsSerializer.ParCreateSerializer
         elif self.action == 'update':
-            return Par_us
+            return UploadsSerializer.ParUpdateSerializer
         # elif self.action == 'list':
         #     return Par_ls
         else:
-            return Par_rs
+            return UploadsSerializer.ParRetriveSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -470,11 +422,11 @@ class NewsManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Up
     def get_serializer_class(self):
         """必须要完整，否则为报错NoneType"""
         if self.action == 'create':
-            return New_c
+            return UploadsSerializer.NewsCreateSerializer
         elif self.action == 'update':
-            return New_u
+            return UploadsSerializer.NewsUpdateSerializer
         else:
-            return New_r
+            return UploadsSerializer.NewsRetrieveSerializer
 
     @action(methods=['GET'], detail=False)
     def get_news_list(self, request):
@@ -491,13 +443,16 @@ class NewsManageView(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Up
         page_num = self.try_except(page_num, 10)  # 验证返回数量
 
         if tag == 't':
-            data = NewsManageView.queryset.values('id', 'title', 'text_create_time', 'text_attached').order_by('-text_create_time')
+            data = NewsManageView.queryset.values(
+                'id', 'title', 'text_create_time', 'text_attached').order_by('-text_create_time')
         elif tag == 'i':
-            data = NewsManageView.queryset.values('id', 'title', 'image_attached', 'text_create_time').filter(image_attached__isnull=False).exclude(image_attached='').order_by('-text_create_time')
+            data = NewsManageView.queryset.values(
+                'id', 'title', 'image_attached', 'text_create_time').filter(
+                image_attached__isnull=False).exclude(image_attached='').order_by('-text_create_time')
         else:
             # 没有图片的正文，返回全部
             data = NewsManageView.queryset.filter(Q(image_attached__isnull=True) | Q(image_attached='')).order_by('-id')
-            res = New_ti(instance=data, many=True)
+            res = UploadsSerializer.NewsTextList2Serializer(instance=data, many=True)
             return Response(res.data, status=status.HTTP_200_OK)
         if keyword:
             data = data.filter(title__contains=keyword)

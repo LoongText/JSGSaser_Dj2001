@@ -22,11 +22,12 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
     is_active = serializers.SerializerMethodField()
     photo = serializers.SerializerMethodField()
     org = serializers.SerializerMethodField()
+    submitter = serializers.SerializerMethodField()
 
     class Meta:
         model = models.User
         fields = ['id', 'username', 'first_name', 'org', 'par', 'date_joined', 'last_login', 'is_active', 'roles',
-                  'id_card', 'cell_phone', 'email', 'photo']
+                  'id_card', 'cell_phone', 'email', 'photo', 'submitter']
 
     @staticmethod
     def get_roles(obj):
@@ -46,17 +47,14 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_org(obj):
         return obj.org.name if obj.org else None
-    # @staticmethod
-    # def get_org_name(obj):
-    #     """获取认证机构"""
-    #     org_obj = obj.org
-    #     return org_obj.name if org_obj else None
-    #
-    # @staticmethod
-    # def get_par_name(obj):
-    #     """获取认证专家"""
-    #     par_obj = obj.par
-    #     return par_obj.name if par_obj else None
+
+    @staticmethod
+    def get_submitter(obj):
+        submitter = obj.submitter
+        if submitter:
+            return submitter.org.name if submitter.org else None
+        else:
+            return None
 
 
 class UserRegisterListSerializer(serializers.ModelSerializer):

@@ -342,15 +342,28 @@ def user_username_search(request):
     """
     新建用户-用户名是否存在验证
     :param request:
-    :return:
+    :return:0:未找到重复，可以添加，1：有重复，不可添加
     """
     username = request.GET.get('username', '')
+    tag = request.GET.get('tag', 'c')  # 区分是“创建:c”还是“修改:e”--修改的话，判断是不是本身，本身不算重复
+    edit_user_id = request.GET.get('edit_user_id', '')  # 待修改的用户id
     # print(username)
     data = models.User.objects.filter(username=username)
-    if data:
-        return Response(1)
+    if tag == 'c':
+        if data:
+            return Response(1)
+        else:
+            return Response(0)
     else:
-        return Response(0)
+        if data:
+            data_tmp = data.filter(id=edit_user_id)
+            if data_tmp:
+                # 是同一用户修改-原名
+                return Response(0)
+            else:
+                return Response(1)
+        else:
+            return Response(0)
 
 
 @api_view(['GET'])
@@ -363,13 +376,23 @@ def user_id_card_search(request):
     # print(request.GET)
     id_card = request.GET.get('id_card', '')
     roles = int(request.GET.get('roles', ''))
+    tag = request.GET.get('tag', 'c')  # 区分是“创建:c”还是“修改:e”--修改的话，判断是不是本身，本身不算重复
+    edit_user_id = request.GET.get('edit_user_id', '')  # 待修改的用户id
     if roles in [settings.FIRST_LEVEL_MANAGER_GROUP, settings.GENERAL_ORG_GROUP]:
         # 机构用户
         data = models.User.objects.filter(id_card=id_card, org__id__isnull=False)
     else:
         data = models.User.objects.filter(id_card=id_card)
     if data:
-        return Response(1)
+        if tag == 'c':
+            return Response(1)
+        else:
+            data_tmp = data.filter(id=edit_user_id)
+            if data_tmp:
+                # 是同一用户修改-原名
+                return Response(0)
+            else:
+                return Response(1)
     else:
         return Response(0)
 

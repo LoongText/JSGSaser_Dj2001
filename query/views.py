@@ -1408,47 +1408,57 @@ class ParQueryView(viewsets.ViewSet):
             serialier_param.save()
         except AttributeError as e:
             set_run_info(level='error', address='/query/view.py/ParQueryView-set_par_re_pro',
-                         user=user_id, keyword='研究人员认证成果：{}'.format(e))
+                         user=user_id, keyword='研究人员认证成果失败：{}'.format(e))
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_201_CREATED)
+
+    @action(methods=['post'], detail=True)
+    def del_par_re_pro(self, request, pk):
+        """
+        研究人员认证成果--删除
+        :param pk
+        :return:
+        """
+        try:
+            models.ParRePro.objects.filter(id=pk).delete()
+        except AttributeError as e:
+            set_run_info(level='error', address='/query/view.py/ParQueryView-del_par_re_pro',
+                         keyword='删除研究人员认证成果失败：{}'.format(e))
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_201_CREATED)
 
     @action(methods=['get'], detail=False)
     def get_par_pro_list(self, request):
         """
-        个人参与的成果展示、包括认证的
+        个人认证成果列表展示
         :return:
         """
-        page = request.query_params.get('page', 1)
-        page_num = request.query_params.get('page_num', 10)
-        # kw = request.query_params.get('kw')
-        user = request.user
+        tag = request.query_params.get('tag', 'personal')  # personal：个人访问manager：通过列表访问
+        if tag == 'personal':
+            user = request.user
+            if type(user) == AnonymousUser:
+                set_run_info(level='error', address='/query/view.py/ParQueryView-get_par_pro_list',
+                             keyword='获取个人参与的成果展示失败：获取不到user')
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        if type(user) == AnonymousUser:
-            set_run_info(level='error', address='/query/view.py/ParQueryView-get_par_pro_list',
-                         keyword='获取个人参与的成果展示失败：获取不到user')
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        if user.par:
-            par_id = user.par.id
+            if user.par:
+                par_id = user.par.id
+            else:
+                set_run_info(level='error', address='/query/view.py/ParQueryView-get_par_pro_list',
+                             keyword='获取个人参与的成果展示失败：获取不到par')
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        elif tag == 'manager':
+            par_id = request.query_params.get('par_id')
+            par_id = self.try_except(par_id, -1)
         else:
             set_run_info(level='error', address='/query/view.py/ParQueryView-get_par_pro_list',
-                         keyword='获取个人参与的成果展示失败：获取不到par')
+                         keyword='获取个人参与的成果展示失败：tag参数值错误')
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        page = self.try_except(page, 1)  # 验证页码
-        page_num = self.try_except(page_num, 10)  # 验证每页的数量
-
-        data1 = models.ProRelations.objects.values(
-            'pro__uuid', 'pro__name', 'pro__key_word', 'pro_source').filter(par=par_id, is_eft=True)
-        data2 = models.ParRePro.objects.values(
-            'id', 'pro__uuid', 'pro__name', 'pro__key_word', 'support_materials').filter(par=par_id)
-        data = []
-        data.extend(data1)
-        data.extend(data2)
-
-        sp = SplitPages(data, page, page_num)
-        res = sp.split_page()
-        return Response(res, status=status.HTTP_200_OK)
+        data = models.ParRePro.objects.values(
+            'id', 'pro__id', 'pro__uuid', 'pro__name', 'pro__key_word', 'support_materials', 'pro__pro_source'
+        ).filter(par=par_id)
+        return Response(data, status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=False)
     def apply_par_to_vip(self, request):
@@ -1492,10 +1502,13 @@ class ParQueryView(viewsets.ViewSet):
         page = self.try_except(page, 1)  # 验证页码
         page_num = self.try_except(page_num, 10)  # 验证每页的数量
 
-        data = models.ParToVIP.objects.values('id', 'par__name', 'created_date').filter(result=result)
+        data = models.ParToVIP.objects.values('id', 'par__id', 'par__name', 'created_date', 'result'
+                                              ).filter(result=result)
 
         sp = SplitPages(data, page, page_num)
         res = sp.split_page()
+        for i in range(len(res['res'])):
+            res['res'][i]['result'] = settings.REGISTER_APPROVAL_RESULT.get(res['res'][i]['result'], -1)
         return Response(res, status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True)
@@ -1596,19 +1609,47 @@ class ParQueryView(viewsets.ViewSet):
         :param request:
         :return:
         """
-        page = request.query_params.get('page', 1)
-        page_num = request.query_params.get('page_num', 10)
         kw = request.query_params.get('kw')
-
-        page = self.try_except(page, 1)  # 验证页码
-        page_num = self.try_except(page_num, 10)  # 验证每页的数量
 
         data = models.Projects.objects.values('id', 'name').filter(status=1)
         if kw:
             data = data.filter(name__contains=kw)
-        sp = SplitPages(data, page, page_num)
-        res = sp.split_page()
-        return Response(res, status=status.HTTP_200_OK)
+
+        return Response(data, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=False)
+    def get_tovip_status(self, request):
+        # 获取审批状态
+        tag = request.query_params.get('tag', 'personal')  # personal：个人访问manager：通过列表访问
+        remarks = ''
+        if tag == 'personal':
+            user = request.user
+            if type(user) == AnonymousUser:
+                set_run_info(level='error', address='/query/view.py/ParQueryView-get_par_pro_list',
+                             keyword='获取个人参与的成果展示失败：获取不到user')
+                return Response({"result": 400, 'remarks': remarks}, status=status.HTTP_200_OK)
+
+            if user.par:
+                par_id = user.par.id
+            else:
+                set_run_info(level='error', address='/query/view.py/ParQueryView-get_tovip_status',
+                             keyword='获取个人参与的成果展示失败：获取不到par')
+                return Response({"result": 400, 'remarks': remarks}, status=status.HTTP_200_OK)
+        elif tag == 'manager':
+            par_id = request.query_params.get('par_id')
+            par_id = self.try_except(par_id, -1)
+        else:
+            set_run_info(level='error', address='/query/view.py/ParQueryView-get_tovip_status',
+                         keyword='获取个人参与的成果展示失败：tag参数值错误')
+            return Response({"result": 400, 'remarks': remarks}, status=status.HTTP_200_OK)
+
+        sp_status_obj = models.ParToVIP.objects.values('result', 'remarks').filter(par=par_id).order_by('-created_date').first()
+        if sp_status_obj:
+            sp_status = sp_status_obj['result']
+            remarks = sp_status_obj['remarks']
+            return Response({"result": sp_status, 'remarks': remarks}, status=status.HTTP_200_OK)
+        else:
+            return Response({"result": 404, 'remarks': remarks}, status=status.HTTP_200_OK)
     # --- 升级专家结束-
 
 
@@ -1666,8 +1707,6 @@ class OrgQueryView(viewsets.ViewSet):
         page_num = request.query_params.get('page_num', 8)
         unit = request.query_params.get('unit', '')
         org_id = request.query_params.get('org_id', 0)
-        # a_b = request.query_params.get('roles', 'b')
-        # print(request.query_params)
         page = self.try_except(page, 1)  # 验证页码
         page_num = self.try_except(page_num, 8)  # 验证每页的数量
         org_id = self.try_except(org_id, 0)  # 验证id
@@ -1773,7 +1812,7 @@ class MyUserView(viewsets.ViewSet):
         page = self.try_except(page, 1)  # 验证类型
         page_num = self.try_except(page_num, 10)  # 验证返回数量
 
-        data = models.User.objects.values('id', 'username', 'first_name', 'is_active').order_by('-id')
+        data = models.User.objects.values('id', 'username', 'first_name', 'is_active', 'org__name').order_by('-id')
 
         # -- 权限开始 --
         user = request.user
@@ -1832,13 +1871,17 @@ class MyUserView(viewsets.ViewSet):
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    @staticmethod
-    def create(request):
+    def create(self, request):
         """
         创建用户
         :param request:
         :return:
         """
+        user = request.user
+        if type(user) == AnonymousUser:
+            set_run_info(level='error', address='/query/view.py/MyUserView-create',
+                         keyword='创建用户失败：获取不到user')
+            return Response({"msg": "创建成功", "status": 400}, status=status.HTTP_200_OK)
         param_dict = request.data
         id_card = param_dict.get('id_card')  # 身份证号
         first_name = param_dict.get('first_name')  # 真实姓名
@@ -1846,7 +1889,6 @@ class MyUserView(viewsets.ViewSet):
         password = param_dict.get('password')
         org_id = param_dict.get('org_id', 0)
         org_name = param_dict.get('org')
-        par_id = param_dict.get('par_id')
         roles = int(param_dict.get('roles', 0))  # 角色
         phone = param_dict.get('phone')  # 手机号
         email = param_dict.get('email')  # 邮箱
@@ -1872,12 +1914,12 @@ class MyUserView(viewsets.ViewSet):
                 return Response({"msg": "找不到机构", "status": 404}, status=status.HTTP_200_OK)
         elif roles in [settings.EXPERT_PER_GROUP]:
             # 验证人员存在
-            par_obj_list = models.Participant.objects.filter(id=par_id)
-            if par_obj_list:
-                par_obj = par_obj_list[0]
-            else:
+            par_info = self.choose_or_create_par(user)
+            par_id = par_info.get("par_id")
+            if par_id == '-1':
                 # 人员不存在
                 return Response({"msg": "找不到人员", "status": 404}, status=status.HTTP_200_OK)
+            par_obj = models.Participant.objects.get(id=par_id)
 
         password_end = make_password(password, None, 'pbkdf2_sha256')  # 源字符串，固定字符串，加密方式
         try:
@@ -1889,7 +1931,8 @@ class MyUserView(viewsets.ViewSet):
                 id_card=id_card,
                 cell_phone=phone,
                 email=email,
-                par=par_obj
+                par=par_obj,
+                submitter=user
             )
             # 添加组
             if roles:
@@ -1909,41 +1952,59 @@ class MyUserView(viewsets.ViewSet):
                          user=request.user.id, keyword='新增用户信息失败：{}'.format(e))
             return Response({"msg": "创建失败", "status": 500}, status=status.HTTP_200_OK)
 
-    @staticmethod
-    def put(request):
+    def put(self, request):
         """
         用户信息修改
         :param request:
         :return:
         """
+        user = request.user
+        if type(user) == AnonymousUser:
+            set_run_info(level='error', address='/query/view.py/MyUserView-put',
+                         keyword='用户信息修改失败：获取不到user')
+            return Response({"result": 400, 'remarks': "未获取到操作用户"}, status=status.HTTP_200_OK)
         param_dict = request.data
         user_id = param_dict.get('user_id')
         is_active = param_dict.get('is_active', 1)
         phone = param_dict.get('phone')  # 手机号
         email = param_dict.get('email')  # 邮箱
         photo = request.FILES.get('photo')  # 头像
+        id_card = param_dict.get('id_card')  # 身份证号-超管可修改
+        first_name = param_dict.get('first_name')  # 真实姓名-超管、平台管理员可修改
+        username = param_dict.get('username')  # 用户名-超管可修改
         # print(param_dict)
+        group_id_list = get_user_group(user)
+        group_id = group_id_list[0] if group_id_list else 0
+        # print(group_id_list)
 
         try:
-            if photo:
-                current_year = datetime.datetime.now().year
-                current_month = '{:02d}'.format(datetime.datetime.now().month)
-                photo_save_path_dirs = os.path.join(settings.MEDIA_ROOT, 'user/', 'portrait/',
-                                                    '{}/'.format(current_year), '{}/'.format(current_month))
-                file_obj = UploadFile(photo_save_path_dirs, photo)
-                photo_name_fin = file_obj.handle()
-
+            user_update_obj = models.User.objects.filter(id=user_id)
+            if user_update_obj:
+                id_card_fin = self._general_validate_method(group_id, user_update_obj[0].id_card, id_card,
+                                                            [user.is_superuser, settings.SUPER_USER_GROUP])
+                username_fin = self._general_validate_method(group_id, user_update_obj[0].username, username,
+                                                             [user.is_superuser, settings.SUPER_USER_GROUP])
+                first_name_fin = self._general_validate_method(group_id, user_update_obj[0].first_name, first_name,
+                                                               [user.is_superuser, settings.SUPER_USER_GROUP, settings.PLANT_MANAGER_GROUP])
+                if photo:
+                    current_year = datetime.datetime.now().year
+                    current_month = '{:02d}'.format(datetime.datetime.now().month)
+                    photo_save_path_dirs = os.path.join(settings.MEDIA_ROOT, 'user/', 'portrait/',
+                                                        '{}/'.format(current_year), '{}/'.format(current_month))
+                    file_obj = UploadFile(photo_save_path_dirs, photo)
+                    photo_name_fin = file_obj.handle()
+                    photo_fin = 'user/portrait/{}/{}/{}'.format(current_year, current_month, photo_name_fin)
+                else:
+                    photo_fin = user_update_obj[0].photo
+                # print(username_fin)
                 models.User.objects.filter(id=user_id).update(
                     cell_phone=phone,
                     is_active=is_active,
                     email=email,
-                    photo='user/portrait/{}/{}/{}'.format(current_year, current_month, photo_name_fin)
-                )
-            else:
-                models.User.objects.filter(id=user_id).update(
-                    cell_phone=phone,
-                    is_active=is_active,
-                    email=email,
+                    first_name=first_name_fin,
+                    username=username_fin,
+                    id_card=id_card_fin,
+                    photo=photo_fin
                 )
             # -- 记录开始 --
             add_user_behavior(keyword='', search_con='编辑用户信息({}):{}'.format(user_id, str(param_dict)),
@@ -1955,6 +2016,22 @@ class MyUserView(viewsets.ViewSet):
                          user=request.user.id, keyword='编辑用户信息失败：{}'.format(e))
             return Response({"msg": "编辑失败", "status": 500}, status=status.HTTP_200_OK)
 
+    @staticmethod
+    def _general_validate_method(group_id, ori_attrs, new_attrs, compare_list):
+        """
+        验证通用方法--简化步骤
+        :param group_id: 用户角色id
+        :param ori_attrs: 原值
+        :param new_attrs: 接收值
+        :param compare_list: 允许修改角色id列表
+        :return: 最终修改值
+        """
+        if group_id in compare_list:
+            return new_attrs
+        else:
+            return ori_attrs
+
+    # --- 研究人员认证开始 ---
     @action(methods=['post'], detail=False)
     def apply_user_to_par(self, request):
         """
@@ -2101,22 +2178,25 @@ class MyUserView(viewsets.ViewSet):
         :param user_obj: 申请用户对象
         :return:{"msg": 成功标志, "par_id": par对应id}
         """
-        par_id_card_code = user_obj.id_card
+        # par_id_card_code = user_obj.id_card
+        par_first_name = user_obj.first_name
         par_info = {"msg": 0, "par_id": -1}
-        if par_id_card_code:
-            par_obj = models.Participant.objects.filter(id_card=par_id_card_code)
+        if par_first_name:
+            par_obj = models.Participant.objects.filter(first_name=par_first_name)
+        # if par_id_card_code:
+        #     par_obj = models.Participant.objects.filter(id_card=par_id_card_code)
             if par_obj:
                 # 人员库里面有直接挂
                 par_id = par_obj.first().id
             else:
-                # 人员库里面没有啧创建
-                par_obj_tmp = models.Participant.objects.create(id_card=par_id_card_code, name=user_obj.first_name)
+                # 人员库里面没有则创建
+                par_obj_tmp = models.Participant.objects.create(id_card=user_obj.id_card, name=user_obj.first_name)
                 par_id = par_obj_tmp.id
             par_info["msg"] = 1
             par_info["par_id"] = par_id
         else:
             set_run_info(level='error', address='/login/view.py/RegisterView-set_register_user',
-                         keyword='注册账号审批失败：{}'.format('注册信息中没有机构信用码'))
+                         keyword='注册账号审批失败：注册信息中没有机构信用码')
         return par_info
 
     @staticmethod
@@ -2188,6 +2268,7 @@ class MyUserView(viewsets.ViewSet):
                     yield c
                 else:
                     break
+    # --- 研究人员认证结束 ---
 
 
 class HotWordsView(viewsets.ViewSet):
